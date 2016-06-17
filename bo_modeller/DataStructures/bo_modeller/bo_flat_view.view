@@ -1,0 +1,4 @@
+{
+  "viewName":"BO_FLAT_VIEW",
+  "query":"SELECT * FROM BO_HEADER, BO_ITEMS WHERE BOH_ID = BOI_BOH_ID"
+}
