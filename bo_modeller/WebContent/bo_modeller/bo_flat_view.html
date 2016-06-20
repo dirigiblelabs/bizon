@@ -25,35 +25,28 @@
 			<table class="table table-condensed table-striped table-hover">
 				<thead>
 					<tr>
-						<th>BO ID</th> 
 						<th>BO Name</th> 
 						<th>BO Table</th> 
-						<th>Item ID</th> 
 						<th>Item Name</th> 
 						<th>Item Column</th> 
 						<th>Item Type</th> 
-						<th>Item Length</th> 
-						<th>Item Null?</th> 
 						<th>Item Primary Key?</th> 
-						<th>Item Default Value</th> 
 					</tr>
 				</thead>
 				<tbody>
-					<tr ng-repeat="entry in data" ng-click="showInfoForEntry(entry)">
-						<td>{{entry.boh_id}}</td>
-						<td>{{entry.boh_name}}</td>
-						<td>{{entry.boh_table}}</td>
-						<td>{{entry.boi_id}}</td>
+					<tr ng-repeat-start="(key, value) in data | groupBy: 'boh_id'" ng-click="showInfoForEntry(value[0])">
+						<td rowspan="{{value.length+1}}">{{value[0].boh_name}}</td>
+						<td rowspan="{{value.length+1}}">{{value[0].boh_table}}</td>
+				    </tr>
+				    <tr ng-repeat-end ng-repeat='entry in value' ng-click="showInfoForEntry(entry)">
 						<td>{{entry.boi_name}}</td>
 						<td>{{entry.boi_column}}</td>
-						<td>{{entry.boi_type}}</td>
-						<td>{{entry.boi_length}}</td>
-						<td>{{entry.boi_null}}</td>
-						<td>{{entry.boi_pk}}</td>
-						<td>{{entry.boi_default}}</td>
-					</tr>
+						<td>{{entry.boi_type=1?'Integer':entry.boi_type}}</td>
+						<td>{{entry.boi_pk==0?'No':'Yes'}}</td>
+				    </tr>
 				</tbody>
 			</table>
+
 			<table class="table table-bordered" ng-show="showEntry">
 				<thead>
 					<tr>
@@ -116,9 +109,11 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular-resource.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular-animate.min.js"></script>
 	<script src="https://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.14.3.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-filter/0.5.8/angular-filter.js"></script>
 
 	<script type="text/javascript">
 		angular.module('page', ['ngAnimate', 'ui.bootstrap']);
+		angular.module('page', ['angular.filter']);
 		angular.module('page').controller('ListAndDetailsController', function ($scope, $http) {
 			
 			var url = '../../js/bo_modeller/bo_flat_view.js';
