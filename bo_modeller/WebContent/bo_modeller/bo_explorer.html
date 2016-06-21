@@ -84,7 +84,7 @@
 			</div>
 			<br>
 			<br>
-			<div ng-show="bo_header_details_show">
+			<div ng-show="details_show">
 				<!-- input form -->
 				<div>
 					<label>ID</label>
@@ -119,115 +119,120 @@
 		</div>
 		
 		<!-- BO Items -->
-		<div ng-show="selectedEntry">
-			<div class="row">
-				<div class="col-lg-12">
-			    	<h1 class="page-header">Business Object Items</h1>
-				</div>
-			</div>
-			<div class="container">
-				<div class="alert alert-danger" ng-show="BOI_errorMessage">{{BOIerrorMessage}}</div>
-				<!-- entities table -->
-				<table class="table table-condensed">
-					<thead>
-						<tr>
-							<th>ID</th>
-							<th>BOH_ID</th>
-							<th>Name</th>
-							<th>Column</th>
-							<th>Type</th>
-							<th>Length</th>
-							<th>Null?</th>
-							<th>Primary Key?</th>
-							<th>Default Value</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr class="selected-{{item._selected_}}" ng-repeat="item in selectedEntry.items"
-							ng-click="showInfoForEntry(item)">
-							<td>{{item.boi_id}}</td>
-							<td>{{item.boi_boh_id}}</td>
-							<td>{{item.boi_name}}</td>
-							<td>{{item.boi_column}}</td>
-							<td>{{item.boi_type}}</td>
-							<td>{{item.boi_length}}</td>
-							<td>{{item.boi_null}}</td>
-							<td>{{item.boi_pk}}</td>
-							<td>{{item.boi_default}}</td>
-						</tr>
-					</tbody>
-				</table>
-				<hr>
-				<br>
-				<!-- new, edit and delete buttons -->
-				<div class="btn-group">
-					<input class="btn btn-default" type="button" value="New"
-						ng-click="setOperation('new')"
-						ng-disabled="errorMessage || operation == 'new' || operation == 'update'"> <input
-						class="btn btn-default" type="button" value="Edit"
-						ng-click="setOperation('update')"
-						ng-disabled="errorMessage || operation == 'new' || operation == 'update'"> <input
-						class="btn btn-default" type="button" value="Delete"
-						ng-click="delete()"
-						ng-disabled="errorMessage || operation == 'new' || operation == 'update'">
-				</div>
-				<br>
-				<br>
-				<div ng-show="bo_item_details_show">
-					<!-- input form -->
-					<div>
-						<label>ID</label>
-						<input type="text" class="form-control" 
-							ng-model="selectedEntry.boi_id" readonly> <br>
-						<br>
-						<label>BOH_ID</label>
-						<input type="number" class="form-control" 
-							ng-model="selectedEntry.boi_boh_id"
-							ng-readonly="operation == 'show'" required="required"></textarea>
-						<br>
-						<label>Name</label>
-						<input type="text" class="form-control" 
-							ng-model="selectedEntry.boi_name"
-							ng-readonly="operation == 'show'" required="required">
-						<br>
-						<label>Column</label>
-						<input type="text" class="form-control" 
-							ng-model="selectedEntry.boi_column"
-							ng-readonly="operation == 'show'" required="required">
-						<br>
-						<label>Type</label>
-						<input type="number" class="form-control" 
-							ng-model="selectedEntry.boi_type"
-							ng-readonly="operation == 'show'" required="required"></textarea>
-						<br>
-						<label>Length</label>
-						<input type="number" class="form-control" 
-							ng-model="selectedEntry.boi_length"
-							ng-readonly="operation == 'show'" required="required"></textarea>
-						<br>
-						<label>Null?</label>
-						<input type="number" class="form-control" 
-							ng-model="selectedEntry.boi_null"
-							ng-readonly="operation == 'show'" required="required"></textarea>
-						<br>
-						<label>Primary Key?</label>
-						<input type="number" class="form-control" 
-							ng-model="selectedEntry.boi_pk"
-							ng-readonly="operation == 'show'" required="required"></textarea>
-						<br>
-						<label>Default Value</label>
-						<input type="text" class="form-control" 
-							ng-model="selectedEntry.boi_default"
-							ng-readonly="operation == 'show'" required="required">
-						<br>
+		<div ng-controller="ItemsController">
+			<div ng-show="$parent.selectedEntry">
+				<div class="row">
+					<div class="col-lg-12">
+						<h1 class="page-header">Business Object Items</h1>
 					</div>
-					
-					<!-- save and cancel buttons -->
+				</div>
+				<div class="container">
+					<div class="alert alert-danger" ng-show="BOI_errorMessage">{{BOIerrorMessage}}</div>
+					<!-- entities table -->
+					<table class="table table-condensed">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>BOH_ID</th>
+								<th>Name</th>
+								<th>Column</th>
+								<th>Type</th>
+								<th>Length</th>
+								<th>Null?</th>
+								<th>Primary Key?</th>
+								<th>Default Value</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="selected-{{item._selected_}}" ng-repeat="item in data"
+								ng-click="showInfoForEntry(item)">
+								<td>{{item.boi_id}}</td>
+								<td>{{item.boi_boh_id}}</td>
+								<td>{{item.boi_name}}</td>
+								<td>{{item.boi_column}}</td>
+								<td>{{item.boi_type}}</td>
+								<td>{{item.boi_length}}</td>
+								<td>{{item.boi_null}}</td>
+								<td>{{item.boi_pk}}</td>
+								<td>{{item.boi_default}}</td>
+							</tr>
+						</tbody>
+					</table>
+					<hr>
+					<br>
+					<!-- new, edit and delete buttons -->
 					<div class="btn-group">
-						<input class="btn btn-primary" type="button" value="Save" ng-show="operation == 'new' || operation == 'update'"
-							ng-click="confirmAction()"> 
-						<input class="btn btn-default" type="button" value="Cancel" ng-show="operation == 'new' || operation == 'update'"
-							ng-click="cancelAction()">
+						<input class="btn btn-default" type="button" value="New"
+							ng-click="setOperation('new')"
+							ng-disabled="errorMessage || operation == 'new' || operation == 'update'"> <input
+							class="btn btn-default" type="button" value="Edit"
+							ng-click="setOperation('update')"
+							ng-disabled="errorMessage || operation == 'new' || operation == 'update'"> <input
+							class="btn btn-default" type="button" value="Delete"
+							ng-click="delete()"
+							ng-disabled="errorMessage || operation == 'new' || operation == 'update'"> <input
+							class="btn btn-default" type="button" value="Details"
+							ng-click="details()"
+							ng-disabled="errorMessage || operation == 'new' || operation == 'update'">
+					</div>
+					<br>
+					<br>
+					<div ng-show="details_show">
+						<!-- input form -->
+						<div>
+							<label>ID</label>
+							<input type="text" class="form-control" 
+								ng-model="selectedEntry.boi_id" readonly> <br>
+							<br>
+							<label>BOH_ID</label>
+							<input type="number" class="form-control" 
+								ng-model="selectedEntry.boi_boh_id"
+								ng-readonly="operation == 'show'" required="required">
+							<br>
+							<label>Name</label>
+							<input type="text" class="form-control" 
+								ng-model="selectedEntry.boi_name"
+								ng-readonly="operation == 'show'" required="required">
+							<br>
+							<label>Column</label>
+							<input type="text" class="form-control" 
+								ng-model="selectedEntry.boi_column"
+								ng-readonly="operation == 'show'" required="required">
+							<br>
+							<label>Type</label>
+							<input type="number" class="form-control" 
+								ng-model="selectedEntry.boi_type"
+								ng-readonly="operation == 'show'" required="required">
+							<br>
+							<label>Length</label>
+							<input type="number" class="form-control" 
+								ng-model="selectedEntry.boi_length"
+								ng-readonly="operation == 'show'" required="required">
+							<br>
+							<label>Null?</label>
+							<input type="number" class="form-control" 
+								ng-model="selectedEntry.boi_null"
+								ng-readonly="operation == 'show'" required="required">
+							<br>
+							<label>Primary Key?</label>
+							<input type="number" class="form-control" 
+								ng-model="selectedEntry.boi_pk"
+								ng-readonly="operation == 'show'" required="required">
+							<br>
+							<label>Default Value</label>
+							<input type="text" class="form-control" 
+								ng-model="selectedEntry.boi_default"
+								ng-readonly="operation == 'show'" required="required">
+							<br>
+						</div>
+						
+						<!-- save and cancel buttons -->
+						<div class="btn-group">
+							<input class="btn btn-primary" type="button" value="Save" ng-show="operation == 'new' || operation == 'update'"
+								ng-click="confirmAction()"> 
+							<input class="btn btn-default" type="button" value="Cancel" ng-show="operation == 'new' || operation == 'update'"
+								ng-click="cancelAction()">
+						</div>
 					</div>
 				</div>
 			</div>
@@ -241,22 +246,22 @@
 
 	<script type="text/javascript">
 		angular.module('page', ['ngAnimate', 'ui.bootstrap']);
-		angular.module('page').controller('ManageController', function ($scope, $http) {
-			
-			var url = '../../js/bo_modeller/bo_header.js';
-			var items_svc_url = '../../js/bo_modeller/bo_item.js';
-
-			$http.get(url)
-			.success(function(data){
-				$scope.data = data;
-			});
-			
+		angular.module('page')
+		.constant("config", {
+			"masterSvcUrl": "../../js/bo_modeller/bo_header.js",
+			"detailsSvcUrl": "../../js/bo_modeller/bo_item.js"
+		});
+		angular.module('page').controller('ManageController', function ($scope, config, $http) {
+						
 			$scope.selectedEntry;
             $scope.operation = 'show';
             $scope.errorMessage = null;
-            $scope.bo_header_details_show = false;
-            
-            $scope.bo_item_details_show = false;
+            $scope.details_show = false;
+			
+			$http.get(config.masterSvcUrl)
+			.success(function(data){
+				$scope.data = data;
+			});
 			
 			$scope.showInfoForEntry = function(entry) {
 				if($scope.operation==='show'){
@@ -273,7 +278,7 @@
 						$scope.selectedEntry = entry;
 						if(!entry.items){
 							//TODO: cosntruct the corect relationship and take care for stale data
-							$http.get(items_svc_url)
+							$http.get(config.detailsSvcUrl)
 							.success(function(data){
 								entry.items = data;
 							});
@@ -287,7 +292,7 @@
                           case 'new':
                               if ($scope.operation !== 'new') {
                             	  $scope.selectedEntry = null;
-                            	  $scope.bo_header_details_show = true;
+                            	  $scope.details_show = true;
                                   $scope.operation = 'new';
                               } else {
                                   $scope.operation = 'show';
@@ -296,7 +301,7 @@
                           case 'update':
                                if ($scope.operation !== 'update') {
                               	 if ($scope.selectedEntry) {
-                              	 	   $scope.bo_header_details_show = true;
+                              	 	   $scope.details_show = true;
                                        $scope.operation = 'update';
                                    } else {
                                        alert("Please first select entry for updated");
@@ -308,7 +313,7 @@
                               break;
                           case 'delete':
                               if ($scope.operation !== 'delete') {
-                              	  $scope.bo_header_details_show = true;
+                              	  $scope.details_show = true;
                                   $scope.operation = 'delete';
                               } else {
                                   $scope.operation = 'show';
@@ -350,11 +355,8 @@
 				}
 			};
 			
-			 $scope.details = function(scope) {
-			 	if(!scope)
-                	$scope.bo_header_details_show = !$scope.bo_header_details_show;
-                else 
-                	$scope.bo_item_details_show = !$scope.bo_item_details_show;
+			$scope.details = function() {
+               	$scope.details_show = !$scope.details_show;
             };
                     
 			function newEntry(entry){
@@ -420,34 +422,173 @@
 
 			
 		});
+		angular.module('page').controller('ItemsController', function ($scope, config, $http) {
+			$scope.selectedEntry;
+            $scope.operation = 'show';
+            $scope.errorMessage = null;
+            $scope.details_show = false;
+			
+			$http.get(config.detailsSvcUrl)
+			.success(function(data){
+				$scope.data = data;
+			});
+			
+			$scope.showInfoForEntry = function(entry) {
+				if($scope.operation==='show'){
+					if($scope.selectedEntry === entry){
+						$scope.showEntry = false;
+						$scope.selectedEntry = null;
+						entry._selected_ = false;
+					}else{
+						for(var i = 0 ; i < $scope.data.length; i ++){
+							$scope.data[i]._selected_ = false;
+						}
+						entry._selected_ = true;
+						$scope.showEntry = true;
+						$scope.selectedEntry = entry;
+					}
+				}
+			};
+					
+			$scope.setOperation = function(operation) {
+                      switch (operation) {
+                          case 'new':
+                              if ($scope.operation !== 'new') {
+                            	  $scope.selectedEntry = null;
+                            	  $scope.details_show = true;
+                                  $scope.operation = 'new';
+                              } else {
+                                  $scope.operation = 'show';
+                              }
+                              break;
+                          case 'update':
+                               if ($scope.operation !== 'update') {
+                              	 if ($scope.selectedEntry) {
+                              	 	   $scope.details_show = true;
+                                       $scope.operation = 'update';
+                                   } else {
+                                       alert("Please first select entry for updated");
+                                       $scope.operation = 'show';
+                                   }
+                              } else {
+                                  $scope.operation = 'show';
+                              }
+                              break;
+                          case 'delete':
+                              if ($scope.operation !== 'delete') {
+                              	  $scope.details_show = true;
+                                  $scope.operation = 'delete';
+                              } else {
+                                  $scope.operation = 'show';
+                              }
+                              break;
+                          default:
+                              $scope.operation = 'show';
+                              break;
+                       }
+            };
+                   
+            $scope.confirmAction = function() {
+                switch($scope.operation){
+                    case 'show':
+                        break;
+                    case 'new':
+                        newEntry($scope.selectedEntry);
+                        break;
+                    case 'update':
+                        updateEntry($scope.selectedEntry);
+                        break;
+                }
+            };
+
+            $scope.cancelAction = function() {
+                refreshData();
+            };
+
+			$scope.delete = function() {
+        	   	if($scope.selectedEntry) {
+                 	var confirmed = confirm('Do you realy want to delete the selected entry?');
+	               	if(confirmed) {
+	                   	delete $scope.selectedEntry._selected_;
+	                       deleteEntry($scope.selectedEntry);
+	                       $scope.operation = 'show';
+	               	}                    	
+               	} else {
+                   	alert('Please select row from the table.');
+				}
+			};
+			
+			$scope.details = function() {
+               	$scope.details_show = !$scope.details_show;
+            };
+                    
+			function newEntry(entry){
+				delete $scope.selectedEntry._selected_;
+				$http.post(url, entry)
+				.success(function(){
+					refreshData();
+					$scope.selectedEntry = null;
+                    $scope.operation = 'show';
+                    $scope.errorMessage = null;
+				})
+				.error(function(response){
+					$scope.errorMessage = response.err.message;
+				});
+			}
+			
+			function updateEntry(entry){
+				delete $scope.selectedEntry._selected_;
+				$http.put(url, entry)
+					.success(function(){
+						refreshData();
+	                    $scope.operation = 'show';
+	                    $scope.errorMessage = null;
+					})
+					.error(function(response){
+						$scope.errorMessage = response.err.message;
+					});
+			}
+
+			function deleteEntry(entry){
+				var primaryKey;
+				primaryKey = "boh_id";
+				var deleteUrl = url+"?"+primaryKey+"="+entry[primaryKey];
+				$http.delete(deleteUrl)
+				.success(function(){
+					refreshData();
+                    $scope.selectedEntry = null;
+					$scope.errorMessage = null;
+				})
+				.error(function(response){
+					$scope.errorMessage = response.err.message;
+				});
+			}
+                    
+			function refreshData(){
+				$http.get(url)
+				.success(function(data){
+					$scope.data = data;
+                    $scope.selectedEntry = null;
+                    $scope.operation = 'show';
+                    $scope.errorMessage = null;
+				})
+				.error(function(response){
+					$scope.errorMessage = response.err.message;
+				});
+			}
+			
+			$scope.dateOptions = {
+				startingDay: 1
+			};
+			$scope.formats = ['yyyy/MM/dd', 'dd-MMMM-yyyy', 'dd.MM.yyyy', 'shortDate'];
+  			$scope.format = $scope.formats[0];
+		});
 		
 	</script>
 	<!-- Bootstrap core JavaScript
 	  ================================================== -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-	<script>
-	  $( document ).ready(function() {
-	  /*
-	    $.getJSON("main.menu", function(data) {
-			$.each(data, function(i, item) {
-				var itemContent = "";
-				if (item.subMenu.length > 0) {
-					itemContent += "<li class=\"dropdown\"><a href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\">" + item.name + " <b class=\"caret\"></b></a>";
-					itemContent += "<ul class=\"dropdown-menu\">";
-					$.each(item.subMenu, function(j, subitem) {
-						itemContent += "<li><a href=\"" + subitem.link + "\" >" + subitem.name + "</a></li>";
-					});
-					itemContent += "</ul>";
-				} else {
-					itemContent += "<li><a href=\"" + item.link + "\" >" + item.name + "</a>";
-				}
-				itemContent += "</li>";
-				$("#main-menu").append(itemContent);
-			});
-		});*/
-	  });
-	</script>
 	
 <div ng-include="'footer.html'"></div>
 </body>
