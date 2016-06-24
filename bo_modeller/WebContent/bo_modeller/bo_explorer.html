@@ -178,19 +178,26 @@
 					        <span class="icon-bar"></span>
 					        <span class="icon-bar"></span>
 					      </button>
-					      <a class="navbar-brand">{{selectedItem.name}}</a>
+					      <h1 class="navbar-brand">{{selectedItem.name}}</h1>
 					    </div>
 					
 					    <!-- Collect the nav links, forms, and other content for toggling -->
 					    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-					 	  <div class="btn-group nav navbar-nav navbar-right bottomright">
-								<button type="submit" class="btn btn-primary">
-								  <i class="fa fa-pencil" aria-hidden="true"></i> Edit
-								</button>
-								<button type="submit" class="btn btn-primary">
-								  <i class="fa fa-minus" aria-hidden="true"></i> Delete
-								</button>
-						  </div>
+					    	<ul class="nav navbar-nav">
+					    		<li><h5 class="subtitle navbar-text">{{selectedItem.description}}</h5></li>
+					      		<li><a>{{selectedItem.key}}</a></li>
+					      		<li><a>{{selectedItem.table}}</a></li>
+					      		<li>
+						 	  		<div class="btn-group bottomright">
+						 	  			<button type="submit" class="btn btn-primary">
+										  <i class="fa fa-pencil" aria-hidden="true"></i> Edit
+										</button>
+										<button type="submit" class="btn btn-primary">
+										  <i class="fa fa-minus" aria-hidden="true"></i> Delete
+										</button>
+						 	  		</div>
+					      		</li>					    		
+					    	</ul>
 					    </div>
 					    <!-- /.navbar-collapse -->
 					  </div>
@@ -207,44 +214,15 @@
 							<table class="table table-condensed">
 							<thead>
 								<tr>
-									<th>ID</th>
 									<th>Name</th>
-									<th>Table</th>
-									<th>Description</th>
+									<th>Type</th>
 								</tr>
 							</thead>
 							<tbody>
 								<tr class="selected-{{entry._selected_}}" ng-repeat="entry in selectedItemDetails">
 									<td>{{entry.name}}</td>
-								</tr>
-															<tr class="selected-{{entry._selected_}}" ng-repeat="entry in selectedItemDetails">
-									<td>{{entry.name}}</td>
-								</tr>
-															<tr class="selected-{{entry._selected_}}" ng-repeat="entry in selectedItemDetails">
-									<td>{{entry.name}}</td>
-								</tr>
-															<tr class="selected-{{entry._selected_}}" ng-repeat="entry in selectedItemDetails">
-									<td>{{entry.name}}</td>
-								</tr>
-															<tr class="selected-{{entry._selected_}}" ng-repeat="entry in selectedItemDetails">
-									<td>{{entry.name}}</td>
-								</tr>
-															<tr class="selected-{{entry._selected_}}" ng-repeat="entry in selectedItemDetails">
-									<td>{{entry.name}}</td>
-								</tr>
-															<tr class="selected-{{entry._selected_}}" ng-repeat="entry in selectedItemDetails">
-									<td>{{entry.name}}</td>
-								</tr>
-															<tr class="selected-{{entry._selected_}}" ng-repeat="entry in selectedItemDetails">
-									<td>{{entry.name}}</td>
-								</tr>
-															<tr class="selected-{{entry._selected_}}" ng-repeat="entry in selectedItemDetails">
-									<td>{{entry.name}}</td>
-								</tr>
-															<tr class="selected-{{entry._selected_}}" ng-repeat="entry in selectedItemDetails">
-									<td>{{entry.name}}</td>
-								</tr>
-								
+									<td>{{entry.type}}</td>
+								</tr>								
 							</tbody>
 						</table>	
 					</div>		

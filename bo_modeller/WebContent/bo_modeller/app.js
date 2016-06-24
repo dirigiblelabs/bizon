@@ -13,73 +13,60 @@ angular.module('businessObjects', ['ngAnimate', 'ui.bootstrap'])
 	}
 	service.getAll = function () {
 		var deferred = $q.defer();
+		var mockContent = [{
+			"id":"1",
+			"name":"A",
+			"description":"Short description for entity A",
+			"key":"Id",
+			"table":"TBL_A"
+		},
+		{
+			"id":"2",
+			"name":"B",
+			"description":"Short description for entity B",
+			"key":"Id",
+			"table":"TBL_B"
+		},
+		{
+			"id":"3",
+			"name":"C",
+			"description":"Short description for entity C",
+			"key":"Id",
+			"table":"TBL_C"
+		}]
 		$http.get(getUrl())
 			.success(function(response){
-				deferred.resolve(
-						[{
-							"id":"1",
-							"name":"A"
-							"description":"Short description for entity A"
-						},
-						{
-							"id":"2",
-							"name":"B"
-						},
-						{
-							"id":"3",
-							"name":"C"
-						}])
+				deferred.resolve(mockContent)
 			})
 			.error(function(msg, code){
-				deferred.resolve(
-						[{
-							"id":"1",
-							"name":"A"
-						},
-						{
-							"id":"2",
-							"name":"B"
-						},
-						{
-							"id":"3",
-							"name":"C"
-						}]);
+				deferred.resolve(mockContent);
 			});
 		return deferred.promise;//$http.get(getUrl());
 	};
 	
 	service.getItemDetails = function (itemId) {
 		var deferred = $q.defer();
+		var mockContent = [{
+			"id":"p1",
+			"name":"Property 1",
+			"type":"Integer"
+		},
+		{
+			"id":"p2",
+			"name":"Property 2",
+			"type":"Boolean"
+		},
+		{
+			"id":"p3",
+			"name":"Property 3",
+			"type":"String"
+		}];
 		$http.get(getUrl())
 			.success(function(response){
-				deferred.resolve(
-					[{
-						"id":"p1",
-						"name":"Property 1"
-					},
-					{
-						"id":"p2",
-						"name":"Property 2"
-					},
-					{
-						"id":"p3",
-						"name":"Property 3"
-					}]);
+				deferred.resolve(mockContent);
 			})
 			.error(function(msg, code){
-				deferred.resolve(
-						[{
-							"id":"p1",
-							"name":"Property 1"
-						},
-						{
-							"id":"p2",
-							"name":"Property 2"
-						},
-						{
-							"id":"p3",
-							"name":"Property 3"
-						}]);
+				deferred.resolve(mockContent);
 			});
 		return deferred.promise;//$http.get(getUrl());
 	};
