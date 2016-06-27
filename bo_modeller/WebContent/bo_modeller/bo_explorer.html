@@ -48,15 +48,107 @@
 
 	.master {
 	  overflow: hidden;
+	  padding-left: 0;
+	  border-left: 1px solid #ddd;
+	  border-top: 1px solid #ddd;
+	  border-right: 1px solid #ddd;
+	  border-top-left-radius: 5px;
 	} 
+	
+	.button-group-item {
+	 display: inline-block;
+	}
+	
+	/*Expandable search box*/
+	.inner-addon { 
+	  position: relative; 
+	}
+	
+	/* style icon */
+	.inner-addon .glyphicon {
+	  position: absolute;
+	  padding: 10px;
+	  pointer-events: none;
+	}
+	
+	/* align icon */
+	.left-addon .glyphicon  { left:  0px;}
+	.right-addon .glyphicon { right: 0px;}
+	
+	/* add padding  */
+	.left-addon input  { padding-left:  10rem; }
+	.right-addon input { padding-right: 10rem; }
+	
+	input[type=search].quick-search {
+	  height: 3rem;
+      width: 2rem;
+	  padding-left: 10px;
+	  color: transparent;
+	  cursor: pointer;
+	  
+	  outline: none;
+	  
+	  -webkit-appearance: textfield;
+	  -webkit-box-sizing: content-box;
+	  font-family: inherit;
+	  font-size: 100%;
+	  
+	  border: solid 1px #ccc;	  
+	  -webkit-border-radius: 10em;
+	  -moz-border-radius: 10em;
+	  border-radius: 10em;
+	  
+	  -webkit-transition: all .5s;
+	  -moz-transition: all .5s;
+	  transition: all .5s;
+	  	  
+	}
+	
+	input[type=search].quick-search:-moz-placeholder {
+		color: transparent;
+	}
+	
+	input[type=search].quick-search::-webkit-input-placeholder {
+		color: transparent;
+	}
+	
+	input[type=search].quick-search:hover {
+		background-color: #fff;
+	}
+	input[type=search].quick-search:focus {
+		width: 10rem;
+		padding-left: 32px;
+		color: #000;
+		background-color: #fff;
+		cursor: auto;
+		color: inherit;
+	}
+
+	input::-webkit-search-decoration,
+	input::-webkit-search-cancel-button {
+		display: none; 
+	}
+	/*Expandable search box end*/	
+	
+	.nav-pills>li>a{
+	  border-radius: 0;
+	}
+	
+	.nav-stacked>li+li{
+	  margin-top: 0;
+	  border-top: 1px solid #d0d0d0;
+	}
+	
+	.tools-remove:hover {
+	  color: red;
+	}
 
  	.footer {
- 	  position: absolute;
- 	  bottom: 0;
+	  position: absolute;
+	  bottom: 0;
 	  width: 100%;
 	  padding-left: 10px;
-	  padding-right: 25px;
-	  background-color: #f5f5f5;
+	  background-color: #363637;
 	  height: 4em;
 	}
 	
@@ -66,6 +158,7 @@
 	
 	.footer .btn-group{
 	  top: 1rem;
+	  padding-right: 10px;
 	}
 	
 	.no-gutter-left,[class*='col-'] {
@@ -82,14 +175,19 @@
 	
 	.details {
 	  overflow: auto;
+	  padding-left: 0;
+      border-top-right-radius: 5px;
 	}
 	
 	.details .object-header {
 	  position: absolute;
-	  background-color: #e0e0e0;
 	  margin: 0;
 	  width: 100%;
 	  padding: 2rem 1rem 1rem 1rem;
+	  background-color: #f2f8fc;
+      border-top: 1px solid #ddd;
+      border-bottom: 1px solid #ddd;
+      border-top-right-radius: 5px;
 	}
 	
 	.details .object-header section, .details .object-header .object-title {
@@ -98,10 +196,12 @@
 	
 	.details div[ng-show] {
 		position: relative;
+	    border-right: 1px solid#ddd;
+	    border-top-right-radius: 5px;
 	}
 	
 	.details .content {
-		padding-top: 13rem;
+		padding-top: 14rem;
 	}
 	
 	.details .object-header section {
@@ -145,10 +245,23 @@
 		margin-right: 2rem;
 	}
 	
+	.nav.nav-tabs{
+	  padding-left: 10px;
+      padding-right: 10px;
+	}
+	
+	a>i {
+	  padding: 0 5px 0 5px;
+	}
+	
 	.tab-content {
 		padding: 1rem 0;
 		overflow: auto;
 		height: 100%;
+	}
+	
+	.tab-content-tools {
+	  margin-right: 10px;
 	}
 	
 	.bottomright {
@@ -185,15 +298,22 @@
 			<div class="alert alert-danger" ng-show="errorMessage">{{errorMessage}}</div>
 			
 			<section class="master col-xs-4 col-md-2 no-gutter-left">
+				
 				<section>
 					<ul class="nav nav-pills nav-stacked">
-				 		<li role="presentation" class="{{item._selectionActive}}" ng-repeat="item in items"><a href="#" ng-click="toggleItemSelection(item)"><i class="fa fa-th-large"></i> {{item.name}}</a></li>			
+				 		<li role="presentation" class="{{item._selectionActive}}" ng-repeat="item in items">
+				 			<a href="#" ng-click="toggleItemSelection(item)"><i class="fa fa-th-large"></i> {{item.name}} <span class="glyphicon glyphicon-remove pull-right tools-remove" aria-hidden="true"></span></a>
+				 		</li>			
 					</ul>
 				</section>
+				
 				<footer class="footer">
 			      <div class="btn-group pull-right">
 					<button type="submit" class="btn btn-primary">
-					  <i class="fa fa-plus" aria-hidden="true"></i> New
+					  <i class="fa fa-plus" aria-hidden="true"></i>
+					</button>
+					<button type="submit" class="btn btn-primary">
+					  <i class="glyphicon glyphicon-filter" aria-hidden="true"></i>
 					</button>
 			      </div>
 			    </footer>
@@ -224,10 +344,7 @@
 						</section>
 			      		<div class="tools btn-group bottomright">
 			 	  			<button type="submit" class="btn btn-primary">
-							  <i class="fa fa-pencil" aria-hidden="true"></i> Edit
-							</button>
-							<button type="submit" class="btn btn-primary">
-							  <i class="glyphicon glyphicon-remove" aria-hidden="true"></i> Delete
+							  <i class="fa fa-pencil" aria-hidden="true"></i>
 							</button>
 			      		</div>					    		
 					</section>
@@ -239,7 +356,13 @@
 						</ul>
 					
 						<div class="tab-content">
-							<table class="table table-condensed">
+							<div class="btn-group tab-content-tools pull-right">
+								<div class="inner-addon left-addon button-group-item">
+								    <i class="glyphicon glyphicon-search"></i>
+								    <input type="search" class="quick-search" placeholder="Search" />
+								</div>
+							</div>
+							<table class="table table-hover">
 								<thead>
 									<tr>
 										<th>Name</th>
@@ -258,10 +381,10 @@
 						<footer class="footer">
 					      <div class="btn-group pull-right">
 							<button type="submit" class="btn btn-primary">
-							  <i class="fa fa-plus" aria-hidden="true"></i> New
+							  <i class="fa fa-plus" aria-hidden="true"></i>
 							</button>
 							<button type="submit" class="btn btn-primary">
-							  <i class="glyphicon glyphicon-remove" aria-hidden="true"></i> Delete
+							  <i class="glyphicon glyphicon-remove" aria-hidden="true"></i>
 							</button>
 					      </div>
 					    </footer>	
