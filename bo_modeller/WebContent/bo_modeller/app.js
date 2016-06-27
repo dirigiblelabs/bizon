@@ -48,18 +48,26 @@ angular.module('businessObjects', ['ngAnimate', 'ui.bootstrap'])
 		var deferred = $q.defer();
 		var mockContent = [{
 			"id":"p1",
-			"name":"Property 1",
-			"type":"Integer"
+			"name":"Id",
+			"type":"Integer",
+			"key": true
 		},
 		{
 			"id":"p2",
 			"name":"Property 2",
-			"type":"Boolean"
+			"type":"Boolean",
+			"nullable":true
 		},
 		{
 			"id":"p3",
 			"name":"Property 3",
 			"type":"String"
+		},
+		{
+			"id":"p4",
+			"name":"Property 4",
+			"type":"Relationship",
+			"relId": "X"
 		}];
 		$http.get(getUrl())
 			.success(function(response){
@@ -173,5 +181,13 @@ angular.module('businessObjects', ['ngAnimate', 'ui.bootstrap'])
 	}
 
 	$scope.deleteItem = deleteItem;
+	
+	$scope.showRelationships = function(){
+		
+	};
+	
+	$scope.showProperties = function(){
+		
+	};
 	
 }]);

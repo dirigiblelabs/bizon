@@ -194,7 +194,7 @@
 		display: inline-block
 	}
 	
-	.details div[ng-show] {
+	.details>div[ng-show] {
 		position: relative;
 	    border-right: 1px solid#ddd;
 	    border-top-right-radius: 5px;
@@ -385,40 +385,25 @@
 				
 					<div class="content">
 						<ul class="nav nav-tabs">
-						  <li role="presentation" class="active"><a href="#">Properties</a></li>
-						  <li role="presentation"><a href="#">Relationships <i class="glyphicon glyphicon-link pull-right"></i></a></li>
+						  <li role="presentation" class="active"><a href="#" ng-click="showProperties">Properties</a></li>
+						  <li role="presentation"><a href="#" ng-click="showRelationships">Relationships <i class="glyphicon glyphicon-link pull-right"></i></a></li>
 						</ul>
 					
 						<div class="tab-content">
 						
 							<div class="btn-group tab-content-tools pull-right">
 								<div class="inner-addon left-addon button-group-item">
-								    <i class="glyphicon glyphicon-search"></i>
-								    <input type="search" class="quick-search" placeholder="Search" />
+								    <i class="glyphicon glyphicon-search"></i>	
+								    <input type="search" class="quick-search" placeholder="Search" ng-model="searchText"/>
 								</div>
 							</div>
 							
 							<div class="list-group" >
-							  <a class="list-group-item selected-{{entry._selected_}}" ng-repeat="entry in selectedItemDetails">
-								<div class="list-item-title">{{entry.name}}</div>
+							  <a class="list-group-item selected-{{entry._selected_}}" ng-repeat="entry in selectedItemDetails|filter:searchText">
+								<div class="list-item-title">{{entry.name}} <div ng-show="entry.key" style="display: inline-block"><i class="fa fa-key"></i></div></div>
 								<div class="list-item-subtitle">{{entry.type}}</div>
 							  </a>
-							</div>
-							
-<!-- 							<table class="table table-hover">
-								<thead>
-									<tr>
-										<th>Name</th>
-										<th>Type</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr class="selected-{{entry._selected_}}" ng-repeat="entry in selectedItemDetails">
-										<td>{{entry.name}}</td>
-										<td>{{entry.type}}</td>
-									</tr>								
-								</tbody>
-							</table> -->	
+							</div>	
 						</div>	
 						
 						<footer class="footer">
