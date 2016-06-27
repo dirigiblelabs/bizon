@@ -281,6 +281,23 @@
 	  margin-right: 10px;
 	}
 	
+	.tab-content .list-group {
+		margin-top: 4.5rem;
+	}
+	
+	.tab-content .list-item-title {
+	  font-weight: bold;
+	}
+	
+	.tab-content .list-item-subtitle {
+	}
+	
+	.tab-content .list-group-item {
+	    border-radius: 0;
+	    border-left: 0;
+	    border-right: 0;
+	}
+	
 	.bottomright {
 		bottom: 0;
 	    float: right;
@@ -373,13 +390,22 @@
 						</ul>
 					
 						<div class="tab-content">
+						
 							<div class="btn-group tab-content-tools pull-right">
 								<div class="inner-addon left-addon button-group-item">
 								    <i class="glyphicon glyphicon-search"></i>
 								    <input type="search" class="quick-search" placeholder="Search" />
 								</div>
 							</div>
-							<table class="table table-hover">
+							
+							<div class="list-group" >
+							  <a class="list-group-item selected-{{entry._selected_}}" ng-repeat="entry in selectedItemDetails">
+								<div class="list-item-title">{{entry.name}}</div>
+								<div class="list-item-subtitle">{{entry.type}}</div>
+							  </a>
+							</div>
+							
+<!-- 							<table class="table table-hover">
 								<thead>
 									<tr>
 										<th>Name</th>
@@ -392,7 +418,7 @@
 										<td>{{entry.type}}</td>
 									</tr>								
 								</tbody>
-							</table>	
+							</table> -->	
 						</div>	
 						
 						<footer class="footer">
