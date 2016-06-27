@@ -123,7 +123,8 @@ angular.module('businessObjects', ['ngAnimate', 'ui.bootstrap'])
 	function showDetails (item){
 		ItemsModel.getItemDetails(item.id)
 			.then(function (result) {
-				$scope.selectedItemDetails = result;
+				$scope._selectedItemDetails = result;
+				$scope.showProperties.apply(this);//Initial content to show
 			  });
 	}
 	
@@ -181,13 +182,27 @@ angular.module('businessObjects', ['ngAnimate', 'ui.bootstrap'])
 	}
 
 	$scope.deleteItem = deleteItem;
-	
-	$scope.showRelationships = function(){
 		
+	$scope.showRelationships = function(){
+		if($scope._selectedItemDetails){
+			$scope.selectedItemDetails = $scope._selectedItemDetails.filter(function(v, i, arr){
+				if(v.type && v.type==='Relationship'){
+					return true;
+				}
+				return false;
+			}, this);
+		}
 	};
 	
 	$scope.showProperties = function(){
-		
+		if($scope._selectedItemDetails){
+			$scope.selectedItemDetails = $scope._selectedItemDetails.filter(function(v, i, arr){
+				if(!v.type || v.type!=='Relationship'){
+					return true;
+				}
+				return false;
+			}, this);
+		}
 	};
 	
 }]);

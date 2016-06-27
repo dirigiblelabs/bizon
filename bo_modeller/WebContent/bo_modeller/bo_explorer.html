@@ -271,14 +271,12 @@
 	  padding: 0 5px 0 5px;
 	}
 	
-	.tab-content {
-		padding: 1rem 0;
-		overflow: auto;
-		height: 100%;
-	}
+ 	.tab-content {
+		margin-top: 6rem;
+	} 
 	
 	.tab-content-tools {
-	  margin-right: 10px;
+	  margin: 1.4rem 1rem;
 	}
 	
 	.tab-content .list-group {
@@ -336,14 +334,14 @@
 				<section>
 					<ul class="nav nav-pills nav-stacked">
 				 		<li role="presentation" class="{{item._selectionActive}}" ng-repeat="item in items">
-				 			<a href="#" ng-click="toggleItemSelection(item)"><i class="fa fa-th-large"></i> {{item.name}} <span class="glyphicon glyphicon-remove pull-right tools-remove" aria-hidden="true"></span></a>
+				 			<a href="#" ng-click="toggleItemSelection(item)"><i class="fa fa-th-large"></i> {{item.name}} <span ng-click="deleteItem(item.id)" class="glyphicon glyphicon-remove pull-right tools-remove" aria-hidden="true"></span></a>
 				 		</li>			
 					</ul>
 				</section>
 				
 				<footer class="footer">
 			      <div class="btn-group pull-right">
-					<button type="submit" class="btn btn-primary">
+					<button type="submit" class="btn btn-primary" ng-click="createItem()">
 					  <i class="fa fa-plus" aria-hidden="true"></i>
 					</button>
 					<button type="submit" class="btn btn-primary">
@@ -385,24 +383,28 @@
 				
 					<div class="content">
 						<ul class="nav nav-tabs">
-						  <li role="presentation" class="active"><a href="#" ng-click="showProperties">Properties</a></li>
-						  <li role="presentation"><a href="#" ng-click="showRelationships">Relationships <i class="glyphicon glyphicon-link pull-right"></i></a></li>
+						  <li role="presentation" class="active"><a href="#" ng-click="showProperties()" role="tab" data-toggle="tab">Properties</a></li>
+						  <li role="presentation"><a href="#" ng-click="showRelationships()" role="tab" data-toggle="tab">Relationships <i class="glyphicon glyphicon-link pull-right"></i></a></li>
 						</ul>
+					
+						<div class="btn-group tab-content-tools pull-right">
+							<div class="inner-addon left-addon button-group-item">
+							    <i class="glyphicon glyphicon-search"></i>	
+							    <input type="search" class="quick-search" placeholder="Search" ng-model="searchText"/>
+							</div>
+						</div>
 					
 						<div class="tab-content">
 						
-							<div class="btn-group tab-content-tools pull-right">
-								<div class="inner-addon left-addon button-group-item">
-								    <i class="glyphicon glyphicon-search"></i>	
-								    <input type="search" class="quick-search" placeholder="Search" ng-model="searchText"/>
+							<div class="tab-pane fade in active">
+								
+								<div class="list-group" >
+								  <a class="list-group-item selected-{{entry._selected_}}" ng-repeat="entry in selectedItemDetails|filter:searchText">
+									<div class="list-item-title">{{entry.name}} <div ng-show="entry.key" style="display: inline-block"><i class="fa fa-key"></i></div></div>
+									<div class="list-item-subtitle">{{entry.type}}</div>
+								  </a>
 								</div>
-							</div>
-							
-							<div class="list-group" >
-							  <a class="list-group-item selected-{{entry._selected_}}" ng-repeat="entry in selectedItemDetails|filter:searchText">
-								<div class="list-item-title">{{entry.name}} <div ng-show="entry.key" style="display: inline-block"><i class="fa fa-key"></i></div></div>
-								<div class="list-item-subtitle">{{entry.type}}</div>
-							  </a>
+								
 							</div>	
 						</div>	
 						
