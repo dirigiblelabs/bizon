@@ -9,440 +9,341 @@
 
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.css">
-
-<style>
-
- 	html, body, .container-fluid, .row-fluid, .master, .master>section, .details, .details>div   {
-	  height:100%;
-	  min-height: 100%;
-	}
-	
-	body {
-		padding-top:7rem;
-	}
-	
-	.page {
-	  overflow: hidden;
-	}
-	
-	.page-title {
- 	  position: absolute;
- 	  top: 0;
-	  width: 100%;
-	  padding: 2rem 0px 1rem 0;
-	  margin: 0 auto;
-	  border-bottom: 2px solid #eee;
-	}
-	
-	.page-title>h1{
-	  margin: 0 auto;
-	  padding: 0;
-	  color:#333;
-	  line-height: 4rem;
-	}
-	
-	.split-app {
-	  overflow: hidden;
-	  padding-top: 2rem;
-	}	
-
-	.master {
-	  overflow: hidden;
-	  padding-left: 0;
-	  border-left: 1px solid #ddd;
-	  border-top: 1px solid #ddd;
-	  border-right: 1px solid #ddd;
-	  border-top-left-radius: 5px;
-	} 
-	
-	.button-group-item {
-	 display: inline-block;
-	}
-	
-	/*Expandable search box*/
-	.inner-addon { 
-	  position: relative; 
-	}
-	
-	/* style icon */
-	.inner-addon .glyphicon {
-	  position: absolute;
-	  padding: 10px;
-	  pointer-events: none;
-	}
-	
-	/* align icon */
-	.left-addon .glyphicon  { left:  0px;}
-	.right-addon .glyphicon { right: 0px;}
-	
-	/* add padding  */
-	.left-addon input  { padding-left:  10rem; }
-	.right-addon input { padding-right: 10rem; }
-	
-	input[type=search].quick-search {
-	  height: 3rem;
-      width: 2rem;
-	  padding-left: 10px;
-	  color: transparent;
-	  cursor: pointer;
-	  
-	  outline: none;
-	  
-	  -webkit-appearance: textfield;
-	  -webkit-box-sizing: content-box;
-	  font-family: inherit;
-	  font-size: 100%;
-	  
-	  border: solid 1px #ccc;	  
-	  -webkit-border-radius: 10em;
-	  -moz-border-radius: 10em;
-	  border-radius: 10em;
-	  
-	  -webkit-transition: all .5s;
-	  -moz-transition: all .5s;
-	  transition: all .5s;
-	  	  
-	}
-	
-	input[type=search].quick-search:-moz-placeholder {
-		color: transparent;
-	}
-	
-	input[type=search].quick-search::-webkit-input-placeholder {
-		color: transparent;
-	}
-	
-	input[type=search].quick-search:hover {
-		background-color: #fff;
-	}
-	input[type=search].quick-search:focus {
-		width: 10rem;
-		padding-left: 32px;
-		color: #000;
-		background-color: #fff;
-		cursor: auto;
-		color: inherit;
-	}
-
-	input::-webkit-search-decoration,
-	input::-webkit-search-cancel-button {
-		display: none; 
-	}
-	/*Expandable search box end*/	
-	
-	.nav-pills>li>a{
-	  border-radius: 0;
-	}
-	
-	.nav-stacked>li+li{
-	  margin-top: 0;
-	  border-top: 1px solid #d0d0d0;
-	}
-	
-	.tools-remove:hover {
-	  color: red;
-	}
-
- 	.footer {
-	  position: absolute;
-	  bottom: 0;
-	  width: 100%;
-	  padding-left: 10px;
-	  background-color: #363637;
-	  height: 4em;
-	}
-	
-	.footer>div>button {
-		float:right;
-	}
-	
-	.footer .btn-group{
-	  top: 1rem;
-	  padding-right: 10px;
-	}
-	
-	.no-gutter-left,[class*='col-'] {
-	  padding-right:0;
-	}
-	
-	.no-gutter-left .nav>li>a {
-	  padding-left: 10px;
-	}
-
-	.master .nav li a{
-	  font-weight: bold;
-	}
-	
-	.details {
-	  overflow: auto;
-	  padding-left: 0;
-      border-top-right-radius: 5px;
-	}
-	
-	.details .object-header {
-	  position: absolute;
-	  margin: 0;
-	  width: 100%;
-	  padding: 2rem 1rem 1rem 1rem;
-	  background-color: #f2f8fc;
-      border-top: 1px solid #ddd;
-      border-bottom: 1px solid #ddd;
-      border-top-right-radius: 5px;
-	}
-	
-	.details .object-header section, .details .object-header .object-title {
-		display: inline-block
-	}
-	
-	.details>div[ng-show] {
-		position: relative;
-	    border-right: 1px solid#ddd;
-	    border-top-right-radius: 5px;
-	}
-	
-	.details .content {
-		padding-top: 14rem;
-	}
-	
-	.details .object-header section {
-		margin-right: 10rem;
-	}
-	
-	.details .object-header .object-image {
-		margin-right: 1rem;
-		display: inline-block;
-		font-size: 4rem;
-	}
-	
-	.details .object-header .object-image>i{
-	    padding: 1rem;
-	    -moz-border-radius: 4rem;
-	    -webkit-border-radius: 4rem;
-	    border-radius: 4rem;
-	    border: 5px solid #888;
-	    background-color: #fff;
-	}
-	
-	.details .object-header .object-image, 
-	.details .object-header .object-image i {
-		vertical-align: top;
-	}
-	
-	.details .object-header .title {
-		margin: 0;
-		line-height: 3rem;
-		font-size: 3rem;
-		font-weight: bold;
-	}
-	
-	.details .object-header .subtitle {
-		margin: 0;
-	    line-height: 1.5rem;
-	    font-size: 1.5rem;
-	    color: #777;
-	}
-	
-	.details .object-header .object-attributes {
-		display: inline-block;
-		vertical-align:top;
-		line-height: 1.5rem;
-	    font-size: 1.5rem;
-	}
-	
-	.details .object-header .object-attributes label {
-		margin-right: 2rem;
-	}
-	
-	.details .object-header .object-attributes label>i {
-	  padding: 0.5rem;
-      -moz-border-radius: 1.5rem;
-      -webkit-border-radius: 1.5rem;
-      border-radius: 1.5rem;
-      border: 1px solid #888;
-      background-color: #fff;
-	}
-	
-	.nav.nav-tabs{
-	  padding-left: 10px;
-      padding-right: 10px;
-	}
-	
-	a>i {
-	  padding: 0 5px 0 5px;
-	}
-	
- 	.tab-content {
-		margin-top: 6rem;
-	} 
-	
-	.tab-content-tools {
-	  margin: 1.4rem 1rem;
-	}
-	
-	.tab-content .list-group {
-		margin-top: 4.5rem;
-	}
-	
-	.tab-content .list-item-title {
-	  font-weight: bold;
-	}
-	
-	.tab-content .list-item-subtitle {
-	}
-	
-	.tab-content .list-group-item {
-	    border-radius: 0;
-	    border-left: 0;
-	    border-right: 0;
-	}
-	
-	.bottomright {
-		bottom: 0;
-	    float: right;
-	    margin: 6rem 0 0 0;
-	}
-	
-	/* Collapsing Navbar Styles */	
-	@media(min-width:768px) {
-	  .details .object-header {
-	    -webkit-transition: all .35s;
-	    -moz-transition: all .35s;
-	    transition: all .35s;
-	    /* padding: 15px 0; */
-	    /* Add additional styles here for the UNCOLLAPSED state */
-	  }
-	  .details .object-header.affix {
-	    padding: 0;
-	    /* Add additional styles here for the COLLAPSED state */
-	  }
-	}
-</style>
-
+<link href="css/xeditable.css" rel="stylesheet">
+<link href="css/default.css" rel="stylesheet">
 </head>
+
 <body ng-app="businessObjects">
 
-	<div class="container-fluid page" ng-controller="MainCtrl">
+	<div class="container-fluid page">
 		
 		<header class="page-title"><h1 class="h2">Business Objects Explorer</h1></header>
 		
 		<div class="row-fluid split-app">
 		
-			<div class="alert alert-danger" ng-show="errorMessage">{{errorMessage}}</div>
+			<div>
+				<div class="alert alert-danger" ng-show="errorMessage" ng-controller="ErrorCtrl">{{errorMessage}} <span ng-click="hide()" class="glyphicon glyphicon-remove pull-right tools-remove" aria-hidden="true"></span></div>
+			</div>
 			
-			<section class="master col-xs-4 col-md-2 no-gutter-left">
-				
-				<section>
-					<ul class="nav nav-pills nav-stacked">
-				 		<li role="presentation" class="{{item._selectionActive}}" ng-repeat="item in items">
-				 			<a href="#" ng-click="toggleItemSelection(item)"><i class="fa fa-th-large"></i> {{item.name}} <span ng-click="deleteItem(item.id)" class="glyphicon glyphicon-remove pull-right tools-remove" aria-hidden="true"></span></a>
-				 		</li>			
-					</ul>
-				</section>
-				
-				<footer class="footer">
-			      <div class="btn-group pull-right">
-					<button type="submit" class="btn btn-primary" ng-click="createItem()">
-					  <i class="fa fa-plus" aria-hidden="true"></i>
-					</button>
-					<button type="submit" class="btn btn-primary">
-					  <i class="glyphicon glyphicon-filter" aria-hidden="true"></i>
-					</button>
-			      </div>
-			    </footer>
-			</section>
+			<div ui-view="master" ng-show="items" class="master col-xs-12 col-md-2 no-gutter-left"></div>
 			
-			<div class="details col-xs-12 col-md-10">
-				<div ng-show="selectedItem">
-				
-					<section class="object-header fluid-container">
-						<section>
-							<div class="object-image">
-								<i class="fa fa-th"></i>
-							</div>
-							<div class="object-title">
-								<p class="title">{{selectedItem.name}}</p>
-					    		<p class="subtitle">{{selectedItem.description}}</p>						
-							</div>
-						</section>
-						<section class="object-attributes">
-				      		<div>
-				      			<label><i class="fa fa-key"></i></label>
-				      			<span>{{selectedItem.key}}</span>
-				      		</div>
-							<div>
-								<label><i class="fa fa-table"></i></label>
-				      			<span>{{selectedItem.table}}</span>
-				      		</div>				      		
-						</section>
-			      		<div class="tools btn-group bottomright">
-			 	  			<button type="submit" class="btn btn-primary">
-							  <i class="fa fa-pencil" aria-hidden="true"></i>
-							</button>
-			      		</div>					    		
-					</section>
-				
-					<div class="content">
-						<ul class="nav nav-tabs">
-						  <li role="presentation" class="active"><a href="#" ng-click="showProperties()" role="tab" data-toggle="tab">Properties</a></li>
-						  <li role="presentation"><a href="#" ng-click="showRelationships()" role="tab" data-toggle="tab">Relationships <i class="glyphicon glyphicon-link pull-right"></i></a></li>
-						</ul>
-					
-						<div class="btn-group tab-content-tools pull-right">
-							<div class="inner-addon left-addon button-group-item">
-							    <i class="glyphicon glyphicon-search"></i>	
-							    <input type="search" class="quick-search" placeholder="Search" ng-model="searchText"/>
-							</div>
-						</div>
-					
-						<div class="tab-content">
-						
-							<div class="tab-pane fade in active">
-								
-								<div class="list-group" >
-								  <a class="list-group-item selected-{{entry._selected_}}" ng-repeat="entry in selectedItemDetails|filter:searchText">
-									<div class="list-item-title">{{entry.name}} <div ng-show="entry.key" style="display: inline-block"><i class="fa fa-key"></i></div></div>
-									<div class="list-item-subtitle">{{entry.type}}</div>
-								  </a>
-								</div>
-								
-							</div>	
-						</div>	
-						
-						<footer class="footer">
-					      <div class="btn-group pull-right">
-							<button type="submit" class="btn btn-primary">
-							  <i class="fa fa-plus" aria-hidden="true"></i>
-							</button>
-							<button type="submit" class="btn btn-primary">
-							  <i class="glyphicon glyphicon-remove" aria-hidden="true"></i>
-							</button>
-					      </div>
-					    </footer>	
-					</div>
-			</div>					
+			<div ui-view="detail" style="display: inline"></div>
+
 		</div>
-
 	</div>
-
-	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.js"></script>
+	<!-- <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular-route.min.js"></script> -->
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.3.1/angular-ui-router.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular-resource.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular-animate.min.js"></script>
-	<script src="https://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.14.3.js"></script>
+
+	<script src="js/xeditable.js"></script>
 	
-	<!-- Bootstrap core JavaScript
-	  ================================================== -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-	<script src="app.js"></script>
+	
 	<script>
-	$('.details .bar').affix({
-		  offset: {
-		    top: 100
-		  }
-		})
+	angular.module('businessObjects', ['ngAnimate', 'ui.router', 'ngResource', 'xeditable'])
+	.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
+		
+		$urlRouterProvider.otherwise("/");
+		
+		$stateProvider
+	    .state('items', {
+	      url: "/",
+	      views: {
+	          'master': {
+	              templateUrl: 'partials/master-list.html',
+	              controller: 'MasterCtrl'
+	          },
+	          'detail': {
+	              templateUrl: 'partials/empty.html'
+	          }
+	      }
+	    })
+	    .state('items.detail', {
+	    	url: ":boId",
+	    	views: {
+		    	'detail@': {
+					templateUrl: "partials/detail_view.html",
+					controller: 'DetailsCtrl'
+		        }
+	    	}
+	    })
+	    .state('items.detail.edit', {
+	    	url: ":boId",
+	    	params: {
+	    		itemForEdit: undefined
+	    	},
+	    	views: {
+		    	'detail@': {
+					templateUrl: "partials/detail_editor.html",
+					controller: 'EditCtrl'
+		        }
+	    	}
+	    })
+	}])
+	.service('Entity', function($resource) {
+	  return $resource('api/bos/:boId', { boId:'@id' }, {
+		    create: {
+		        method: 'POST'
+		      },
+		    update: {
+		        method: 'PUT'
+		      }
+		    });
+	})
+	.controller('MasterCtrl', ['Entity', '$scope', '$rootScope', '$state', '$stateParams', '$window', function (Entity, $scope, $rootScope, $state, $stateParams, $window) {
+		
+		/*Controller invoked upon routing or navigation click events*/
+		
+		$scope.items;
+		$scope.selectedItem;
+
+		$scope.selectItem = function(item){
+			if(!$scope.selectedItem && !item || ($scope.selectedItem && $scope.selectedItem.id === item.id))//noops
+				return;
+			if(item){
+				$scope.selectedItem = item;// save the selected item 
+			}
+			$state.go('items.detail', {'boId': item.id})
+				.then(function(){
+					//broadcast selection change event to interested listeners
+					$rootScope.$broadcast('ItemSelectionChange', {
+							"selection": item
+						});
+				});
+		}
+
+		function init(){
+			var itemId = $state.params.boId;  
+			if(itemId && $scope.selectedItem && $scope.selectedItem.id===itemId){ //trying to select an item that is already selected
+				return;
+			}
+			Entity.query().$promise
+			.then(function(result){
+				var item;
+				if(result && result.length>0){
+					
+					itemId = itemId || result[0].id;
+					
+					item = findItemById(result, itemId);
+					
+					if(item === undefined){
+						fireLocationError.apply(this);
+						item = result[0];	
+					}
+					
+					$scope.items = result;//initialize the items to display
+					$scope.selectItem.apply($scope, [item]);//set the requested item selected
+					
+				} else {
+					if(itemId !== undefined){
+						fireLocationError.apply($scope);
+						$state.go('items', undefined, {location:false});
+					}
+				}
+			});
+		}
+		
+		function findItemById(items, itemId){
+			var item;
+			for(var i=0; i< items.length; i++){
+				if(items[i].id === itemId ){
+					item = items[i];
+					break;
+				}
+			}
+			return item;
+		}
+		
+		function fireLocationError(){
+			$rootScope.$broadcast('ApplicationError', {
+				"errorMessage": $window.location.href + " is not valid application path. Check the URL and try again."
+			});	
+		}
+		
+		init.apply(this);
+		
+		$scope.createItem = function(){
+			Entity.save({
+						"name":"Business Object Name",
+						"description":"Description for business object",
+						"key":"Id",
+						"table":"TBL_NAME",
+		
+						"properties": [{
+							"name":"Id",
+							"type":"Integer",
+							"key": true
+						}]
+					}).$promise
+			.then(function(newItem){
+				$stateParams.boId = newItem.id;
+				$state.go($state.current, $stateParams, {reload: true, location:true, inherit: true});
+			})
+		}
+		
+		$scope.deleteItem = function(itemId){
+			Entity.remove({boId: itemId}).$promise
+			.then(function(){
+				//$state.reload();
+				$state.go($state.current, $stateParams, {reload: true, location:false, inherit: false});
+			})
+		}
+		
+	}])
+	.controller('DetailsCtrl', ['Entity', '$scope', '$state', '$stateParams' , function (Entity, $scope, $state, $stateParams) {
+		
+		$scope.selectedItem;
+		$scope.selectedItemDetails;
+		
+		$scope.$on('ItemSelectionChange', function(evt, data){
+			$scope.selectedItem = data.selection;
+			if($scope.selectedItem)
+				showDetails($scope.selectedItem);
+			else
+				$scope.message = "Not Found"
+		});
+		
+		function showDetails (item){
+			$scope._selectedItemDetails = item.properties;
+			$scope.showProperties.apply(this);//Initial content to show
+		}
+		
+		$scope.showRelationships = function(){
+			if($scope._selectedItemDetails){
+				$scope.selectedItemDetails = $scope._selectedItemDetails.filter(function(v, i, arr){
+					if(v.type && v.type==='Relationship'){
+						return true;
+					}
+					return false;
+				}, this);
+			}
+		};
+		
+		$scope.showProperties = function(){
+			if($scope._selectedItemDetails){
+				$scope.selectedItemDetails = $scope._selectedItemDetails.filter(function(v, i, arr){
+					if(!v.type || v.type!=='Relationship'){
+						return true;
+					}
+					return false;
+				}, this);
+			}
+		};
+		
+		$scope.startEdit = function() {
+		    $stateParams.itemForEdit = angular.copy($scope.selectedItem);
+		    $state.go("items.detail.edit", $stateParams, {location:false});
+		}
+		
+		$scope.duplicateItem = function() {
+			var duplicateItem = angular.copy($scope.selectedItem, {});
+			delete duplicateItem.id;
+			Entity.save(duplicateItem).$promise
+				.then(function(newItem){
+					$stateParams.boId = newItem.id;
+					$state.go($state.current, $stateParams, {reload: true, location:true, inherit: true});
+				});
+		}
+		
+		$scope.deleteItem = function() {
+			Entity.remove($scope.selectedItem).$promise
+			.then(function(){
+				$state.go($state.current, {boId: $scope.selectedItem.id}, {reload: true, location:true, inherit: true});
+			})
+		}
+		
+	}])
+	.controller('EditCtrl', ['Entity', '$scope', '$state', '$stateParams', function (Entity, $scope, $state, $stateParams) {
+		
+		$scope.selectedItem = $stateParams.itemForEdit;
+		$scope.selectedItemDetails;
+		
+		function showDetails (item){
+			$scope._selectedItemDetails = item.properties;
+			$scope.showProperties.apply(this);//Initial content to show
+		}
+		
+		$scope.showProperties = function(){
+			if($scope._selectedItemDetails){
+				$scope.selectedItemDetails = $scope._selectedItemDetails.filter(function(v, i, arr){
+					if(!v.type || v.type!=='Relationship'){
+						return true;
+					}
+					return false;
+				}, this);
+			}
+		};
+		
+		showDetails.apply(this, [$scope.selectedItem]);
+		
+		$scope.showRelationships = function(){
+			if($scope._selectedItemDetails){
+				$scope.selectedItemDetails = $scope._selectedItemDetails.filter(function(v, i, arr){
+					if(v.type && v.type==='Relationship'){
+						return true;
+					}
+					return false;
+				}, this);
+			}
+		};
+		
+		$scope.cancelEdit = function(mode) {
+		    $state.go($state.current, {boId: $scope.selectedItem.id}, {reload: true, location:true, inherit: true});
+		}
+		
+		$scope.saveItem = function() {
+		    Entity.update($scope.selectedItem).$promise
+		    	.then(function(item){
+		    		$state.go($state.current, {boId: $scope.selectedItem.id}, {reload: true, location:true, inherit: true});
+		    	})
+		}
+		
+	}])
+	.controller('ErrorCtrl', ['$scope', '$timeout', '$animate', function ($scope, $timeout, $animate) {
+		
+		var errorMessageEl = $('.alert,.alert-danger'); 
+		
+		$scope.$on('ApplicationError', function(evt, data){
+			$scope.errorMessage = data.errorMessage;
+		});
+		
+		$scope.hide = hideErrorMessage;
+		
+		var timer;
+		
+		$animate.on('removeClass', errorMessageEl,
+		  $.proxy(function (element, phase) {
+			if('close' === phase && $scope.errorMessage){
+				timer = $timeout(5000)
+				.then(function(){
+						hideErrorMessage.apply(this, [element]);
+					});
+			}
+		  },this));
+		
+		function hideErrorMessage(element){
+			if($scope.errorMessage){
+				element = element || errorMessageEl;
+				$(element).fadeTo('slow', 0, function(){
+					$(element).parent().slideUp('slow', function(){
+						$scope.errorMessage = undefined;
+						$timeout.cancel(timer);
+						$scope.$apply();
+					});
+				});	
+			}
+		}
+				
+	}])
+	.run(['editableOptions', function(editableOptions)  {
+	  editableOptions.theme = 'bs3'; // bootstrap3 theme. Can be also 'bs2', 'default'
+	}]);
 	
 	</script>
-	
 
 </body>
 </html>

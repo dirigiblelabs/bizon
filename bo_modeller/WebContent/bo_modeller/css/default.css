@@ -1,0 +1,347 @@
+ 	html, body, .container-fluid, .row-fluid, .master, .master>section, .details, .details>div   {
+	  height:100%;
+	  min-height: 100%;
+	}
+	
+	body {
+		padding-top:7rem;
+	}
+	
+	.page {
+	  overflow: hidden;
+	}
+	
+	.page-title {
+ 	  position: absolute;
+ 	  top: 0;
+	  width: 100%;
+	  padding: 2rem 0px 1rem 0;
+	  margin: 0 auto;
+	  border-bottom: 2px solid #eee;
+	}
+	
+	.page-title>h1{
+	  margin: 0 auto;
+	  padding: 0;
+	  color:#333;
+	  line-height: 4rem;
+	}
+	
+	.split-app {
+	  overflow: hidden;
+	  padding-top: 2rem;
+	}	
+
+	.master {
+	  overflow: hidden;
+	  padding-left: 0;
+	  border-left: 1px solid #ddd;
+	  border-top: 1px solid #ddd;
+	  border-right: 1px solid #ddd;
+	  border-top-left-radius: 5px;
+	} 
+	
+	.button-group-item {
+	 display: inline-block;
+	}
+	
+	/*Expandable search box*/
+	.inner-addon { 
+	  position: relative; 
+	}
+	
+	/* style icon */
+	.inner-addon .glyphicon {
+	  position: absolute;
+	  padding: 10px;
+	  pointer-events: none;
+	}
+	
+	/* align icon */
+	.left-addon .glyphicon  { left:  0px;}
+	.right-addon .glyphicon { right: 0px;}
+	
+	/* add padding  */
+	.left-addon input  { padding-left:  10rem; }
+	.right-addon input { padding-right: 10rem; }
+	
+	input[type=search].quick-search {
+	  height: 3rem;
+      width: 2rem;
+	  padding-left: 10px;
+	  color: transparent;
+	  cursor: pointer;
+	  
+	  outline: none;
+	  
+	  -webkit-appearance: textfield;
+	  -webkit-box-sizing: content-box;
+	  font-family: inherit;
+	  font-size: 100%;
+	  
+	  border: solid 1px #ccc;	  
+	  -webkit-border-radius: 10em;
+	  -moz-border-radius: 10em;
+	  border-radius: 10em;
+	  
+	  -webkit-transition: all .5s;
+	  -moz-transition: all .5s;
+	  transition: all .5s;
+	  	  
+	}
+	
+	input[type=search].quick-search:-moz-placeholder {
+		color: transparent;
+	}
+	
+	input[type=search].quick-search::-webkit-input-placeholder {
+		color: transparent;
+	}
+	
+	input[type=search].quick-search:hover {
+		background-color: #fff;
+	}
+	input[type=search].quick-search:focus {
+		width: 10rem;
+		padding-left: 32px;
+		color: #000;
+		background-color: #fff;
+		cursor: auto;
+		color: inherit;
+	}
+
+	input::-webkit-search-decoration,
+	input::-webkit-search-cancel-button {
+		display: none; 
+	}
+	/*Expandable search box end*/	
+	
+	.nav-pills>li>a{
+	  border-radius: 0;
+	}
+	
+	.nav-stacked>li+li{
+	  margin-top: 0;
+	  border-top: 1px solid #d0d0d0;
+	}
+	
+	.tools-remove:hover {
+	  color: red;
+	}
+
+ 	.footer {
+	  position: absolute;
+	  bottom: 0;
+	  width: 100%;
+	  padding-left: 10px;
+	  background-color: #363637;
+	  height: 4em;
+	}
+	
+	.footer>div>button {
+		float:right;
+	}
+	
+	.footer .btn-group{
+	  top: 1rem;
+	  padding-right: 10px;
+	}
+	
+	.no-gutter-left,[class*='col-'] {
+	  padding-right:0;
+	}
+	
+	.no-gutter-left .nav>li>a {
+	  padding-left: 10px;
+	}
+
+	.master .nav li a{
+	  font-weight: bold;
+	}
+	
+	.details {
+	  overflow: auto;
+	  padding-left: 0;
+      border-top-right-radius: 5px;
+	}
+	
+	.details .object-header {
+	  position: absolute;
+	  margin: 0;
+	  width: 100%;
+	  padding: 2rem 1rem 1rem 1rem;
+	  background-color: #f2f8fc;
+      border-top: 1px solid #ddd;
+      border-bottom: 1px solid #ddd;
+      border-top-right-radius: 5px;
+	}
+	
+	.details .object-header section, .details .object-header .object-title {
+		display: inline-block
+	}
+	
+	.details>div[ng-show] {
+		position: relative;
+	    border-right: 1px solid#ddd;
+	    border-top-right-radius: 5px;
+	}
+	
+	.details .content {
+		padding-top: 14rem;
+	}
+	
+	.details .object-header section {
+		margin-right: 10rem;
+	}
+	
+	.details .object-header .object-image {
+		margin-right: 1rem;
+		display: inline-block;
+		font-size: 4rem;
+	}
+	
+	.details .object-header .object-image>i{
+	    padding: 1rem;
+	    -moz-border-radius: 4rem;
+	    -webkit-border-radius: 4rem;
+	    border-radius: 4rem;
+	    border: 5px solid #888;
+	    background-color: #fff;
+	}
+	
+	.details .object-header .object-image, 
+	.details .object-header .object-image i {
+		vertical-align: top;
+	}
+	
+	.details .object-header .title {
+		margin: 0;
+		line-height: 3rem;
+		font-size: 3rem;
+		font-weight: bold;
+	}
+	
+	.details .object-header .subtitle {
+		margin: 0;
+	    line-height: 1.5rem;
+	    font-size: 1.5rem;
+	    color: #777;
+	}
+	
+	.details .object-header .object-attributes {
+		display: inline-block;
+		vertical-align:top;
+		line-height: 1.5rem;
+	    font-size: 1.5rem;
+	}
+	
+	.details .object-header .object-attributes label {
+		margin-right: 2rem;
+	}
+	
+	.details .object-header .object-attributes label>i {
+	  padding: 0.5rem;
+      -moz-border-radius: 1.5rem;
+      -webkit-border-radius: 1.5rem;
+      border-radius: 1.5rem;
+      border: 1px solid #888;
+      background-color: #fff;
+	}
+	
+	.editable-click { 
+	  color: inherit;
+	  border-bottom: inherit;
+	}
+	.editable-click:hover { 
+	  color: #2a6496 !important;
+	  border-bottom-color: inherit;
+	  cursor: pointer;
+  	  border-radius: 4px;
+	  box-shadow: 0 0 5px #2a6496;
+	  
+	  -webkit-transition: all 0.20s ease-in-out;
+	  -moz-transition: all 0.20s ease-in-out;
+	  -ms-transition: all 0.20s ease-in-out;
+	  -o-transition: all 0.20s ease-in-out;	  
+	}
+	
+	.nav.nav-tabs{
+	  padding-left: 10px;
+      padding-right: 10px;
+	}
+	
+	a>i {
+	  padding: 0 5px 0 5px;
+	}
+	
+ 	.tab-content {
+		margin-top: 6rem;
+	} 
+	
+	.tab-content-tools {
+	  margin: 1.4rem 1rem;
+	}
+	
+	.tab-content .list-group {
+		margin-top: 4.5rem;
+	}
+	
+	.tab-content .list-item-title {
+	  font-weight: bold;
+	}
+	
+	.tab-content .list-item-subtitle {
+	}
+	
+	.tab-content .list-group-item {
+	    border-radius: 0;
+	    border-left: 0;
+	    border-right: 0;
+	}
+	
+	.required {
+		color: red;
+		margin-right: 5px;
+	}
+	
+	.bottomright {
+		bottom: 0;
+	    float: right;
+	    margin: 6rem 0 0 0;
+	}
+	
+	/* Collapsing Navbar Styles */	
+	@media(min-width:768px) {
+	  .details .object-header {
+	    -webkit-transition: all .35s;
+	    -moz-transition: all .35s;
+	    transition: all .35s;
+	    /* padding: 15px 0; */
+	    /* Add additional styles here for the UNCOLLAPSED state */
+	  }
+	  .details .object-header.affix {
+	    padding: 0;
+	    /* Add additional styles here for the COLLAPSED state */
+	  }
+	}
+	
+	.alert {
+	  transition: 1s linear all;
+	  -webkit-transition: 1s linear all;
+	}
+	
+	.alert.ng-hide-remove {
+	  opacity: 0;
+	}
+	
+ 	.alert.ng-hide-remove.ng-hide-remove-active {
+	  opacity: 1;
+	}
+	
+	.alert.ng-hide-add {
+	  opacity: 1;
+	}
+	
+	.alert.ng-hide-add.ng-add-active {
+	  opacity: 0;
+	}

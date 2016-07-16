@@ -1,0 +1,88 @@
+<style>	
+	.editable-click { 
+	  color: inherit;
+	  border-bottom: inherit;
+	}
+	.editable-click:hover { 
+	  color: #2a6496 !important;
+	  border-bottom-color: inherit;
+	  cursor: pointer;
+  	  border-radius: 4px;
+	  box-shadow: 0 0 5px #2a6496;
+	  
+	  -webkit-transition: all 0.20s ease-in-out;
+	  -moz-transition: all 0.20s ease-in-out;
+	  -ms-transition: all 0.20s ease-in-out;
+	  -o-transition: all 0.20s ease-in-out;
+	  
+	  display: inline-block;
+	  min-width: 120px;	  
+	}
+</style>
+<div class="details col-xs-8 col-md-10">
+	<div>
+			<div>
+				<section class="object-header fluid-container">
+				<section>
+					<div class="object-image">
+						<i class="fa fa-th"></i>
+					</div>
+					<div class="object-title">
+						<p class="title" editable-text="selectedItem.name">{{selectedItem.name}}</p>
+			    		<p class="subtitle" editable-text="selectedItem.description">{{selectedItem.description}}</p>						
+					</div>
+				</section>
+				<section class="object-attributes">
+		      		<div>
+		      			<label><i class="fa fa-key"></i></label>
+		      			<span editable-select="selectedItem.key" e-ng-options="s.value as s.text for s in [{text:'Id', value:'Id'}, {text:'Property 1', value:2}, {text:'Property 2', value:3}]">{{selectedItem.key}}</span>
+		      		</div>
+					<div>
+						<label><i class="fa fa-table"></i></label>
+		      			<span editable-select="selectedItem.table" e-ng-options="s.value as s.text for s in [{text:'TBL_A', value:'TBL_A'}, {text:'TBL_B', value:'TBL_B'}, {text:'TBL_C', value:'TBL_C'}]">{{selectedItem.table}}</span>
+		      		</div>				      		
+				</section>					    		
+			</section>
+			
+			<div class="content">
+				<ul class="nav nav-tabs">
+				  <li role="presentation" class="active"><a href="#" ng-click="showProperties()" role="tab" data-toggle="tab">Properties</a></li>
+				  <li role="presentation"><a href="#" ng-click="showRelationships()" role="tab" data-toggle="tab">Relationships <i class="glyphicon glyphicon-link pull-right"></i></a></li>
+				</ul>
+			
+				<div class="btn-group tab-content-tools pull-right">
+					<div class="inner-addon left-addon button-group-item">
+					    <i class="glyphicon glyphicon-search"></i>	
+					    <input type="search" class="quick-search" placeholder="Search" ng-model="searchText"/>
+					</div>
+				</div>
+			
+				<div class="tab-content">
+				
+					<div class="tab-pane fade in active">
+						
+						<div class="list-group" >
+						  <a class="list-group-item selected-{{entry._selected_}}" ng-repeat="entry in selectedItemDetails|filter:searchText">
+							<div class="list-item-title"><span class="required" ng-show="!entry.nullable">*</span>{{entry.name}} <div ng-show="entry.key" style="display: inline-block"><i class="fa fa-key"></i></div></div>
+							<div class="list-item-subtitle">{{entry.type}}</div>
+						  </a>
+						</div>
+						
+					</div>	
+				</div>	
+				
+				<footer class="footer">
+			      <div class="btn-group pull-right">
+			   		<button type="submit" class="btn btn-primary" ng-click="saveItem()">
+					  <i class="fa fa-check" aria-hidden="true"></i>
+					</button>
+			   		<button type="reset" class="btn btn-primary" ng-click="cancelEdit()">
+					  <i class="fa fa-ban" aria-hidden="true"></i>
+					</button>
+			      </div>
+			    </footer>	
+			</div>
+		</div>
+	</div>
+</div>		
+<script src="js/xeditable.js"></script>
