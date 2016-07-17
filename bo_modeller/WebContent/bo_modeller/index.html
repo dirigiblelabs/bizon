@@ -21,9 +21,7 @@
 		
 		<div class="row-fluid split-app">
 		
-			<div>
-				<div class="alert alert-danger" ng-show="errorMessage" ng-controller="ErrorCtrl">{{errorMessage}} <span ng-click="hide()" class="glyphicon glyphicon-remove pull-right tools-remove" aria-hidden="true"></span></div>
-			</div>
+			<div ui-view="notifications"></div>
 			
 			<div ui-view="master" ng-show="items" class="master col-xs-12 col-md-2 no-gutter-left"></div>
 			
@@ -52,6 +50,9 @@
 		$stateProvider
 	    .state('items', {
 	      url: "/",
+	      params: {
+	    	  message: undefined  
+	      },
 	      views: {
 	          'master': {
 	              templateUrl: 'partials/master-list.html',
@@ -59,7 +60,11 @@
 	          },
 	          'detail': {
 	              templateUrl: 'partials/empty.html'
-	          }
+	          },
+	          'notifications': {
+	              templateUrl: 'partials/notifications.html',
+	              controller: 'NotificationsCtrl'
+	          },
 	      }
 	    })
 	    .state('items.detail', {
@@ -85,7 +90,7 @@
 	    })
 	}])
 	.service('Entity', function($resource) {
-	  return $resource('api/bos/:boId', { boId:'@id' }, {
+	  return $resource('http://localhost:8081/api/bos/:boId', { boId:'@id' }, {
 		    create: {
 		        method: 'POST'
 		      },
@@ -107,7 +112,8 @@
 			if(item){
 				$scope.selectedItem = item;// save the selected item 
 			}
-			$state.go('items.detail', {'boId': item.id})
+			$stateParams.boId = item.id;
+			$state.go('items.detail', $stateParams)
 				.then(function(){
 					//broadcast selection change event to interested listeners
 					$rootScope.$broadcast('ItemSelectionChange', {
@@ -141,7 +147,7 @@
 				} else {
 					if(itemId !== undefined){
 						fireLocationError.apply($scope);
-						$state.go('items', undefined, {location:false});
+						$state.go('items', $stateParams, {location:false});
 					}
 				}
 			});
@@ -159,9 +165,10 @@
 		}
 		
 		function fireLocationError(){
-			$rootScope.$broadcast('ApplicationError', {
-				"errorMessage": $window.location.href + " is not valid application path. Check the URL and try again."
-			});	
+			$stateParams.message = {
+					text:$window.location.href + " is not valid application path. Check the URL and try again.",
+					type: 'alert-danger'
+			}
 		}
 		
 		init.apply(this);
@@ -181,6 +188,10 @@
 					}).$promise
 			.then(function(newItem){
 				$stateParams.boId = newItem.id;
+				$stateParams.message = {
+					text: 'New Buisness Object successfully created.',
+					type: 'alert-success'
+				}
 				$state.go($state.current, $stateParams, {reload: true, location:true, inherit: true});
 			})
 		}
@@ -189,6 +200,11 @@
 			Entity.remove({boId: itemId}).$promise
 			.then(function(){
 				//$state.reload();
+				delete $stateParams.boId;
+				$stateParams.message = {
+						text: 'Buisness Object successfully deleted.',
+						type: 'alert-success'
+					}
 				$state.go($state.current, $stateParams, {reload: true, location:false, inherit: false});
 			})
 		}
@@ -250,9 +266,15 @@
 		}
 		
 		$scope.deleteItem = function() {
-			Entity.remove($scope.selectedItem).$promise
+			Entity.remove({boId: $scope.selectedItem.id}).$promise
 			.then(function(){
-				$state.go($state.current, {boId: $scope.selectedItem.id}, {reload: true, location:true, inherit: true});
+				//$state.reload();
+				delete $stateParams.boId;
+				$stateParams.message = {
+						text: 'Buisness Object successfully deleted.',
+						type: 'alert-success'
+					}
+				$state.go($state.current, $stateParams, {reload: true, location:false, inherit: false});
 			})
 		}
 		
@@ -301,40 +323,44 @@
 		    		$state.go($state.current, {boId: $scope.selectedItem.id}, {reload: true, location:true, inherit: true});
 		    	})
 		}
-		
+				
 	}])
-	.controller('ErrorCtrl', ['$scope', '$timeout', '$animate', function ($scope, $timeout, $animate) {
+	.controller('NotificationsCtrl', ['$scope', '$timeout', '$animate', '$stateParams', function ($scope, $timeout, $animate, $stateParams) {
 		
-		var errorMessageEl = $('.alert,.alert-danger'); 
+		var messageEl = $('.alert');
+		$scope.message = $stateParams.message;
 		
-		$scope.$on('ApplicationError', function(evt, data){
-			$scope.errorMessage = data.errorMessage;
-		});
-		
-		$scope.hide = hideErrorMessage;
+		$scope.hide = hideMessage;
 		
 		var timer;
 		
-		$animate.on('removeClass', errorMessageEl,
-		  $.proxy(function (element, phase) {
-			if('close' === phase && $scope.errorMessage){
-				timer = $timeout(5000)
+		if($scope.message){
+			
+			$scope.messageTypeClass = $scope.message.type || 'alert-danger';
+			
+			timer = $timeout(5000)
 				.then(function(){
-						hideErrorMessage.apply(this, [element]);
-					});
-			}
-		  },this));
+					hideMessage.apply(this);
+				});	
+		}
 		
-		function hideErrorMessage(element){
-			if($scope.errorMessage){
-				element = element || errorMessageEl;
+		function hideMessage(element){
+			if($scope.message){
+				element = element || messageEl;
 				$(element).fadeTo('slow', 0, function(){
 					$(element).parent().slideUp('slow', function(){
-						$scope.errorMessage = undefined;
+						$scope.message = undefined;
 						$timeout.cancel(timer);
 						$scope.$apply();
 					});
 				});	
+			}
+		}
+		
+
+		$scope.destroy = function(){
+			if(timer){
+				$timeout.cancel(timer);
 			}
 		}
 				
