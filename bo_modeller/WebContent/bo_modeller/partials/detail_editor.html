@@ -50,6 +50,11 @@
 				  <li role="presentation"><a href="#" ng-click="showRelationships()" role="tab" data-toggle="tab">Relationships <i class="glyphicon glyphicon-link pull-right"></i></a></li>
 				</ul>
 			
+				<div class="btn-group tab-content-tools pull-left">
+			   		<button type="submit" class="btn btn-primary" ng-click="saveItem()">
+					  <i class="fa fa-plus" aria-hidden="true"></i>
+					</button>
+				</div>
 				<div class="btn-group tab-content-tools pull-right">
 					<div class="inner-addon left-addon button-group-item">
 					    <i class="glyphicon glyphicon-search"></i>	
@@ -63,8 +68,18 @@
 						
 						<div class="list-group" >
 						  <a class="list-group-item selected-{{entry._selected_}}" ng-repeat="entry in selectedItemDetails|filter:searchText">
-							<div class="list-item-title"><span class="required" ng-show="!entry.nullable">*</span>{{entry.name}} <div ng-show="entry.key" style="display: inline-block"><i class="fa fa-key"></i></div></div>
-							<div class="list-item-subtitle">{{entry.type}}</div>
+						  	<div style="display:inline-block">
+								<div class="list-item-title"><span class="required" ng-show="!entry.nullable">*</span>{{entry.name}} <div ng-show="entry.key" style="display: inline-block"><i class="fa fa-key"></i></div></div>
+								<div class="list-item-subtitle">{{entry.type}}</div>						  	
+						  	</div>
+							<div class="btn-group pull-right">
+						   		<button type="submit" class="btn btn-primary" ng-click="saveItem()">
+								  <i class="fa fa-pencil" aria-hidden="true"></i>
+								</button>
+								<button type="submit" class="btn btn-primary" ng-click="saveItem()">
+								  <i class="glyphicon glyphicon-remove" aria-hidden="true"></i>
+								</button>
+							</div>
 						  </a>
 						</div>
 						
