@@ -15,19 +15,19 @@
 
 <body ng-app="businessObjects">
 
-	<div class="container-fluid page">
+	<div class="container-fluid">
 		
-		<header class="page-title"><h1 class="h2">Business Objects Explorer</h1></header>
-		
-		<div class="row-fluid split-app">
-		
-			<div ui-view="notifications"></div>
-			
-			<div ui-view="master" ng-show="items" class="master col-xs-12 col-md-2 no-gutter-left"></div>
-			
-			<div ui-view="detail" style="display: inline"></div>
+		<div class="row-fluid page">
 
+			<header class="page-title"><h1 class="h2">Business Objects Explorer</h1></header>
+			
+			<div class="page-content">
+				<div ui-view="master" ng-show="items" class="master col-xs-12 col-md-2 no-gutter-left"></div>
+				<div ui-view="detail"></div>
+			</div>
+			<div ui-view="notifications" class="notification-bar"></div>			
 		</div>
+		
 	</div>
 	
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.js"></script>
@@ -340,7 +340,7 @@
 			
 			timer = $timeout(5000)
 				.then(function(){
-					hideMessage.apply(this);
+					//hideMessage.apply(this);
 				});	
 		}
 		

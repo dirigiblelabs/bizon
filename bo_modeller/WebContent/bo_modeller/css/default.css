@@ -1,23 +1,27 @@
- 	html, body, .container-fluid, .row-fluid, .master, .master>section, .details, .details>div   {
+ 	html, body, .container-fluid, .row-fluid   {
 	  height:100%;
 	  min-height: 100%;
 	}
 	
-	body {
-		padding-top:7rem;
+	body{
+		background-color: #ddd;
+		background-image: linear-gradient( #fff, #eee );
 	}
 	
 	.page {
-	  overflow: hidden;
+		background: #fff;
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		align-items: stretch;
 	}
 	
 	.page-title {
- 	  position: absolute;
- 	  top: 0;
 	  width: 100%;
 	  padding: 2rem 0px 1rem 0;
-	  margin: 0 auto;
+	  margin-bottom: 3rem;
 	  border-bottom: 2px solid #eee;
+	  flex: 1 auto;
 	}
 	
 	.page-title>h1{
@@ -27,22 +31,49 @@
 	  line-height: 4rem;
 	}
 	
-	.split-app {
+	.page-content {
+	  flex: 1 100%;
+	  display: flex;
+      align-items: stretch;
 	  overflow: hidden;
-	  padding-top: 2rem;
-	}	
+	  position: relative;
+	  border: 1px solid #ddd;
+	  border-radius: 5px 5px 0 0;
+	  border-bottom: 0;
+	}
+	
+	.notification-bar {
+	  position: absolute;
+	  bottom: 0;
+	  width: 100%;
+	  margin-bottom: 0;
+	  flex: 1 auto;
+	}
 
 	.master {
 	  overflow: hidden;
 	  padding-left: 0;
-	  border-left: 1px solid #ddd;
-	  border-top: 1px solid #ddd;
 	  border-right: 1px solid #ddd;
-	  border-top-left-radius: 5px;
+	  flex: 1 auto;
 	} 
 	
-	.button-group-item {
-	 display: inline-block;
+	.master .nav {
+	  font-weight: bold;
+	  margin-top: 5.7rem;
+	}
+	
+	.master .nav>li>a {
+	  padding-left: 5px !important;
+	  padding-right: 10px !important;
+	}
+	
+	.nav-pills>li>a{
+	  border-radius: 0;
+	}
+	
+	.nav-stacked>li+li{
+	  margin-top: 0;
+	  border-top: 1px solid #d0d0d0;
 	}
 	
 	/*Expandable search box*/
@@ -116,20 +147,29 @@
 	}
 	/*Expandable search box end*/	
 	
-	.nav-pills>li>a{
-	  border-radius: 0;
-	}
-	
-	.nav-stacked>li+li{
-	  margin-top: 0;
-	  border-top: 1px solid #d0d0d0;
-	}
-	
 	.tools-remove:hover {
 	  color: red;
 	}
 
- 	.footer {
+	.header {
+	  position: absolute;
+	  top: 0;
+	  width: 100%;
+	  padding-left: 10px;
+	  background-color: #363637;
+	  height: 4em;
+	}
+	
+	.header>div>button {
+		float:right;
+	}
+	
+	.header .btn-group{
+	  top: 1rem;
+	  padding-right: 10px;
+	}
+
+/*  	.footer {
 	  position: absolute;
 	  bottom: 0;
 	  width: 100%;
@@ -145,62 +185,56 @@
 	.footer .btn-group{
 	  top: 1rem;
 	  padding-right: 10px;
-	}
+	} */
 	
-	.no-gutter-left,[class*='col-'] {
+	[class*='col-'] {
 	  padding-right:0;
 	}
 	
-	.no-gutter-left .nav>li>a {
-	  padding-left: 10px;
-	}
-
-	.master .nav li a{
-	  font-weight: bold;
+	[ui-view="detail"] {
+		flex: 1 80%;
 	}
 	
-	.details {
+	.detail {
 	  overflow: auto;
 	  padding-left: 0;
-      border-top-right-radius: 5px;
+	  width: 100%;
 	}
 	
-	.details .object-header {
+	.detail .object-header {
 	  position: absolute;
-	  margin: 0;
+	  margin: 5.7rem 0rem 0rem 0rem;
 	  width: 100%;
 	  padding: 2rem 1rem 1rem 1rem;
 	  background-color: #f2f8fc;
-      border-top: 1px solid #ddd;
       border-bottom: 1px solid #ddd;
-      border-top-right-radius: 5px;
 	}
 	
-	.details .object-header section, .details .object-header .object-title {
+	.detail .object-header section, .detail .object-header .object-title {
 		display: inline-block
 	}
 	
-	.details>div[ng-show] {
+	.detail>div[ng-show] {
 		position: relative;
-	    border-right: 1px solid#ddd;
+	    /* border-right: 1px solid#ddd; */
 	    border-top-right-radius: 5px;
 	}
 	
-	.details .content {
-		padding-top: 14rem;
+	.detail .content {
+		padding-top: 19.7rem;
 	}
 	
-	.details .object-header section {
+	.detail .object-header section {
 		margin-right: 10rem;
 	}
 	
-	.details .object-header .object-image {
+	.detail .object-header .object-image {
 		margin-right: 1rem;
 		display: inline-block;
 		font-size: 4rem;
 	}
 	
-	.details .object-header .object-image>i{
+	.detail .object-header .object-image>i{
 	    padding: 1rem;
 	    -moz-border-radius: 4rem;
 	    -webkit-border-radius: 4rem;
@@ -209,37 +243,37 @@
 	    background-color: #fff;
 	}
 	
-	.details .object-header .object-image, 
-	.details .object-header .object-image i {
+	.detail .object-header .object-image, 
+	.detail .object-header .object-image i {
 		vertical-align: top;
 	}
 	
-	.details .object-header .title {
+	.detail .object-header .title {
 		margin: 0;
 		line-height: 3rem;
 		font-size: 3rem;
 		font-weight: bold;
 	}
 	
-	.details .object-header .subtitle {
+	.detail .object-header .subtitle {
 		margin: 0;
 	    line-height: 1.5rem;
 	    font-size: 1.5rem;
 	    color: #777;
 	}
 	
-	.details .object-header .object-attributes {
+	.detail .object-header .object-attributes {
 		display: inline-block;
 		vertical-align:top;
 		line-height: 1.5rem;
 	    font-size: 1.5rem;
 	}
 	
-	.details .object-header .object-attributes label {
+	.detail .object-header .object-attributes label {
 		margin-right: 2rem;
 	}
 	
-	.details .object-header .object-attributes label>i {
+	.detail .object-header .object-attributes label>i {
 	  padding: 0.5rem;
       -moz-border-radius: 1.5rem;
       -webkit-border-radius: 1.5rem;
@@ -312,14 +346,14 @@
 	
 	/* Collapsing Navbar Styles */	
 	@media(min-width:768px) {
-	  .details .object-header {
+	  .detail .object-header {
 	    -webkit-transition: all .35s;
 	    -moz-transition: all .35s;
 	    transition: all .35s;
 	    /* padding: 15px 0; */
 	    /* Add additional styles here for the UNCOLLAPSED state */
 	  }
-	  .details .object-header.affix {
+	  .detail .object-header.affix {
 	    padding: 0;
 	    /* Add additional styles here for the COLLAPSED state */
 	  }
@@ -328,6 +362,8 @@
 	.alert {
 	  transition: 1s linear all;
 	  -webkit-transition: 1s linear all;
+	  border-radius: 0;
+	  margin-bottom: 0;
 	}
 	
 	.alert.ng-hide-remove {
