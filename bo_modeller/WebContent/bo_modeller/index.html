@@ -18,14 +18,15 @@
 	<div class="container-fluid">
 		
 		<div class="row-fluid page">
-
+		
 			<header class="page-title"><h1 class="h2">Business Objects Explorer</h1></header>
 			
 			<div class="page-content">
 				<div ui-view="master" ng-show="items" class="master col-xs-12 col-md-2 no-gutter-left"></div>
 				<div ui-view="detail"></div>
 			</div>
-			<div ui-view="notifications" class="notification-bar"></div>			
+			<div ui-view="notifications" class="notification-bar"></div>
+		
 		</div>
 		
 	</div>
@@ -33,6 +34,7 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.js"></script>
 	<!-- <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular-route.min.js"></script> -->
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.3.1/angular-ui-router.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/1.3.3/ui-bootstrap.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular-resource.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular-animate.min.js"></script>
 
@@ -42,52 +44,89 @@
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 	
 	<script>
-	angular.module('businessObjects', ['ngAnimate', 'ui.router', 'ngResource', 'xeditable'])
+	angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.bootstrap.modal', 'xeditable'])
 	.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
 		
 		$urlRouterProvider.otherwise("/");
 		
 		$stateProvider
-	    .state('items', {
-	      url: "/",
-	      params: {
-	    	  message: undefined  
-	      },
-	      views: {
-	          'master': {
-	              templateUrl: 'partials/master-list.html',
-	              controller: 'MasterCtrl'
-	          },
-	          'detail': {
-	              templateUrl: 'partials/empty.html'
-	          },
-	          'notifications': {
-	              templateUrl: 'partials/notifications.html',
-	              controller: 'NotificationsCtrl'
-	          },
-	      }
-	    })
-	    .state('items.detail', {
-	    	url: ":boId",
-	    	views: {
-		    	'detail@': {
-					templateUrl: "partials/detail_view.html",
-					controller: 'DetailsCtrl'
-		        }
-	    	}
-	    })
-	    .state('items.detail.edit', {
-	    	url: ":boId",
-	    	params: {
-	    		itemForEdit: undefined
-	    	},
-	    	views: {
-		    	'detail@': {
-					templateUrl: "partials/detail_editor.html",
-					controller: 'EditCtrl'
-		        }
-	    	}
-	    })
+		.state('items', {
+			  url: "/",
+		      params: {
+		    	  message: undefined  
+		      },
+		      views: {
+		          'master': {
+		              templateUrl: 'partials/master-list.html',
+		              controller: 'MasterListCtrl'
+		          },
+		          'detail': {
+		              templateUrl: 'partials/empty.html',
+		          },
+		          'notifications': {
+		              templateUrl: 'partials/notifications.html',
+		              controller: 'NotificationsCtrl'
+		          }
+		      }
+		    })
+		.state('items.select', {
+			  url: ":boId",
+		      params: {
+		    	  items: undefined,
+				  selectedItem: undefined
+		      },
+		      views: {
+		    	  'detail@': {
+					  templateUrl: "partials/detail_view.html",
+					  controller: 'DetailsCtrl'
+			      }
+		      }
+		    })
+		.state('items.select.edit', {
+			  url: "edit",
+		      params: {
+		    	  items: undefined,
+		    	  selectedItem: undefined,
+		    	  itemForEdit: undefined,
+		    	  message: undefined  
+		      },
+		      views: {
+		          'master@': {
+		              templateUrl: 'partials/master-list.html',
+		              controller: 'MasterListCtrl'
+		          },
+			      'detail@': {
+					  templateUrl: "partials/detail_editor.html",
+					  controller: 'EditCtrl'
+			      }
+		      }
+		    })
+		.state('items.select.edit.propDialog', {
+			  url: ":propId",
+		      params: {
+				  items: undefined,
+				  selectedItem: undefined,
+				  itemForEdit: undefined,
+				  property: undefined,
+		    	  message: undefined  
+		      },
+		      onEnter: function(){
+		    	  debugger;
+		      },
+			  onExit: function(){
+				  debugger;
+		      },
+		      views: {
+		          'master@': {
+		              templateUrl: 'partials/master-list.html',
+		              controller: 'MasterListCtrl'
+		          },
+			      'detail@': {
+					  templateUrl: "partials/detail_editor.html",
+					  controller: 'EditCtrl'
+			      }
+		      }
+		    });
 	}])
 	.service('Entity', function($resource) {
 	  return $resource('http://localhost:8081/api/bos/:boId', { boId:'@id' }, {
@@ -99,58 +138,75 @@
 		      }
 		    });
 	})
-	.controller('MasterCtrl', ['Entity', '$scope', '$rootScope', '$state', '$stateParams', '$window', function (Entity, $scope, $rootScope, $state, $stateParams, $window) {
+	.controller('MasterListCtrl', ['Entity', '$scope', 'orderByFilter', '$rootScope', '$state', '$stateParams', '$window', function (Entity, $scope, orderBy, $rootScope, $state, $stateParams, $window) {
 		
 		/*Controller invoked upon routing or navigation click events*/
 		
-		$scope.items;
-		$scope.selectedItem;
-
+		$scope.items = $stateParams.items;
+		$scope.selectedItem= $stateParams.selectedItem;
+		
+		$scope.isDisabled = $stateParams.itemForEdit!==undefined;
+		
+		$scope.sortByPropertyName = 'name';
+	    $scope.reverse = false;//ASC
+		
+	 	$scope.sortBy = function(propertyName) {
+		    $scope.reverse = (propertyName !== null && $scope.propertyName === propertyName)
+		        ? !$scope.reverse : false;
+		    $scope.sortByPropertyName = propertyName;
+		    $scope.items = orderBy($scope.items, $scope.sortByPropertyName, $scope.reverse);
+		};
+		
 		$scope.selectItem = function(item){
 			if(!$scope.selectedItem && !item || ($scope.selectedItem && $scope.selectedItem.id === item.id))//noops
 				return;
 			if(item){
-				$scope.selectedItem = item;// save the selected item 
+				$scope.selectedItem = item;// save the selected item
+				$state.go('items.select', {
+					selectedItem: item,
+					boId: item.id
+				})
 			}
-			$stateParams.boId = item.id;
-			$state.go('items.detail', $stateParams)
-				.then(function(){
-					//broadcast selection change event to interested listeners
-					$rootScope.$broadcast('ItemSelectionChange', {
-							"selection": item
-						});
-				});
 		}
 
 		function init(){
+/* 			if($scope.items){
+				if(!$scope.selectedItem){
+					var itemId = $state.params.boId || $scope.items[0];
+					$scope.selectedItem = findItemById($scope.items, itemId);
+					$scope.selectItem.apply($scope, [$scope.selectedItem]);//set the requested item selected	
+				}
+				return;
+			}
 			var itemId = $state.params.boId;  
 			if(itemId && $scope.selectedItem && $scope.selectedItem.id===itemId){ //trying to select an item that is already selected
 				return;
+			} */
+			var itemId = $state.params.boId;
+			if(!$scope.items){
+				Entity.query().$promise
+				.then(function(result){
+					if(result && result.length>0){
+						
+						$scope.items = result;//initialize the items to display
+						$scope.sortBy($scope.sortByPropertyName);
+						
+						itemId = itemId || result[0].id;					
+						var item = findItemById(result, itemId);
+						if(item === undefined){
+							fireLocationError.apply(this);
+							item = result[0];	
+						}
+						$scope.selectItem.apply($scope, [item]);//set the requested item selected
+						
+					} else {
+						if(itemId !== undefined){
+							fireLocationError.apply($scope);
+							$state.go('items', $stateParams);
+						}
+					}
+				});	
 			}
-			Entity.query().$promise
-			.then(function(result){
-				var item;
-				if(result && result.length>0){
-					
-					itemId = itemId || result[0].id;
-					
-					item = findItemById(result, itemId);
-					
-					if(item === undefined){
-						fireLocationError.apply(this);
-						item = result[0];	
-					}
-					
-					$scope.items = result;//initialize the items to display
-					$scope.selectItem.apply($scope, [item]);//set the requested item selected
-					
-				} else {
-					if(itemId !== undefined){
-						fireLocationError.apply($scope);
-						$state.go('items', $stateParams, {location:false});
-					}
-				}
-			});
 		}
 		
 		function findItemById(items, itemId){
@@ -192,7 +248,7 @@
 					text: 'New Buisness Object successfully created.',
 					type: 'alert-success'
 				}
-				$state.go($state.current, $stateParams, {reload: true, location:true, inherit: true});
+				$state.go($state.current, $stateParams, {reload: true});
 			})
 		}
 		
@@ -212,21 +268,28 @@
 	}])
 	.controller('DetailsCtrl', ['Entity', '$scope', '$state', '$stateParams' , function (Entity, $scope, $state, $stateParams) {
 		
-		$scope.selectedItem;
+		$scope.selectedItem = $stateParams.selectedItem;
 		$scope.selectedItemDetails;
+				
+		$scope.showProperties = function(){
+			if($scope._selectedItemDetails){
+				$scope.selectedItemDetails = $scope._selectedItemDetails.filter(function(v, i, arr){
+					if(!v.type || v.type!=='Relationship'){
+						return true;
+					}
+					return false;
+				}, this);
+			}
+		};
 		
-		$scope.$on('ItemSelectionChange', function(evt, data){
-			$scope.selectedItem = data.selection;
-			if($scope.selectedItem)
-				showDetails($scope.selectedItem);
-			else
-				$scope.message = "Not Found"
-		});
-		
-		function showDetails (item){
-			$scope._selectedItemDetails = item.properties;
-			$scope.showProperties.apply(this);//Initial content to show
+		function showDetails(item){
+			if(item){
+				$scope._selectedItemDetails = item.properties;
+				$scope.showProperties.apply(this);//Initial content to show	
+			}
 		}
+		
+		showDetails($scope.selectedItem);
 		
 		$scope.showRelationships = function(){
 			if($scope._selectedItemDetails){
@@ -239,20 +302,9 @@
 			}
 		};
 		
-		$scope.showProperties = function(){
-			if($scope._selectedItemDetails){
-				$scope.selectedItemDetails = $scope._selectedItemDetails.filter(function(v, i, arr){
-					if(!v.type || v.type!=='Relationship'){
-						return true;
-					}
-					return false;
-				}, this);
-			}
-		};
-		
 		$scope.startEdit = function() {
-		    $stateParams.itemForEdit = angular.copy($scope.selectedItem);
-		    $state.go("items.detail.edit", $stateParams, {location:false});
+		    $stateParams.itemForEdit = angular.copy($scope.selectedItem);		    
+		    $state.go("items.select.edit", $stateParams, {location:false});
 		}
 		
 		$scope.duplicateItem = function() {
@@ -313,14 +365,16 @@
 			}
 		};
 		
-		$scope.cancelEdit = function(mode) {
-		    $state.go($state.current, {boId: $scope.selectedItem.id}, {reload: true, location:true, inherit: true});
+		$scope.cancelEdit = function() {
+			delete $stateParams.boIdedit;
+			delete $stateParams.itemForEdit;
+		    $state.go("^", $stateParams);
 		}
 		
 		$scope.saveItem = function() {
 		    Entity.update($scope.selectedItem).$promise
 		    	.then(function(item){
-		    		$state.go($state.current, {boId: $scope.selectedItem.id}, {reload: true, location:true, inherit: true});
+					$state.go('items.select', {boId: $scope.selectedItem.id})	
 		    	})
 		}
 				
@@ -340,7 +394,7 @@
 			
 			timer = $timeout(5000)
 				.then(function(){
-					//hideMessage.apply(this);
+					hideMessage.apply(this);
 				});	
 		}
 		

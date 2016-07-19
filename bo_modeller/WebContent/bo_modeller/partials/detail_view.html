@@ -1,70 +1,66 @@
 <div class="detail col-xs-8 col-md-10">
-	<div>
-		<div>
-			<header class="header">
-		      <div class="btn-group pull-right">
-		   		<button type="submit" class="btn btn-primary" ng-click="startEdit()">
-				  <i class="fa fa-pencil" aria-hidden="true"></i>
-				</button>
-		   		<button type="submit" class="btn btn-primary" ng-click="duplicateItem()">
-				  <i class="fa fa-files-o" aria-hidden="true"></i>
-				</button>
-				<button type="submit" class="btn btn-primary" ng-click="deleteItem()">
-				  <i class="glyphicon glyphicon-remove" aria-hidden="true"></i>
-				</button>
-		      </div>
-		    </header>
-		
-			<section class="object-header fluid-container">
-				<section>
-					<div class="object-image">
-						<i class="fa fa-th"></i>
-					</div>
-					<div class="object-title">
-						<p class="title">{{selectedItem.name}}</p>
-			    		<p class="subtitle">{{selectedItem.description}}</p>						
-					</div>
-				</section>
-				<section class="object-attributes">
-		      		<div>
-		      			<label><i class="fa fa-key"></i></label>
-		      			<span>{{selectedItem.key}}</span>
-		      		</div>
-					<div>
-						<label><i class="fa fa-table"></i></label>
-		      			<span>{{selectedItem.table}}</span>
-		      		</div>				      							    		
-				</section>
-			</section>
-								
-			<div class="content">
-				<ul class="nav nav-tabs">
-				  <li role="presentation" class="active"><a ng-click="showProperties()" role="tab" data-toggle="tab">Properties</a></li>
-				  <li role="presentation"><a ng-click="showRelationships()" role="tab" data-toggle="tab">Relationships <i class="glyphicon glyphicon-link pull-right"></i></a></li>
-				</ul>
-			
-				<div class="btn-group tab-content-tools pull-right">
-					<div class="inner-addon left-addon">
-					    <i class="glyphicon glyphicon-search"></i>	
-					    <input type="search" class="quick-search" placeholder="Search" ng-model="searchText"/>
-					</div>
-				</div>
-			
-				<div class="tab-content">
-				
-					<div class="tab-pane fade in active">
-						
-						<div class="list-group" >
-						  <a class="list-group-item selected-{{entry._selected_}}" ng-repeat="entry in selectedItemDetails|filter:searchText track by entry.id">
-							<div class="list-item-title"><span class="required" ng-show="!entry.nullable">*</span>{{entry.name}} <div ng-show="entry.key" style="display: inline-block"><i class="fa fa-key"></i></div></div>
-							<div class="list-item-subtitle">{{entry.type}}</div>
-						  </a>
-						</div>
-						
-					</div>	
-				</div>
+	<header class="header">
+      <div class="btn-group pull-right">
+   		<button type="submit" class="btn btn-primary" ng-click="startEdit()">
+		  <i class="fa fa-pencil" aria-hidden="true"></i>
+		</button>
+   		<button type="submit" class="btn btn-primary" ng-click="duplicateItem()">
+		  <i class="fa fa-files-o" aria-hidden="true"></i>
+		</button>
+		<button type="submit" class="btn btn-primary" ng-click="deleteItem()">
+		  <i class="glyphicon glyphicon-remove" aria-hidden="true"></i>
+		</button>
+      </div>
+    </header>
 
+	<section class="object-header fluid-container">
+		<section>
+			<div class="object-image">
+				<i class="fa fa-th"></i>
+			</div>
+			<div class="object-title">
+				<p class="title">{{selectedItem.name}}</p>
+	    		<p class="subtitle">{{selectedItem.description}}</p>						
+			</div>
+		</section>
+		<section class="object-attributes">
+      		<div>
+      			<label><i class="fa fa-key"></i></label>
+      			<span>{{selectedItem.key}}</span>
+      		</div>
+			<div>
+				<label><i class="fa fa-table"></i></label>
+      			<span>{{selectedItem.table}}</span>
+      		</div>				      							    		
+		</section>
+	</section>
+								
+	<div class="content">
+		<ul class="nav nav-tabs">
+		  <li role="presentation" class="active"><a ng-click="showProperties()" role="tab" data-toggle="tab">Properties</a></li>
+		  <li role="presentation"><a ng-click="showRelationships()" role="tab" data-toggle="tab">Relationships <i class="glyphicon glyphicon-link pull-right"></i></a></li>
+		</ul>
+	
+		<div class="btn-group tab-content-tools pull-right">
+			<div class="inner-addon left-addon">
+			    <i class="glyphicon glyphicon-search"></i>	
+			    <input type="search" class="quick-search" placeholder="Search" ng-model="searchText"/>
 			</div>
 		</div>
+	
+		<div class="tab-content">
+		
+			<div class="tab-pane fade in active">
+				
+				<div class="list-group" >
+				  <a class="list-group-item selected-{{entry._selected_}}" ng-repeat="entry in selectedItemDetails|filter:searchText track by entry.id">
+					<div class="list-item-title"><span class="required" ng-show="!entry.nullable">*</span>{{entry.name}} <div ng-show="entry.key" style="display: inline-block"><i class="fa fa-key"></i></div></div>
+					<div class="list-item-subtitle">{{entry.type}}</div>
+				  </a>
+				</div>
+				
+			</div>	
+		</div>
+
 	</div>
 </div>
