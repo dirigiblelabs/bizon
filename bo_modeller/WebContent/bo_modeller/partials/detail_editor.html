@@ -27,10 +27,10 @@
 		
 	<header class="header">
       <div class="btn-group pull-right">
-   		<button type="submit" class="btn btn-primary" ng-click="saveItem()">
+   		<button class="btn btn-success" ng-click="saveItem()">
 		  <i class="fa fa-check" aria-hidden="true"></i>
 		</button>
-   		<button type="reset" class="btn btn-primary" ng-click="cancelEdit()">
+   		<button type="reset" class="btn" ng-click="cancelEdit()">
 		  <i class="fa fa-ban" aria-hidden="true"></i>
 		</button>
       </div>
@@ -65,7 +65,7 @@
 		</ul>
 	
 		<div class="btn-group tab-content-tools pull-left">
-	   		<button type="submit" class="btn btn-primary" ng-click="saveItem()">
+	   		<button type="submit" class="btn btn-primary" ng-click="openPropertyEditor()">
 			  <i class="fa fa-plus" aria-hidden="true"></i>
 			</button>
 		</div>
@@ -81,16 +81,16 @@
 			<div class="tab-pane fade in active">
 				
 				<div class="list-group" >
-				  <a class="list-group-item selected-{{entry._selected_}}" ng-repeat="entry in selectedItemDetails|filter:searchText track by entry.id">
+				  <a class="list-group-item selected-{{entry._selected_}}" ng-repeat="entry in selectedItemDetails|filter:searchText|orderBy:'name'">
 				  	<div style="display:inline-block">
 						<div class="list-item-title"><span class="required" ng-show="!entry.nullable">*</span>{{entry.name}} <div ng-show="entry.key" style="display: inline-block"><i class="fa fa-key"></i></div></div>
 						<div class="list-item-subtitle">{{entry.type}}</div>						  	
 				  	</div>
 					<div class="btn-group pull-right">
-				   		<button type="submit" class="btn btn-primary" ng-click="saveItem()">
+				   		<button class="btn btn-primary" ng-click="openPropertyEditor(entry)">
 						  <i class="fa fa-pencil" aria-hidden="true"></i>
 						</button>
-						<button type="submit" class="btn btn-primary" ng-click="cancelEdit()">
+						<button class="btn btn-danger" ng-click="deleteProperty(entry)">
 						  <i class="glyphicon glyphicon-remove" aria-hidden="true"></i>
 						</button>
 					</div>
@@ -102,4 +102,5 @@
 		
 	</div>
 </div>
+<!-- <div ui-view="modal"></div> -->
 <script src="js/xeditable.js"></script>
