@@ -38,27 +38,27 @@ function handleRequest() {
 	
 	if(!entityBo_header.hasConflictingParameters(id, count, metadata)) {
 		// switch based on method type
-		if ((method === 'POST')) {
+		if (method === 'POST') {
 			// create
 			entityBo_header.createBo_header();
-		} else if ((method === 'GET')) {
+		} else if (method === 'GET'){
 			// read
 			if (id) {
-				entityBo_header.readBo_headerEntity(id);
+				entityBo_header.readBo_headerEntity(id, true);
 			} else if (count !== null) {
 				entityBo_header.countBo_header();
 			} else if (metadata !== null) {
 				entityBo_header.metadataBo_header();
 			} else {
-				entityBo_header.readBo_headerList(limit, offset, sort, desc);
+				entityBo_header.readBo_headerList(limit, offset, sort, desc, true);
 			}
-		} else if ((method === 'PUT')) {
+		} else if (method === 'PUT') {
 			// update
-			entityBo_header.updateBo_header();    
-		} else if ((method === 'DELETE')) {
+			entityBo_header.updateBo_header(true);    
+		} else if (method === 'DELETE') {
 			// delete
 			if(entityBo_header.isInputParameterValid(idParameter)){
-				entityBo_header.deleteBo_header(id);
+				entityBo_header.deleteBo_header(id, true);
 			}
 		} else {
 			entityBo_header.printError(response.BAD_REQUEST, 4, "Invalid HTTP Method", method);

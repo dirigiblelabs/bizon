@@ -76,7 +76,7 @@ exports.readBo_headerEntity = function(id, expanded) {
         }
 
 		if(expanded){
-		   var properties = boItemLib.readHeaderBo_itemsList(header.id);
+		   var properties = boItemLib.readBo_itemsEntity(header.id);
 		   if(properties){
 		   	 header.properties = properties;
 	   	   }
@@ -116,7 +116,7 @@ exports.readBo_headerList = function(limit, offset, sort, desc, expanded) {
         while (resultSet.next()) {
         	var header = createEntity(resultSet);
         	if(expanded){
-			   var properties = boItemLib.readHeaderBo_itemsList(header.id);
+			   var properties = boItemLib.readBo_itemsEntity(header.id);
 			   if(properties){
 			   	 header.properties = properties;
 		   	   }
@@ -168,14 +168,14 @@ exports.updateBo_header = function(cascaded) {
         statement.setString(++i, header.boh_name);
         statement.setString(++i, header.boh_table);
         statement.setString(++i, header.boh_description);
-        var id = responseBody.boh_id;
+        var id = header.boh_id;
         statement.setInt(++i, id);
         statement.executeUpdate();
         
         if(cascaded){
         	if(header.properties){
-        		for(var i=0; i<header.properties.length;i++){
-        			var item = header.properties[i];
+        		for(var j=0; j<header.properties.length;j++){
+        			var item = header.properties[j];
         			if(item.id){
         				boItemLib.updateBo_items(item, false);
         			} else {
@@ -204,10 +204,10 @@ exports.deleteBo_header = function(id, cascaded) {
         statement.executeUpdate();
         
         if(cascaded){
-	       	var properties = boItemLib.readHeaderBo_itemsList(id, false);
+	       	var properties = boItemLib.readBo_itemsEntity(id);
 	       	if(properties){
 	       		for(var i=0;i<properties.length;i++){
-	       			boItemLib.deleteBo_items(properties[i].id, false);
+	       			boItemLib.deleteBo_items(properties[i].id);
 	   			}
 	   		}    	
     	}
@@ -299,25 +299,25 @@ exports.pkToSQL = function() {
 
 exports.hasConflictingParameters = function(id, count, metadata) {
     if(id !== null && count !== null){
-    	printError(response.EXPECTATION_FAILED, 1, "Expectation failed: conflicting parameters - id, count");
+    	exports.printError(response.EXPECTATION_FAILED, 1, "Expectation failed: conflicting parameters - id, count");
         return true;
     }
     if(id !== null && metadata !== null){
-    	printError(response.EXPECTATION_FAILED, 2, "Expectation failed: conflicting parameters - id, metadata");
+    	exports.printError(response.EXPECTATION_FAILED, 2, "Expectation failed: conflicting parameters - id, metadata");
         return true;
     }
     return false;
-}
+};
 
 // check whether the parameter exists 
 exports.isInputParameterValid = function(paramName) {
     var param = request.getParameter(paramName);
     if(param === null || param === undefined){
-    	printError(response.PRECONDITION_FAILED, 3, "Expected parameter is missing: " + paramName);
+    	exports.printError(response.PRECONDITION_FAILED, 3, "Expected parameter is missing: " + paramName);
         return false;
     }
     return true;
-}
+};
 
 // print error
 exports.printError = function(httpCode, errCode, errMessage, errContext) {
@@ -329,4 +329,4 @@ exports.printError = function(httpCode, errCode, errMessage, errContext) {
     if (errContext !== null) {
     	console.error(JSON.stringify(errContext));
     }
-}
+};

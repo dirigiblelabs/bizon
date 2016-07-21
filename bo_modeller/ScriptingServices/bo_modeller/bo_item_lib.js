@@ -70,8 +70,11 @@ exports.createBo_items = function(item, printResultInResponse) {
         	response.println(id);
         return id;
     } catch(e) {
-        var errorCode = response.BAD_REQUEST;
-        exports.printError(errorCode, errorCode, e.message, sql);
+    	if(printResultInResponse){
+    	    var errorCode = response.BAD_REQUEST;
+        	exports.printError(errorCode, errorCode, e.message, sql);
+    	}
+		throw e;
     } finally {
         connection.close();
     }
@@ -99,8 +102,11 @@ exports.readBo_itemsEntity = function(id, printResultInResponse) {
         }
         return item;
     } catch(e){
-        var errorCode = response.BAD_REQUEST;
-        exports.printError(errorCode, errorCode, e.message, sql);
+        if(printResultInResponse){
+        	var errorCode = response.BAD_REQUEST;
+        	exports.printError(errorCode, errorCode, e.message, sql);
+    	}
+		throw e;
     } finally {
         connection.close();
     }
@@ -108,6 +114,7 @@ exports.readBo_itemsEntity = function(id, printResultInResponse) {
 
 // read all entities and print them as JSON array to response
 exports.readBo_itemsList = function(headerId, limit, offset, sort, desc, printResultInResponse) {
+	console.info("header id:  %s", headerId);
     var connection = datasource.getConnection();
     try {
         var items = [];
@@ -116,7 +123,7 @@ exports.readBo_itemsList = function(headerId, limit, offset, sort, desc, printRe
             sql += " " + datasource.getPaging().genTopAndStart(limit, offset);
         }
         sql += " * FROM BO_ITEMS";
-        if(headerId != null){
+        if(headerId !== null){
         	sql += " WHERE BOI_BOH_ID=" + headerId;
         }
         if (sort !== null) {
@@ -139,8 +146,11 @@ exports.readBo_itemsList = function(headerId, limit, offset, sort, desc, printRe
         }
         return items;
     } catch(e){
-        var errorCode = response.BAD_REQUEST;
-        exports.printError(errorCode, errorCode, e.message, sql);
+        if(printResultInResponse){
+	        var errorCode = response.BAD_REQUEST;
+	        exports.printError(errorCode, errorCode, e.message, sql);
+    	}
+		throw e;
     } finally {
         connection.close();
     }
@@ -211,8 +221,11 @@ exports.updateBo_items = function(item, printResultInResponse) {
         	response.println(id);
         return id;
     } catch(e){
-        var errorCode = response.BAD_REQUEST;
-        exports.printError(errorCode, errorCode, e.message, sql);
+        if(printResultInResponse){
+	        var errorCode = response.BAD_REQUEST;
+	        exports.printError(errorCode, errorCode, e.message, sql);
+    	}
+		throw e;
     } finally {
         connection.close();
     }
@@ -230,8 +243,11 @@ exports.deleteBo_items = function(id, printResultInResponse) {
         	response.println(id);
         return id;
     } catch(e){
-        var errorCode = response.BAD_REQUEST;
-        exports.printError(errorCode, errorCode, e.message, sql);
+        if(printResultInResponse){
+	        var errorCode = response.BAD_REQUEST;
+	        exports.printError(errorCode, errorCode, e.message, sql);
+    	}
+		throw e;    
     } finally {
         connection.close();
     }
@@ -249,8 +265,11 @@ exports.countBo_items = function(printResultInResponse) {
             count = rs.getInt(1);
         }
     } catch(e){
-        var errorCode = response.BAD_REQUEST;
-        exports.printError(errorCode, errorCode, e.message, sql);
+        if(printResultInResponse){
+	        var errorCode = response.BAD_REQUEST;
+	        exports.printError(errorCode, errorCode, e.message, sql);
+    	}
+		throw e;        
     } finally {
         connection.close();
     }
