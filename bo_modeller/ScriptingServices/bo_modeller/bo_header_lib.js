@@ -76,7 +76,8 @@ exports.readBo_headerEntity = function(id, expanded) {
         }
 
 		if(expanded){
-		   var properties = boItemLib.readBo_itemsEntity(header.id);
+			//limit, offset, sort, order?
+		   var properties = boItemLib.readBo_itemsList(header.boh_id, null, null, null, null, false);
 		   if(properties){
 		   	 header.properties = properties;
 	   	   }
@@ -84,7 +85,7 @@ exports.readBo_headerEntity = function(id, expanded) {
         
         var jsonResponse = JSON.stringify(header, null, 2);
         response.println(jsonResponse);
-    } catch(e){
+    } catch(e) {
         var errorCode = response.BAD_REQUEST;
         exports.printError(errorCode, errorCode, e.message, sql);
     } finally {
@@ -115,8 +116,9 @@ exports.readBo_headerList = function(limit, offset, sort, desc, expanded) {
         var resultSet = statement.executeQuery();
         while (resultSet.next()) {
         	var header = createEntity(resultSet);
-        	if(expanded){
-			   var properties = boItemLib.readBo_itemsEntity(header.id);
+        	if(expanded){        	
+        	   //separate limit, offset, sort, order?
+			   var properties = boItemLib.readBo_itemsList(header.boh_id, null, null, null, null, false);
 			   if(properties){
 			   	 header.properties = properties;
 		   	   }
