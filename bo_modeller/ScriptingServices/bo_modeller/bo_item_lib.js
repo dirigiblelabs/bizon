@@ -8,9 +8,11 @@ var database = require("db/database");
 var datasource = database.getDatasource();
 
 // create entity by parsing JSON object from request body
-exports.createBo_items = function() {
-    var input = request.readInputText();
-    var requestBody = JSON.parse(input);
+exports.createBo_items = function(item) {
+	if(!item){	
+	    var input = request.readInputText();
+	    item = JSON.parse(input);
+	}
     var connection = datasource.getConnection();
     try {
         var sql = "INSERT INTO BO_ITEMS (";
@@ -55,14 +57,14 @@ exports.createBo_items = function() {
         var i = 0;
         var id = datasource.getSequence('BO_ITEMS_BOI_ID').next();
         statement.setInt(++i, id);
-        statement.setInt(++i, requestBody.boi_boh_id);
-        statement.setString(++i, requestBody.boi_name);
-        statement.setString(++i, requestBody.boi_column);
-        statement.setInt(++i, requestBody.boi_type);
-        statement.setInt(++i, requestBody.boi_length);
-        statement.setShort(++i, requestBody.boi_null);
-        statement.setShort(++i, requestBody.boi_pk);
-        statement.setString(++i, requestBody.boi_default);
+        statement.setInt(++i, item.boi_boh_id);
+        statement.setString(++i, item.boi_name);
+        statement.setString(++i, item.boi_column);
+        statement.setInt(++i, item.boi_type);
+        statement.setInt(++i, item.boi_length);
+        statement.setShort(++i, item.boi_null);
+        statement.setShort(++i, item.boi_pk);
+        statement.setString(++i, item.boi_default);
         statement.executeUpdate();
 		response.println(id);
         return id;
@@ -134,6 +136,37 @@ exports.readBo_itemsList = function(limit, offset, sort, desc) {
     }
 };
 
+// read all entities for a header with given id and returns them as JSON array
+exports.readHeaderBo_itemsList = function(headerId, limit, offset, sort, desc) {
+    var connection = datasource.getConnection();
+    try {
+        var result = [];
+        var sql = "SELECT ";
+        if (limit !== null && offset !== null) {
+            sql += " " + datasource.getPaging().genTopAndStart(limit, offset);
+        }
+        sql += " * FROM BO_ITEMS";
+        sql += " WHERE BOI_BOH_ID=" + headerId;
+        if (sort !== null) {
+            sql += " ORDER BY " + sort;
+        }
+        if (sort !== null && desc !== null) {
+            sql += " DESC ";
+        }
+        if (limit !== null && offset !== null) {
+            sql += " " + datasource.getPaging().genLimitAndOffset(limit, offset);
+        }
+        var statement = connection.prepareStatement(sql);
+        var resultSet = statement.executeQuery();
+        while (resultSet.next()) {
+            result.push(createEntity(resultSet));
+        }
+		return JSON.stringify(result, null, 2);
+    } finally {
+        connection.close();
+    }
+};
+
 //create entity as JSON object from ResultSet current Row
 function createEntity(resultSet) {
     var result = {};
@@ -157,9 +190,12 @@ function convertToDateString(date) {
 }
 
 // update entity by id
-exports.updateBo_items = function() {
-    var input = request.readInputText();
-    var responseBody = JSON.parse(input);
+exports.updateBo_items = function(item) {
+	if(!item){
+	    var input = request.readInputText();
+	    item = JSON.parse(input);		
+	}
+
     var connection = datasource.getConnection();
     try {
         var sql = "UPDATE BO_ITEMS SET ";
@@ -181,15 +217,15 @@ exports.updateBo_items = function() {
         sql += " WHERE BOI_ID = ?";
         var statement = connection.prepareStatement(sql);
         var i = 0;
-        statement.setInt(++i, responseBody.boi_boh_id);
-        statement.setString(++i, responseBody.boi_name);
-        statement.setString(++i, responseBody.boi_column);
-        statement.setInt(++i, responseBody.boi_type);
-        statement.setInt(++i, responseBody.boi_length);
-        statement.setShort(++i, responseBody.boi_null);
-        statement.setShort(++i, responseBody.boi_pk);
-        statement.setString(++i, responseBody.boi_default);
-        var id = responseBody.boi_id;
+        statement.setInt(++i, item.boi_boh_id);
+        statement.setString(++i, item.boi_name);
+        statement.setString(++i, item.boi_column);
+        statement.setInt(++i, item.boi_type);
+        statement.setInt(++i, item.boi_length);
+        statement.setShort(++i, item.boi_null);
+        statement.setShort(++i, item.boi_pk);
+        statement.setString(++i, item.boi_default);
+        var id = item.boi_id;
         statement.setInt(++i, id);
         statement.executeUpdate();
 		response.println(id);
@@ -202,14 +238,16 @@ exports.updateBo_items = function() {
 };
 
 // delete entity
-exports.deleteBo_items = function(id) {
+exports.deleteBo_items = function(id, printResultInResponse) {
     var connection = datasource.getConnection();
     try {
     	var sql = "DELETE FROM BO_ITEMS WHERE " + exports.pkToSQL();
         var statement = connection.prepareStatement(sql);
         statement.setString(1, id);
         statement.executeUpdate();
-        response.println(id);
+        if(printResultInResponse)
+        	response.println(id);
+        return id;
     } catch(e){
         var errorCode = response.BAD_REQUEST;
         exports.printError(errorCode, errorCode, e.message, sql);
@@ -217,6 +255,7 @@ exports.deleteBo_items = function(id) {
         connection.close();
     }
 };
+
 
 exports.countBo_items = function() {
     var count = 0;
@@ -327,25 +366,25 @@ exports.pkToSQL = function() {
 
 exports.hasConflictingParameters = function(id, count, metadata) {
     if(id !== null && count !== null){
-    	printError(response.EXPECTATION_FAILED, 1, "Expectation failed: conflicting parameters - id, count");
+    	exports.printError(response.EXPECTATION_FAILED, 1, "Expectation failed: conflicting parameters - id, count");
         return true;
     }
     if(id !== null && metadata !== null){
-    	printError(response.EXPECTATION_FAILED, 2, "Expectation failed: conflicting parameters - id, metadata");
+    	exports.printError(response.EXPECTATION_FAILED, 2, "Expectation failed: conflicting parameters - id, metadata");
         return true;
     }
     return false;
-}
+};
 
 // check whether the parameter exists 
 exports.isInputParameterValid = function(paramName) {
     var param = request.getParameter(paramName);
     if(param === null || param === undefined){
-    	printError(response.PRECONDITION_FAILED, 3, "Expected parameter is missing: " + paramName);
+    	exports.printError(response.PRECONDITION_FAILED, 3, "Expected parameter is missing: " + paramName);
         return false;
     }
     return true;
-}
+};
 
 // print error
 exports.printError = function(httpCode, errCode, errMessage, errContext) {
@@ -357,4 +396,4 @@ exports.printError = function(httpCode, errCode, errMessage, errContext) {
     if (errContext !== null) {
     	console.error(JSON.stringify(errContext));
     }
-}
+};
