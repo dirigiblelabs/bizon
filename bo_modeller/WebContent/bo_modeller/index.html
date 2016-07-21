@@ -152,7 +152,7 @@
 		  });		    
 	}])
 	.service('Entity', function($resource) {
-	  return $resource('api/bos/:boId', { boId:'@id' }, {
+	  return $resource('http://localhost:8081/api/bos/:boId', { boId:'@id' }, {
 		    create: {
 		        method: 'POST'
 		      },
@@ -170,7 +170,7 @@
 		
 		$scope.isDisabled = $stateParams.itemForEdit!==undefined;
 		
-		$scope.sortByPropertyName = 'name';
+		$scope.sortByPropertyName = 'boh_name';
 	    $scope.reverse = false;//ASC
 		
 	 	$scope.sortBy = function(propertyName) {
@@ -181,13 +181,13 @@
 		};
 		
 		$scope.selectItem = function(item){
-			if(!$scope.selectedItem && !item || ($scope.selectedItem && $scope.selectedItem.id === item.id))//noops
+			if(!$scope.selectedItem && !item || ($scope.selectedItem && $scope.selectedItem.boh_id === item.noh_id))//noops
 				return;
 			if(item){
 				$scope.selectedItem = item;// save the selected item
 				$state.go('items.select', {
 					selectedItem: item,
-					boId: item.id
+					boId: item.boh_id
 				})
 			}
 		}
@@ -202,7 +202,7 @@
 						$scope.items = result;//initialize the items to display
 						$scope.sortBy($scope.sortByPropertyName);
 						
-						itemId = itemId || result[0].id;					
+						itemId = itemId || result[0].boh_id;					
 						var item = findItemById(result, itemId);
 						if(item === undefined){
 							fireLocationError.apply(this);
@@ -223,7 +223,7 @@
 		function findItemById(items, itemId){
 			var item;
 			for(var i=0; i< items.length; i++){
-				if(items[i].id === itemId ){
+				if(items[i].boh_id === itemId ){
 					item = items[i];
 					break;
 				}
@@ -242,19 +242,20 @@
 		
 		$scope.createItem = function(){
 			Entity.save({
-						"name":"Business Object Name",
-						"description":"Description for business object",
-						"key":"Id",
-						"table":"TBL_NAME",
+						"boh_name":"Business Object Name",
+						"boh_table": "BO_TABLE_NAME",
+						"boh_description":"Description for business object",
+						"boh_key":"Id",
 		
 						"properties": [{
-							"name":"Id",
-							"type":"Integer",
-							"key": true
+							"boi_name":"Id",
+							"boi_type":"Integer",
+							"boi_nullable":0,
+							"boi_key": true
 						}]
 					}).$promise
 			.then(function(newItem){
-				$stateParams.boId = newItem.id;
+				$stateParams.boId = newItem.boh_id;
 				$stateParams.message = {
 					text: 'New Buisness Object successfully created.',
 					type: 'alert-success'
@@ -285,7 +286,7 @@
 		$scope.showProperties = function(){
 			if($scope._selectedItemDetails){
 				$scope.selectedItemDetails = $scope._selectedItemDetails.filter(function(v, i, arr){
-					if(!v.type || v.type!=='Relationship'){
+					if(!v.boi_type || v.boi_type!=='Relationship'){
 						return true;
 					}
 					return false;
@@ -305,7 +306,7 @@
 		$scope.showRelationships = function(){
 			if($scope._selectedItemDetails){
 				$scope.selectedItemDetails = $scope._selectedItemDetails.filter(function(v, i, arr){
-					if(v.type && v.type==='Relationship'){
+					if(v.boi_type && v.boi_type==='Relationship'){
 						return true;
 					}
 					return false;
@@ -320,16 +321,16 @@
 		
 		$scope.duplicateItem = function() {
 			var duplicateItem = angular.copy($scope.selectedItem, {});
-			delete duplicateItem.id;
+			delete duplicateItem.boh_id;
 			Entity.save(duplicateItem).$promise
 				.then(function(newItem){
-					$stateParams.boId = newItem.id;
+					$stateParams.boId = newItem.boh_id;
 					$state.go($state.current, $stateParams, {reload: true, location:true, inherit: true});
 				});
 		}
 		
 		$scope.deleteItem = function() {
-			Entity.remove({boId: $scope.selectedItem.id}).$promise
+			Entity.remove({boId: $scope.selectedItem.boh_id}).$promise
 			.then(function(){
 				//$state.reload();
 				delete $stateParams.boId;
@@ -355,7 +356,7 @@
 		$scope.showProperties = function(){
 			if($scope._selectedItemDetails){
 				$scope.selectedItemDetails = $scope._selectedItemDetails.filter(function(v, i, arr){
-					if(!v.type || v.type!=='Relationship'){
+					if(!v.boi_type || v.boi_type!=='Relationship'){
 						return true;
 					}
 					return false;
@@ -368,7 +369,7 @@
 		$scope.showRelationships = function(){
 			if($scope._selectedItemDetails){
 				$scope.selectedItemDetails = $scope._selectedItemDetails.filter(function(v, i, arr){
-					if(v.type && v.type==='Relationship'){
+					if(v.boi_type && v.boi_type==='Relationship'){
 						return true;
 					}
 					return false;
@@ -402,7 +403,7 @@
 		$scope.saveItem = function() {
 		    Entity.update($scope.selectedItem).$promise
 		    	.then(function(item){
-					$state.go('items.select', {boId: $scope.selectedItem.id})	
+					$state.go('items.select', {boId: $scope.selectedItem.boi_id})	
 		    	})
 		}
 				
@@ -447,35 +448,11 @@
 				$scope.property = $stateParams.property;
 			}
 			for(var i=0; i<$scope.typeOptions.length; i++){
-				if($scope.typeOptions[i].val === $scope.property.type){
+				if($scope.typeOptions[i].val === $scope.property.boi_type){
 					$scope.selectedTypeOption = $scope.typeOptions[i];
 					break;
 				}
 			}
-			
-		   /*$('.modal-body form').validate( {
-		        rules: {
-		            name: {
-		                minlength: 1,
-		                required: true
-		            },
-		            type: {
-		                required: true,
-		                email: true
-		            },
-		            message: {
-		                minlength: 2,
-		                required: true
-		            }
-		        },
-		        highlight: function (element) {
-		            $(element).closest('.control-group').removeClass('success').addClass('error');
-		        },
- 		        success: function (element) {
-		            element.text('OK!').addClass('valid')
-		                .closest('.control-group').removeClass('error').addClass('success');
-		        }
-		   });*/
 		}
         
         $scope.cancel = function() {

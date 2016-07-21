@@ -42,18 +42,18 @@
 				<i class="fa fa-th"></i>
 			</div>
 			<div class="object-title">
-				<p class="title" editable-text="selectedItem.name">{{selectedItem.name}}</p>
-	    		<p class="subtitle" editable-text="selectedItem.description">{{selectedItem.description}}</p>						
+				<p class="title" editable-text="selectedItem.name">{{selectedItem.boh_name}}</p>
+	    		<p class="subtitle" editable-text="selectedItem.description">{{selectedItem.boh_description}}</p>						
 			</div>
 		</section>
 		<section class="object-attributes">
       		<div>
       			<label><i class="fa fa-key"></i></label>
-      			<span editable-select="selectedItem.key" e-ng-options="s.value as s.text for s in [{text:'Id', value:'Id'}, {text:'Property 1', value:2}, {text:'Property 2', value:3}]">{{selectedItem.key}}</span>
+      			<span editable-select="selectedItem.key" e-ng-options="s.value as s.text for s in [{text:'Id', value:'Id'}, {text:'Property 1', value:2}, {text:'Property 2', value:3}]">{{selectedItem.boh_key}}</span>
       		</div>
 			<div>
 				<label><i class="fa fa-table"></i></label>
-      			<span editable-select="selectedItem.table" e-ng-options="s.value as s.text for s in [{text:'TBL_A', value:'TBL_A'}, {text:'TBL_B', value:'TBL_B'}, {text:'TBL_C', value:'TBL_C'}]">{{selectedItem.table}}</span>
+      			<span editable-select="selectedItem.table" e-ng-options="s.value as s.text for s in [{text:'TBL_A', value:'TBL_A'}, {text:'TBL_B', value:'TBL_B'}, {text:'TBL_C', value:'TBL_C'}]">{{selectedItem.boh_table}}</span>
       		</div>				      		
 		</section>					    		
 	</section>
@@ -81,10 +81,10 @@
 			<div class="tab-pane fade in active">
 				
 				<div class="list-group" >
-				  <a class="list-group-item selected-{{entry._selected_}}" ng-repeat="entry in selectedItemDetails|filter:searchText|orderBy:'name'">
+				  <a class="list-group-item selected-{{entry._selected_}}" ng-repeat="entry in selectedItemDetails|filter:searchText|orderBy:'boi_name'">
 				  	<div style="display:inline-block">
-						<div class="list-item-title"><span class="required" ng-show="!entry.nullable">*</span>{{entry.name}} <div ng-show="entry.key" style="display: inline-block"><i class="fa fa-key"></i></div></div>
-						<div class="list-item-subtitle">{{entry.type}}</div>						  	
+						<div class="list-item-title"><span class="required" ng-show="boi_nullable">*</span>{{entry.boi_name}} <div ng-show="entry.boi_key" style="display: inline-block"><i class="fa fa-key"></i></div></div>
+						<div class="list-item-subtitle">{{entry.boi_type}}</div>						  	
 				  	</div>
 					<div class="btn-group pull-right">
 				   		<button class="btn btn-primary" ng-click="openPropertyEditor(entry)">

@@ -19,18 +19,18 @@
 				<i class="fa fa-th"></i>
 			</div>
 			<div class="object-title">
-				<p class="title">{{selectedItem.name}}</p>
-	    		<p class="subtitle">{{selectedItem.description}}</p>						
+				<p class="title">{{selectedItem.boh_name}}</p>
+	    		<p class="subtitle">{{selectedItem.boh_description}}</p>						
 			</div>
 		</section>
 		<section class="object-attributes">
       		<div>
       			<label><i class="fa fa-key"></i></label>
-      			<span>{{selectedItem.key}}</span>
+      			<span>{{selectedItem.boh_key}}</span>
       		</div>
 			<div>
 				<label><i class="fa fa-table"></i></label>
-      			<span>{{selectedItem.table}}</span>
+      			<span>{{selectedItem.boh_table}}</span>
       		</div>				      							    		
 		</section>
 	</section>
@@ -53,9 +53,9 @@
 			<div class="tab-pane fade in active">
 				
 				<div class="list-group" >
-				  <a class="list-group-item selected-{{entry._selected_}}" ng-repeat="entry in selectedItemDetails|filter:searchText track by entry.id">
-					<div class="list-item-title"><span class="required" ng-show="!entry.nullable">*</span>{{entry.name}} <div ng-show="entry.key" style="display: inline-block"><i class="fa fa-key"></i></div></div>
-					<div class="list-item-subtitle">{{entry.type}}</div>
+				  <a class="list-group-item selected-{{entry._selected_}}" ng-repeat="entry in selectedItemDetails|filter:searchText|orderBy:'boi_name'">
+					<div class="list-item-title"><span class="required" ng-show="!entry.boi_nullable">*</span>{{entry.boi_name}} <div ng-show="entry.boi_key" style="display: inline-block"><i class="fa fa-key"></i></div></div>
+					<div class="list-item-subtitle">{{entry.boi_type}}</div>
 				  </a>
 				</div>
 				

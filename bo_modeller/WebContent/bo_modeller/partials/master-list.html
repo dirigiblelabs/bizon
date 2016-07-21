@@ -12,8 +12,8 @@
     </header>
 
 	<ul class="nav nav-pills nav-stacked" style="margin-top: 5.7rem">
- 		<li role="presentation" ng-class="{active: selectedItem.id===item.id}" ng-repeat="item in items track by item.id">
- 			<a ng-click="selectItem(item)"><i class="fa fa-th-large"></i> {{item.name}} <span ng-click="deleteItem(item.id)" class="glyphicon glyphicon-remove pull-right tools-remove" aria-hidden="true"></span></a>
+ 		<li role="presentation" ng-class="{active: selectedItem.boh_id===item.boh_id}" ng-repeat="item in items track by item.boh_id">
+ 			<a ng-click="selectItem(item)"><i class="fa fa-th-large"></i> {{item.boh_name}} <span ng-click="deleteItem(item.boh_id)" class="glyphicon glyphicon-remove pull-right tools-remove" aria-hidden="true"></span></a>
  		</li>
 	</ul>
 
