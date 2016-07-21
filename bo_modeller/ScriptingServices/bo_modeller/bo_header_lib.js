@@ -4,13 +4,14 @@
 var request = require("net/http/request");
 var response = require("net/http/response");
 var database = require("db/database");
+var boItemLib = require("bo_modeller/bo_item_lib");
 
 var datasource = database.getDatasource();
 
 // create entity by parsing JSON object from request body
 exports.createBo_header = function() {
     var input = request.readInputText();
-    var requestBody = JSON.parse(input);
+    var header = JSON.parse(input);
     var connection = datasource.getConnection();
     try {
         var sql = "INSERT INTO BO_HEADER (";
@@ -35,10 +36,18 @@ exports.createBo_header = function() {
         var i = 0;
         var id = datasource.getSequence('BO_HEADER_BOH_ID').next();
         statement.setInt(++i, id);
-        statement.setString(++i, requestBody.boh_name);
-        statement.setString(++i, requestBody.boh_table);
-        statement.setString(++i, requestBody.boh_description);
+        statement.setString(++i, header.boh_name);
+        statement.setString(++i, header.boh_table);
+        statement.setString(++i, header.boh_description);
         statement.executeUpdate();
+        
+        if(header.properties && header.properties.length>0){
+        	for(var j=0; j<header.properties.length; j++){
+        		var property = header.properties[j];
+				boItemLib.createBo_items(property, false);
+    		}
+    	}
+
 		response.println(id);
         return id;
     } catch(e) {
@@ -51,21 +60,29 @@ exports.createBo_header = function() {
 };
 
 // read single entity by id and print as JSON object to response
-exports.readBo_headerEntity = function(id) {
+exports.readBo_headerEntity = function(id, expanded) {
     var connection = datasource.getConnection();
     try {
-        var result;
+        var header;
         var sql = "SELECT * FROM BO_HEADER WHERE " + exports.pkToSQL();
         var statement = connection.prepareStatement(sql);
         statement.setInt(1, id);
         
         var resultSet = statement.executeQuery();
         if (resultSet.next()) {
-            result = createEntity(resultSet);
+            header = createEntity(resultSet);
         } else {
         	exports.printError(response.NOT_FOUND, 1, "Record with id: " + id + " does not exist.", sql);
         }
-        var jsonResponse = JSON.stringify(result, null, 2);
+
+		if(expanded){
+		   var properties = boItemLib.readHeaderBo_itemsList(header.id);
+		   if(properties){
+		   	 header.properties = properties;
+	   	   }
+		}
+        
+        var jsonResponse = JSON.stringify(header, null, 2);
         response.println(jsonResponse);
     } catch(e){
         var errorCode = response.BAD_REQUEST;
@@ -76,10 +93,10 @@ exports.readBo_headerEntity = function(id) {
 };
 
 // read all entities and print them as JSON array to response
-exports.readBo_headerList = function(limit, offset, sort, desc) {
+exports.readBo_headerList = function(limit, offset, sort, desc, expanded) {
     var connection = datasource.getConnection();
     try {
-        var result = [];
+        var headers = [];
         var sql = "SELECT ";
         if (limit !== null && offset !== null) {
             sql += " " + datasource.getPaging().genTopAndStart(limit, offset);
@@ -97,9 +114,16 @@ exports.readBo_headerList = function(limit, offset, sort, desc) {
         var statement = connection.prepareStatement(sql);
         var resultSet = statement.executeQuery();
         while (resultSet.next()) {
-            result.push(createEntity(resultSet));
+        	var header = createEntity(resultSet);
+        	if(expanded){
+			   var properties = boItemLib.readHeaderBo_itemsList(header.id);
+			   if(properties){
+			   	 header.properties = properties;
+		   	   }
+			}
+            headers.push(header);
         }
-        var jsonResponse = JSON.stringify(result, null, 2);
+        var jsonResponse = JSON.stringify(headers, null, 2);
         response.println(jsonResponse);
     } catch(e){
         var errorCode = response.BAD_REQUEST;
@@ -126,10 +150,10 @@ function convertToDateString(date) {
     return fullYear + "/" + month + "/" + dateOfMonth;
 }
 
-// update entity by id
-exports.updateBo_header = function() {
+// update Header entity by id, optionally upserting its Items composition
+exports.updateBo_header = function(cascaded) {
     var input = request.readInputText();
-    var responseBody = JSON.parse(input);
+    var header = JSON.parse(input);
     var connection = datasource.getConnection();
     try {
         var sql = "UPDATE BO_HEADER SET ";
@@ -141,12 +165,26 @@ exports.updateBo_header = function() {
         sql += " WHERE BOH_ID = ?";
         var statement = connection.prepareStatement(sql);
         var i = 0;
-        statement.setString(++i, responseBody.boh_name);
-        statement.setString(++i, responseBody.boh_table);
-        statement.setString(++i, responseBody.boh_description);
+        statement.setString(++i, header.boh_name);
+        statement.setString(++i, header.boh_table);
+        statement.setString(++i, header.boh_description);
         var id = responseBody.boh_id;
         statement.setInt(++i, id);
         statement.executeUpdate();
+        
+        if(cascaded){
+        	if(header.properties){
+        		for(var i=0; i<header.properties.length;i++){
+        			var item = header.properties[i];
+        			if(item.id){
+        				boItemLib.updateBo_items(item, false);
+        			} else {
+        				boItemLib.createBo_items(item, false);
+        			}
+        		}	
+        	}
+        }
+        
 		response.println(id);
     } catch(e){
         var errorCode = response.BAD_REQUEST;
@@ -157,13 +195,22 @@ exports.updateBo_header = function() {
 };
 
 // delete entity
-exports.deleteBo_header = function(id) {
+exports.deleteBo_header = function(id, cascaded) {
     var connection = datasource.getConnection();
     try {
     	var sql = "DELETE FROM BO_HEADER WHERE " + exports.pkToSQL();
         var statement = connection.prepareStatement(sql);
         statement.setString(1, id);
         statement.executeUpdate();
+        
+        if(cascaded){
+	       	var properties = boItemLib.readHeaderBo_itemsList(id, false);
+	       	if(properties){
+	       		for(var i=0;i<properties.length;i++){
+	       			boItemLib.deleteBo_items(properties[i].id, false);
+	   			}
+	   		}    	
+    	}
         response.println(id);
     } catch(e){
         var errorCode = response.BAD_REQUEST;

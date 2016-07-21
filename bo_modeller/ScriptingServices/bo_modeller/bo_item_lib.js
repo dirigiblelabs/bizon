@@ -8,9 +8,11 @@ var database = require("db/database");
 var datasource = database.getDatasource();
 
 // create entity by parsing JSON object from request body
-exports.createBo_items = function() {
-    var input = request.readInputText();
-    var requestBody = JSON.parse(input);
+exports.createBo_items = function(item, printResultInResponse) {
+	if(!item){	
+	    var input = request.readInputText();
+	    item = JSON.parse(input);
+	}
     var connection = datasource.getConnection();
     try {
         var sql = "INSERT INTO BO_ITEMS (";
@@ -55,16 +57,17 @@ exports.createBo_items = function() {
         var i = 0;
         var id = datasource.getSequence('BO_ITEMS_BOI_ID').next();
         statement.setInt(++i, id);
-        statement.setInt(++i, requestBody.boi_boh_id);
-        statement.setString(++i, requestBody.boi_name);
-        statement.setString(++i, requestBody.boi_column);
-        statement.setInt(++i, requestBody.boi_type);
-        statement.setInt(++i, requestBody.boi_length);
-        statement.setShort(++i, requestBody.boi_null);
-        statement.setShort(++i, requestBody.boi_pk);
-        statement.setString(++i, requestBody.boi_default);
+        statement.setInt(++i, item.boi_boh_id);
+        statement.setString(++i, item.boi_name);
+        statement.setString(++i, item.boi_column);
+        statement.setInt(++i, item.boi_type);
+        statement.setInt(++i, item.boi_length);
+        statement.setShort(++i, item.boi_null);
+        statement.setShort(++i, item.boi_pk);
+        statement.setString(++i, item.boi_default);
         statement.executeUpdate();
-		response.println(id);
+        if(printResultInResponse)
+        	response.println(id);
         return id;
     } catch(e) {
         var errorCode = response.BAD_REQUEST;
@@ -76,22 +79,25 @@ exports.createBo_items = function() {
 };
 
 // read single entity by id and print as JSON object to response
-exports.readBo_itemsEntity = function(id) {
+exports.readBo_itemsEntity = function(id, printResultInResponse) {
     var connection = datasource.getConnection();
     try {
-        var result;
+        var item;
         var sql = "SELECT * FROM BO_ITEMS WHERE " + exports.pkToSQL();
         var statement = connection.prepareStatement(sql);
         statement.setInt(1, id);
         
         var resultSet = statement.executeQuery();
         if (resultSet.next()) {
-            result = createEntity(resultSet);
+            item = createEntity(resultSet);
         } else {
         	exports.printError(response.NOT_FOUND, 1, "Record with id: " + id + " does not exist.", sql);
         }
-        var jsonResponse = JSON.stringify(result, null, 2);
-        response.println(jsonResponse);
+        if(printResultInResponse){
+            var jsonResponse = JSON.stringify(item, null, 2);
+            response.println(jsonResponse);        	
+        }
+        return item;
     } catch(e){
         var errorCode = response.BAD_REQUEST;
         exports.printError(errorCode, errorCode, e.message, sql);
@@ -101,15 +107,18 @@ exports.readBo_itemsEntity = function(id) {
 };
 
 // read all entities and print them as JSON array to response
-exports.readBo_itemsList = function(limit, offset, sort, desc) {
+exports.readBo_itemsList = function(headerId, limit, offset, sort, desc, printResultInResponse) {
     var connection = datasource.getConnection();
     try {
-        var result = [];
+        var items = [];
         var sql = "SELECT ";
         if (limit !== null && offset !== null) {
             sql += " " + datasource.getPaging().genTopAndStart(limit, offset);
         }
         sql += " * FROM BO_ITEMS";
+        if(headerId != null){
+        	sql += " WHERE BOI_BOH_ID=" + headerId;
+        }
         if (sort !== null) {
             sql += " ORDER BY " + sort;
         }
@@ -122,10 +131,13 @@ exports.readBo_itemsList = function(limit, offset, sort, desc) {
         var statement = connection.prepareStatement(sql);
         var resultSet = statement.executeQuery();
         while (resultSet.next()) {
-            result.push(createEntity(resultSet));
+            items.push(createEntity(resultSet));
         }
-        var jsonResponse = JSON.stringify(result, null, 2);
-        response.println(jsonResponse);
+        if(printResultInResponse){
+            var jsonResponse = JSON.stringify(items, null, 2);
+        	response.println(jsonResponse);
+        }
+        return items;
     } catch(e){
         var errorCode = response.BAD_REQUEST;
         exports.printError(errorCode, errorCode, e.message, sql);
@@ -157,9 +169,12 @@ function convertToDateString(date) {
 }
 
 // update entity by id
-exports.updateBo_items = function() {
-    var input = request.readInputText();
-    var responseBody = JSON.parse(input);
+exports.updateBo_items = function(item, printResultInResponse) {
+	if(!item){
+	    var input = request.readInputText();
+	    item = JSON.parse(input);		
+	}
+
     var connection = datasource.getConnection();
     try {
         var sql = "UPDATE BO_ITEMS SET ";
@@ -181,18 +196,20 @@ exports.updateBo_items = function() {
         sql += " WHERE BOI_ID = ?";
         var statement = connection.prepareStatement(sql);
         var i = 0;
-        statement.setInt(++i, responseBody.boi_boh_id);
-        statement.setString(++i, responseBody.boi_name);
-        statement.setString(++i, responseBody.boi_column);
-        statement.setInt(++i, responseBody.boi_type);
-        statement.setInt(++i, responseBody.boi_length);
-        statement.setShort(++i, responseBody.boi_null);
-        statement.setShort(++i, responseBody.boi_pk);
-        statement.setString(++i, responseBody.boi_default);
-        var id = responseBody.boi_id;
+        statement.setInt(++i, item.boi_boh_id);
+        statement.setString(++i, item.boi_name);
+        statement.setString(++i, item.boi_column);
+        statement.setInt(++i, item.boi_type);
+        statement.setInt(++i, item.boi_length);
+        statement.setShort(++i, item.boi_null);
+        statement.setShort(++i, item.boi_pk);
+        statement.setString(++i, item.boi_default);
+        var id = item.boi_id;
         statement.setInt(++i, id);
         statement.executeUpdate();
-		response.println(id);
+        if(printResultInResponse)
+        	response.println(id);
+        return id;
     } catch(e){
         var errorCode = response.BAD_REQUEST;
         exports.printError(errorCode, errorCode, e.message, sql);
@@ -202,14 +219,16 @@ exports.updateBo_items = function() {
 };
 
 // delete entity
-exports.deleteBo_items = function(id) {
+exports.deleteBo_items = function(id, printResultInResponse) {
     var connection = datasource.getConnection();
     try {
     	var sql = "DELETE FROM BO_ITEMS WHERE " + exports.pkToSQL();
         var statement = connection.prepareStatement(sql);
         statement.setString(1, id);
         statement.executeUpdate();
-        response.println(id);
+        if(printResultInResponse)
+        	response.println(id);
+        return id;
     } catch(e){
         var errorCode = response.BAD_REQUEST;
         exports.printError(errorCode, errorCode, e.message, sql);
@@ -218,7 +237,8 @@ exports.deleteBo_items = function(id) {
     }
 };
 
-exports.countBo_items = function() {
+
+exports.countBo_items = function(printResultInResponse) {
     var count = 0;
     var connection = datasource.getConnection();
     try {
@@ -234,7 +254,9 @@ exports.countBo_items = function() {
     } finally {
         connection.close();
     }
-    response.println(count);
+    if(printResultInResponse)
+    	response.println(count);
+    return count;
 };
 
 exports.metadataBo_items = function() {
@@ -327,25 +349,25 @@ exports.pkToSQL = function() {
 
 exports.hasConflictingParameters = function(id, count, metadata) {
     if(id !== null && count !== null){
-    	printError(response.EXPECTATION_FAILED, 1, "Expectation failed: conflicting parameters - id, count");
+    	exports.printError(response.EXPECTATION_FAILED, 1, "Expectation failed: conflicting parameters - id, count");
         return true;
     }
     if(id !== null && metadata !== null){
-    	printError(response.EXPECTATION_FAILED, 2, "Expectation failed: conflicting parameters - id, metadata");
+    	exports.printError(response.EXPECTATION_FAILED, 2, "Expectation failed: conflicting parameters - id, metadata");
         return true;
     }
     return false;
-}
+};
 
 // check whether the parameter exists 
 exports.isInputParameterValid = function(paramName) {
     var param = request.getParameter(paramName);
     if(param === null || param === undefined){
-    	printError(response.PRECONDITION_FAILED, 3, "Expected parameter is missing: " + paramName);
+    	exports.printError(response.PRECONDITION_FAILED, 3, "Expected parameter is missing: " + paramName);
         return false;
     }
     return true;
-}
+};
 
 // print error
 exports.printError = function(httpCode, errCode, errMessage, errContext) {
@@ -357,4 +379,4 @@ exports.printError = function(httpCode, errCode, errMessage, errContext) {
     if (errContext !== null) {
     	console.error(JSON.stringify(errContext));
     }
-}
+};
