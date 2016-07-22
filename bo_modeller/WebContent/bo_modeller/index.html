@@ -181,7 +181,7 @@
 		};
 		
 		$scope.selectItem = function(item){
-			if(!$scope.selectedItem && !item || ($scope.selectedItem && $scope.selectedItem.boh_id === item.noh_id))//noops
+			if(!$scope.selectedItem && !item || ($scope.selectedItem && $scope.selectedItem.boh_id === item.boh_id))//noops
 				return;
 			if(item){
 				$scope.selectedItem = item;// save the selected item
@@ -223,7 +223,7 @@
 		function findItemById(items, itemId){
 			var item;
 			for(var i=0; i< items.length; i++){
-				if(items[i].boh_id === itemId ){
+				if(items[i].boh_id == itemId ){
 					item = items[i];
 					break;
 				}
