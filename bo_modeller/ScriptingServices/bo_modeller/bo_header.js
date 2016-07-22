@@ -21,7 +21,8 @@ function handleRequest() {
 	var idParameter = entityBo_header.getPrimaryKey();
 	
 	// retrieve the id as parameter if exist 
-	var id = xss.escapeSql(request.getParameter(idParameter));
+	var id = xss.escapeSql(request.getParameter(idParameter)) || request.getAttribute("path");
+	console.info("Requested HEADER id: %s", id);
 	var count = xss.escapeSql(request.getParameter('count'));
 	var metadata = xss.escapeSql(request.getParameter('metadata'));
 	var sort = xss.escapeSql(request.getParameter('sort'));

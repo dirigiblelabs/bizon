@@ -119,7 +119,6 @@ exports.readBo_itemsList = function(headerId, limit, offset, sort, desc, printRe
         var items = [];
         var sql = "SELECT ";
         if (limit !== null && offset !== null) {
-        	console.info("LIMIT:  %s , OFFSET: %s", limit, offset);
             sql += " " + datasource.getPaging().genTopAndStart(limit, offset);
         }
         sql += " * FROM BO_ITEMS";

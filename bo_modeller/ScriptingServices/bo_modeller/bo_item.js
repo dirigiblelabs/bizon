@@ -21,7 +21,8 @@ function handleRequest() {
 	var idParameter = entityBo_items.getPrimaryKey();
 	
 	// retrieve the id as parameter if exist 
-	var id = xss.escapeSql(request.getParameter(idParameter));
+	var id = xss.escapeSql(request.getParameter(idParameter)) || request.getAttribute("path");
+	console.info("Requested ITEM id: %s", id);
 	var count = xss.escapeSql(request.getParameter('count'));
 	var metadata = xss.escapeSql(request.getParameter('metadata'));
 	var sort = xss.escapeSql(request.getParameter('sort'));
@@ -38,24 +39,24 @@ function handleRequest() {
 	
 	if(!entityBo_items.hasConflictingParameters(id, count, metadata)) {
 		// switch based on method type
-		if ((method === 'POST')) {
+		if (method === 'POST') {
 			// create
 			entityBo_items.createBo_items();
-		} else if ((method === 'GET')) {
+		} else if (method === 'GET') {
 			// read
 			if (id) {
-				entityBo_items.readBo_itemsEntity(id);
+				entityBo_items.readBo_itemsEntity(id, true);
 			} else if (count !== null) {
 				entityBo_items.countBo_items();
 			} else if (metadata !== null) {
 				entityBo_items.metadataBo_items();
 			} else {
-				entityBo_items.readBo_itemsList(limit, offset, sort, desc);
+				entityBo_items.readBo_itemsList(null, limit, offset, sort, desc, true);
 			}
-		} else if ((method === 'PUT')) {
+		} else if (method === 'PUT') {
 			// update
 			entityBo_items.updateBo_items();    
-		} else if ((method === 'DELETE')) {
+		} else if (method === 'DELETE') {
 			// delete
 			if(entityBo_items.isInputParameterValid(idParameter)){
 				entityBo_items.deleteBo_items(id);
