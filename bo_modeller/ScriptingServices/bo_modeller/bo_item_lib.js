@@ -7,12 +7,14 @@ var database = require("db/database");
 
 var datasource = database.getDatasource();
 
-// create entity by parsing JSON object from request body
-exports.createBo_items = function(item, printResultInResponse) {
-	if(!item){	
-	    var input = request.readInputText();
-	    item = JSON.parse(input);
+// Parse JSON entity into SQL and insert in db. Returns the new record id.
+exports.createBo_items = function(item) {
+
+	if(item.boi_type === undefined || item.type === null){
+		throw new Error('Invalid type: ' + item.type);
 	}
+	
+
     var connection = datasource.getConnection();
     try {
         var sql = "INSERT INTO BO_ITEMS (";
@@ -68,15 +70,10 @@ exports.createBo_items = function(item, printResultInResponse) {
         statement.setShort(++i, item.boi_pk);
         statement.setString(++i, item.boi_default);
         statement.executeUpdate();
-                		        
-        if(printResultInResponse)
-        	response.println(id);
+
         return id;
     } catch(e) {
-    	if(printResultInResponse){
-    	    var errorCode = response.BAD_REQUEST;
-        	exports.printError(errorCode, errorCode, e.message, sql);
-    	}
+		e.errContext = sql;
 		throw e;
     } finally {
         connection.close();
@@ -84,8 +81,8 @@ exports.createBo_items = function(item, printResultInResponse) {
     return -1;
 };
 
-// read single entity by id and print as JSON object to response
-exports.readBo_itemsEntity = function(id, printResultInResponse) {
+// Reads a single entity by id, parsed into JSON object 
+exports.readBo_itemsEntity = function(id) {
     var connection = datasource.getConnection();
     try {
         var item;
@@ -96,27 +93,18 @@ exports.readBo_itemsEntity = function(id, printResultInResponse) {
         var resultSet = statement.executeQuery();
         if (resultSet.next()) {
             item = createEntity(resultSet);
-        } else {
-        	exports.printError(response.NOT_FOUND, 1, "Record with id: " + id + " does not exist.", sql);
-        }
-        if(printResultInResponse){
-            var jsonResponse = JSON.stringify(item, null, 2);
-            response.println(jsonResponse);        	
-        }
+        } 
         return item;
-    } catch(e){
-        if(printResultInResponse){
-        	var errorCode = response.BAD_REQUEST;
-        	exports.printError(errorCode, errorCode, e.message, sql);
-    	}
+    } catch(e) {
+		e.errContext = sql;
 		throw e;
     } finally {
         connection.close();
     }
 };
 
-// read all entities and print them as JSON array to response
-exports.readBo_itemsList = function(headerId, limit, offset, sort, desc, printResultInResponse) {
+// Read all entities, parse and return them as an array of JSON objets
+exports.readBo_itemsList = function(headerId, limit, offset, sort, desc) {
     var connection = datasource.getConnection();
     try {
         var items = [];
@@ -142,16 +130,9 @@ exports.readBo_itemsList = function(headerId, limit, offset, sort, desc, printRe
         while (resultSet.next()) {
             items.push(createEntity(resultSet));
         }
-        if(printResultInResponse){
-            var jsonResponse = JSON.stringify(items, null, 2);
-        	response.println(jsonResponse);
-        }
         return items;
-    } catch(e){
-        if(printResultInResponse){
-	        var errorCode = response.BAD_REQUEST;
-	        exports.printError(errorCode, errorCode, e.message, sql);
-    	}
+    }  catch(e) {
+		e.errContext = sql;
 		throw e;
     } finally {
         connection.close();
@@ -189,15 +170,10 @@ function createSQLEntity(item) {
     if(item){
 		item.boi_type = stringToCodeItemTypeMapping(item.boi_type);
 		console.info("Item type: %s", item.boi_type);
-		if(item.boi_null===undefined){
+		if(item.boi_null === null || item.boi_null === undefined || item.boi_null === true){
 			item.boi_null = 1;
 		} else {
-	    	if(item.boi_null === true){
-	    		item.boi_null = 1;
-	    	} else {
-	    	   	item.boi_null = 0;
-		   	}
-	
+    	   	item.boi_null = 0;
 	    }
 	   	console.info("Item nullable: %s", item.boi_null);
 	   	if(item.boi_pk===undefined){
@@ -262,12 +238,16 @@ function codeToStringItemTypeMapping(code) {
 		return 'Relationship';
 }
 
-// update entity by id
-exports.updateBo_items = function(item, printResultInResponse) {
-	if(!item){
-	    var input = request.readInputText();
-	    item = JSON.parse(input);		
+// update entity from a JSON object. Returns the id of the updated entity.
+exports.updateBo_items = function(item) {
+
+	if(item.boi_id === undefined || item.boi_id === null){
+		throw new Error('Invalid id: ' + item.id);
 	}
+	if(item.boi_type === undefined || item.type === null){
+		throw new Error('Invalid type: ' + item.type);
+	}
+	
 
     var connection = datasource.getConnection();
     try {
@@ -304,44 +284,34 @@ exports.updateBo_items = function(item, printResultInResponse) {
         var id = item.boi_id;
         statement.setInt(++i, id);
         statement.executeUpdate();
-        if(printResultInResponse)
-        	response.println(id);
         return id;
-    } catch(e){
-        if(printResultInResponse){
-	        var errorCode = response.BAD_REQUEST;
-	        exports.printError(errorCode, errorCode, e.message, sql);
-    	}
+    } catch(e) {
+		e.errContext = sql;
 		throw e;
     } finally {
         connection.close();
     }
 };
 
-// delete entity
-exports.deleteBo_items = function(id, printResultInResponse) {
+// delete entity by id. Returns the id of the deleted entity.
+exports.deleteBo_items = function(id) {
     var connection = datasource.getConnection();
     try {
     	var sql = "DELETE FROM BO_ITEMS WHERE " + exports.pkToSQL();
         var statement = connection.prepareStatement(sql);
         statement.setString(1, id);
         statement.executeUpdate();
-        if(printResultInResponse)
-        	response.println(id);
         return id;
-    } catch(e){
-        if(printResultInResponse){
-	        var errorCode = response.BAD_REQUEST;
-	        exports.printError(errorCode, errorCode, e.message, sql);
-    	}
-		throw e;    
+    }  catch(e) {
+		e.errContext = sql;
+		throw e;
     } finally {
         connection.close();
     }
 };
 
 
-exports.countBo_items = function(printResultInResponse) {
+exports.countBo_items = function() {
     var count = 0;
     var connection = datasource.getConnection();
     try {
@@ -351,17 +321,12 @@ exports.countBo_items = function(printResultInResponse) {
         if (rs.next()) {
             count = rs.getInt(1);
         }
-    } catch(e){
-        if(printResultInResponse){
-	        var errorCode = response.BAD_REQUEST;
-	        exports.printError(errorCode, errorCode, e.message, sql);
-    	}
-		throw e;        
+    }  catch(e) {
+		e.errContext = sql;
+		throw e;
     } finally {
         connection.close();
     }
-    if(printResultInResponse)
-    	response.println(count);
     return count;
 };
 
@@ -375,8 +340,8 @@ exports.metadataBo_items = function() {
 	var propertyboi_id = {
 		name: 'boi_id',
 		type: 'integer',
-	key: 'true',
-	required: 'true'
+		key: 'true',
+		required: 'true'
 	};
     entityMetadata.properties.push(propertyboi_id);
 
@@ -428,8 +393,8 @@ exports.metadataBo_items = function() {
 	};
     entityMetadata.properties.push(propertyboi_default);
 
+	return JSON.stringify(entityMetadata);
 
-	response.println(JSON.stringify(entityMetadata));
 };
 
 exports.getPrimaryKeys = function() {
@@ -453,36 +418,165 @@ exports.pkToSQL = function() {
     return pks[0] + " = ?";
 };
 
-exports.hasConflictingParameters = function(id, count, metadata) {
-    if(id !== null && count !== null){
-    	exports.printError(response.EXPECTATION_FAILED, 1, "Expectation failed: conflicting parameters - id, count");
-        return true;
-    }
-    if(id !== null && metadata !== null){
-    	exports.printError(response.EXPECTATION_FAILED, 2, "Expectation failed: conflicting parameters - id, metadata");
-        return true;
-    }
-    return false;
-};
+exports.http = {
 
-// check whether the parameter exists 
-exports.isInputParameterValid = function(paramName) {
-    var param = request.getParameter(paramName);
-    if(param === null || param === undefined){
-    	exports.printError(response.PRECONDITION_FAILED, 3, "Expected parameter is missing: " + paramName);
-        return false;
-    }
-    return true;
-};
+	dispatch: function(urlParameters){
+		var method = request.getMethod().toUpperCase();
+		if('POST' === method){
+			this.createBO_Item();
+		} else if('PUT' === method){
+			this.updateBO_Item();
+		} else if('DELETE' === method){
+			this.deleteBO_Item(urlParameters.id);
+		} else if('GET' === method){
+			if(urlParameters){
+				if(urlParameters.id){
+					this.readBO_Item(urlParameters.id);
+				} else if(urlParameters.metadata){
+					this.metadataBO_Items();
+				} else if(urlParameters.count){
+					this.countBO_Items();
+				} else if(urlParameters.list){
+					this.readBO_ItemsList(urlParameters.list.headerId, urlParameters.list.limit, urlParameters.list.offset, urlParameters.list.sort, urlParameters.list.desc);
+				}
+			} else {
+				this.readBO_ItemsList();
+			}
+		} else {
+			this.printError(response.BAD_REQUEST, 4, "Invalid HTTP Method", method);
+		}
 
-// print error
-exports.printError = function(httpCode, errCode, errMessage, errContext) {
-    var body = {'err': {'code': errCode, 'message': errMessage}};
-    response.setStatus(httpCode);
-    response.setHeader("Content-Type", "application/json");
-    response.print(JSON.stringify(body));
-    console.error(JSON.stringify(body));
-    if (errContext !== null) {
-    	console.error(JSON.stringify(errContext));
-    }
+	}, 
+
+	createBO_Item: function(){
+		var input = request.readInputText();
+	    var item = JSON.parse(input);
+	    try{
+			item.id = exports.createBo_items(item);
+			response.setStatus(response.OK);
+			response.setHeader('Location', $.getRequest().getRequestURL().toString() + '/' + item.id);
+		} catch(e) {
+    	    var errorCode = response.INTERNAL_SERVER_ERROR;
+        	this.printError(errorCode, errorCode, e.message, e.errContext);
+        	throw e;
+		}
+	},
+	
+	updateBO_Item: function() {
+		var input = request.readInputText();
+	    var item = JSON.parse(input);
+	    try{
+			item.id = exports.updateBo_items(item);
+			response.setStatus(response.NO_CONTENT);
+		} catch(e) {
+    	    var errorCode = response.INTERNAL_SERVER_ERROR ;
+        	this.printError(errorCode, errorCode, e.message, e.errContext);
+        	throw e;
+		}
+	},
+	
+	deleteBO_Item: function(id) {
+	    try{
+			exports.deleteBo_items(id);
+			response.setStatus(response.NO_CONTENT);
+		} catch(e) {
+    	    var errorCode = response.INTERNAL_SERVER_ERROR;
+        	this.printError(errorCode, errorCode, e.message, e.errContext);
+        	throw e;
+		}
+	},
+	
+	readBO_Item: function(id){
+		//id is mandatory parameter and an integer
+		if(id === undefined || isNaN(parseInt(id))) {
+			this.printError(response.BAD_REQUEST, 1, "Invallid id parameter: " + id);
+		}
+
+	    try{
+			var item = exports.readBo_itemsEntity(id);
+			if(!item){
+        		this.printError(response.NOT_FOUND, 1, "Record with id: " + id + " does not exist.");
+			}
+			var jsonResponse = JSON.stringify(item, null, 2);
+	        response.println(jsonResponse);        	
+		} catch(e) {
+    	    var errorCode = response.INTERNAL_SERVER_ERROR ;
+        	this.printError(errorCode, errorCode, e.message, e.errContext);
+        	throw e;
+		}		
+	},
+	
+	readBO_ItemsList: function(headerId, limit, offset, sort, desc){
+		if (headerId === undefined) {
+			headerId = null;
+		}
+		if (offset === undefined || offset === null) {
+			offset = 0;
+		} else if(isNaN(parseInt(offset)) || offset<0) {
+			this.printError(response.BAD_REQUEST, 1, "Invallid offset parameter: " + offset + ". Must be a positive integer.");
+		}
+
+		if (limit === undefined || limit === null) {
+			limit = 0;
+		}  else if(isNaN(parseInt(limit)) || limit<0) {
+			this.printError(response.BAD_REQUEST, 1, "Invallid limit parameter: " + limit + ". Must be a positive integer.");
+		}
+		if (sort === undefined) {
+			sort = null;
+		} 
+		if (desc === undefined) {
+			desc = null;
+		} else if(desc!==null){
+			if(sort === null){
+				this.printError(response.BAD_REQUEST, 1, "Parameter desc is invalid without paramter sort to order by.");
+			} else if(desc.toLowerCase()!=='desc' || desc.toLowerCase()!=='asc'){
+				this.printError(response.BAD_REQUEST, 1, "Invallid desc parameter: " + desc + ". Must be either ASC or DESC.");
+			}
+		}
+	    try{
+			var items = exports.readBo_itemsList(headerId, limit, offset, sort, desc);
+	        var jsonResponse = JSON.stringify(items, null, 2);
+	    	response.println(jsonResponse);      	
+		} catch(e) {
+    	    var errorCode = response.INTERNAL_SERVER_ERROR ;
+        	this.printError(errorCode, errorCode, e.message, e.errContext);
+        	throw e;
+		}		
+	},
+	
+	countBO_Items: function(){
+	    try{
+			var itemsCount = exports.countBo_items();
+			response.setHeader("Content-Type", "text/plain");
+	    	response.println(itemsCount);      	
+		} catch(e) {
+    	    var errorCode = response.INTERNAL_SERVER_ERROR ;
+        	this.printError(errorCode, errorCode, e.message, e.errContext);
+        	throw e;
+		}		
+	},
+	
+	metadataBO_Items: function(){
+ 		try{
+			var entityMetadata = exports.metadataBo_items();
+			response.setHeader("Content-Type", "application/json");
+			response.println(entityMetadata);
+		} catch(e) {
+    	    var errorCode = response.INTERNAL_SERVER_ERROR ;
+        	this.printError(errorCode, errorCode, e.message, e.errContext);
+        	throw e;        	
+		}		
+	},
+	
+	printError: function(httpCode, errCode, errMessage, errContext) {
+	    var body = {'err': {'code': errCode, 'message': errMessage}};
+	    response.setStatus(httpCode);
+	    response.setHeader("Content-Type", "application/json");
+	    response.print(JSON.stringify(body));
+	    console.error(JSON.stringify(body));
+	    if (errContext !== null) {
+	    	console.error(JSON.stringify(errContext));
+	    }
+	}
+	
 };

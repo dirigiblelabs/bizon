@@ -9,9 +9,7 @@ var boItemLib = require("bo_modeller/bo_item_lib");
 var datasource = database.getDatasource();
 
 // create entity by parsing JSON object from request body
-exports.createBo_header = function() {
-    var input = request.readInputText();
-    var header = JSON.parse(input);
+exports.createBo_header = function(header) {
     var connection = datasource.getConnection();
     try {
         var sql = "INSERT INTO BO_HEADER (";
@@ -45,14 +43,13 @@ exports.createBo_header = function() {
         	for(var j=0; j<header.properties.length; j++){
         		var property = header.properties[j];
         		property.boi_boh_id = header.boh_id;
-				boItemLib.createBo_items(property, false);
+				boItemLib.createBo_items(property);
     		}
     	}
-		response.println( header.boh_id);
         return  header.boh_id;
     } catch(e) {
-        var errorCode = response.BAD_REQUEST;
-        exports.printError(errorCode, errorCode, e.message, sql);
+		e.errContext = sql;
+		throw e;
     } finally {
         connection.close();
     }
@@ -71,23 +68,21 @@ exports.readBo_headerEntity = function(id, expanded) {
         var resultSet = statement.executeQuery();
         if (resultSet.next()) {
             header = createEntity(resultSet);
-        } else {
-        	exports.printError(response.NOT_FOUND, 1, "Record with id: " + id + " does not exist.", sql);
-        }
-
+        } 
+        if(!header){
+        	return;
+    	}
 		if(expanded){
 			//limit, offset, sort, order?
-		   var properties = boItemLib.readBo_itemsList(header.boh_id, null, null, null, null, false);
+		   var properties = boItemLib.readBo_itemsList(header.boh_id, null, null, null, null);
 		   if(properties){
 		   	 header.properties = properties;
 	   	   }
 		}
-        
-        var jsonResponse = JSON.stringify(header, null, 2);
-        response.println(jsonResponse);
+		return header;
     } catch(e) {
-        var errorCode = response.BAD_REQUEST;
-        exports.printError(errorCode, errorCode, e.message, sql);
+		e.errContext = sql;
+		throw e;
     } finally {
         connection.close();
     }
@@ -118,18 +113,17 @@ exports.readBo_headerList = function(limit, offset, sort, desc, expanded) {
         	var header = createEntity(resultSet);
         	if(expanded){        	
         	   //separate limit, offset, sort, order?
-			   var properties = boItemLib.readBo_itemsList(header.boh_id, null, null, null, null, false);
-			   if(properties){
+			   var properties = boItemLib.readBo_itemsList(header.boh_id, null, null, null, null);
+			   if(properties) {
 			   	 header.properties = properties;
 		   	   }
 			}
             headers.push(header);
         }
-        var jsonResponse = JSON.stringify(headers, null, 2);
-        response.println(jsonResponse);
-    } catch(e){
-        var errorCode = response.BAD_REQUEST;
-        exports.printError(errorCode, errorCode, e.message, sql);
+        return headers;
+    } catch(e) {
+		e.errContext = sql;
+		throw e;
     } finally {
         connection.close();
     }
@@ -153,9 +147,8 @@ function convertToDateString(date) {
 }
 
 // update Header entity by id, optionally upserting its Items composition
-exports.updateBo_header = function(cascaded) {
-    var input = request.readInputText();
-    var header = JSON.parse(input);
+exports.updateBo_header = function(header, cascaded) {
+
     var connection = datasource.getConnection();
     try {
         var sql = "UPDATE BO_HEADER SET ";
@@ -175,22 +168,21 @@ exports.updateBo_header = function(cascaded) {
         statement.executeUpdate();
         
         if(cascaded){
-        	if(header.properties){
+        	if(header.properties && header.properties.length>0){
         		for(var j=0; j<header.properties.length;j++){
         			var item = header.properties[j];
         			if(item.id){
-        				boItemLib.updateBo_items(item, false);
+        				boItemLib.updateBo_items(item);
         			} else {
-        				boItemLib.createBo_items(item, false);
+        				boItemLib.createBo_items(item);
         			}
         		}	
         	}
         }
-        
-		response.println(id);
-    } catch(e){
-        var errorCode = response.BAD_REQUEST;
-        exports.printError(errorCode, errorCode, e.message, sql);
+        return id;
+    } catch(e) {
+		e.errContext = sql;
+		throw e;
     } finally {
         connection.close();
     }
@@ -213,10 +205,10 @@ exports.deleteBo_header = function(id, cascaded) {
 	   			}
 	   		}    	
     	}
-        response.println(id);
-    } catch(e){
-        var errorCode = response.BAD_REQUEST;
-        exports.printError(errorCode, errorCode, e.message, sql);
+        return id;
+    } catch(e) {
+		e.errContext = sql;
+		throw e;
     } finally {
         connection.close();
     }
@@ -232,13 +224,13 @@ exports.countBo_header = function() {
         if (rs.next()) {
             count = rs.getInt(1);
         }
-    } catch(e){
-        var errorCode = response.BAD_REQUEST;
-        exports.printError(errorCode, errorCode, e.message, sql);
+    } catch(e) {
+		e.errContext = sql;
+		throw e;
     } finally {
         connection.close();
     }
-    response.println(count);
+    return count;
 };
 
 exports.metadataBo_header = function() {
@@ -274,8 +266,7 @@ exports.metadataBo_header = function() {
 	};
     entityMetadata.properties.push(propertyboh_description);
 
-
-	response.println(JSON.stringify(entityMetadata));
+	return entityMetadata;
 };
 
 exports.getPrimaryKeys = function() {
@@ -299,36 +290,163 @@ exports.pkToSQL = function() {
     return pks[0] + " = ?";
 };
 
-exports.hasConflictingParameters = function(id, count, metadata) {
-    if(id !== null && count !== null){
-    	exports.printError(response.EXPECTATION_FAILED, 1, "Expectation failed: conflicting parameters - id, count");
-        return true;
-    }
-    if(id !== null && metadata !== null){
-    	exports.printError(response.EXPECTATION_FAILED, 2, "Expectation failed: conflicting parameters - id, metadata");
-        return true;
-    }
-    return false;
-};
 
-// check whether the parameter exists 
-exports.isInputParameterValid = function(paramName) {
-    var param = request.getParameter(paramName);
-    if(param === null || param === undefined){
-    	exports.printError(response.PRECONDITION_FAILED, 3, "Expected parameter is missing: " + paramName);
-        return false;
-    }
-    return true;
-};
+exports.http = {
 
-// print error
-exports.printError = function(httpCode, errCode, errMessage, errContext) {
-    var body = {'err': {'code': errCode, 'message': errMessage}};
-    response.setStatus(httpCode);
-    response.setHeader("Content-Type", "application/json");
-    response.print(JSON.stringify(body));
-    console.error(JSON.stringify(body));
-    if (errContext !== null) {
-    	console.error(JSON.stringify(errContext));
-    }
+	dispatch: function(urlParameters){
+		var method = request.getMethod().toUpperCase();
+		if('POST' === method){
+			this.createBO_Header();
+		} else if('PUT' === method){
+			this.updateBO_Header(urlParameters.cascaded);
+		} else if('DELETE' === method){
+			this.deleteBO_Header(urlParameters.id, urlParameters.cascaded);
+		} else if('GET' === method){
+			if(urlParameters){
+				if(urlParameters.id){
+					this.readBO_Header(urlParameters.id, urlParameters.expanded);
+				} else if(urlParameters.metadata){
+					this.metadataBO_Headers();
+				} else if(urlParameters.count){
+					this.countBO_Headers();
+				} else if(urlParameters.list){
+					this.readBO_HeadersList(urlParameters.list.limit, urlParameters.list.offset, urlParameters.list.sort, urlParameters.list.desc, urlParameters.expanded);
+				}
+			} else {
+				this.readBO_HeadersList();
+			}
+		} else {
+			this.printError(response.BAD_REQUEST, 4, "Invalid HTTP Method", method);
+		}
+
+	}, 
+
+	createBO_Header: function(){
+		var input = request.readInputText();
+	    var item = JSON.parse(input);
+	    try{
+			item.id = exports.createBo_header(item);
+			response.setStatus(response.OK);
+			response.setHeader('Location', $.getRequest().getRequestURL().toString() + '/' + item.id);
+		} catch(e) {
+    	    var errorCode = response.INTERNAL_SERVER_ERROR;
+        	this.printError(errorCode, errorCode, e.message, e.errContext);
+        	throw e;
+		}
+	},
+	
+	updateBO_Header: function(cascaded) {
+		var input = request.readInputText();
+	    var item = JSON.parse(input);
+	    try{
+			item.id = exports.updateBo_header(item, cascaded);
+			response.setStatus(response.NO_CONTENT);
+		} catch(e) {
+    	    var errorCode = response.INTERNAL_SERVER_ERROR ;
+        	this.printError(errorCode, errorCode, e.message, e.errContext);
+        	throw e;
+		}
+	},
+	
+	deleteBO_Header: function(id, cascaded) {
+	    try{
+			exports.deleteBo_header(id, cascaded);
+			response.setStatus(response.NO_CONTENT);
+		} catch(e) {
+    	    var errorCode = response.INTERNAL_SERVER_ERROR;
+        	this.printError(errorCode, errorCode, e.message, e.errContext);
+        	throw e;
+		}
+	},
+	
+	readBO_Header: function(id, expanded){
+		//id is mandatory parameter and an integer
+		if(id === undefined || isNaN(parseInt(id))) {
+			this.printError(response.BAD_REQUEST, 1, "Invallid id parameter: " + id);
+		}
+
+	    try{
+			var item = exports.readBo_headerEntity(id, expanded);
+			if(!item){
+        		this.printError(response.NOT_FOUND, 1, "Record with id: " + id + " does not exist.");
+			}
+			var jsonResponse = JSON.stringify(item, null, 2);
+	        response.println(jsonResponse);        	
+		} catch(e) {
+    	    var errorCode = response.INTERNAL_SERVER_ERROR ;
+        	this.printError(errorCode, errorCode, e.message, e.errContext);
+        	throw e;
+		}		
+	},
+	
+	readBO_HeadersList: function(limit, offset, sort, desc, expanded){
+		if (offset === undefined || offset === null) {
+			offset = 0;
+		} else if(isNaN(parseInt(offset)) || offset<0) {
+			this.printError(response.BAD_REQUEST, 1, "Invallid offset parameter: " + offset + ". Must be a positive integer.");
+		}
+
+		if (limit === undefined || limit === null) {
+			limit = 0;
+		}  else if(isNaN(parseInt(limit)) || limit<0) {
+			this.printError(response.BAD_REQUEST, 1, "Invallid limit parameter: " + limit + ". Must be a positive integer.");
+		}
+		if (sort === undefined) {
+			sort = null;
+		} 
+		if (desc === undefined) {
+			desc = null;
+		} else if(desc!==null){
+			if(sort === null){
+				this.printError(response.BAD_REQUEST, 1, "Parameter desc is invalid without paramter sort to order by.");
+			} else if(desc.toLowerCase()!=='desc' || desc.toLowerCase()!=='asc'){
+				this.printError(response.BAD_REQUEST, 1, "Invallid desc parameter: " + desc + ". Must be either ASC or DESC.");
+			}
+		}
+	    try{
+			var items = exports.readBo_headerList(limit, offset, sort, desc, expanded);
+	        var jsonResponse = JSON.stringify(items, null, 2);
+	    	response.println(jsonResponse);      	
+		} catch(e) {
+    	    var errorCode = response.INTERNAL_SERVER_ERROR ;
+        	this.printError(errorCode, errorCode, e.message, e.errContext);
+        	throw e;
+		}		
+	},
+	
+	countBO_Headers: function(){
+	    try{
+			var itemsCount = exports.countBo_header();
+			response.setHeader("Content-Type", "text/plain");
+	    	response.println(itemsCount);      	
+		} catch(e) {
+    	    var errorCode = response.INTERNAL_SERVER_ERROR ;
+        	this.printError(errorCode, errorCode, e.message, e.errContext);
+        	throw e;
+		}		
+	},
+	
+	metadataBO_Headers: function(){
+ 		try{
+			var entityMetadata = exports.metadataBo_header();
+			response.setHeader("Content-Type", "application/json");
+			response.println(JSON.stringify(entityMetadata));
+		} catch(e) {
+    	    var errorCode = response.INTERNAL_SERVER_ERROR ;
+        	this.printError(errorCode, errorCode, e.message, e.errContext);
+        	throw e;        	
+		}		
+	},
+	
+	printError: function(httpCode, errCode, errMessage, errContext) {
+	    var body = {'err': {'code': errCode, 'message': errMessage}};
+	    response.setStatus(httpCode);
+	    response.setHeader("Content-Type", "application/json");
+	    response.print(JSON.stringify(body));
+	    console.error(JSON.stringify(body));
+	    if (errContext !== null) {
+	    	console.error(JSON.stringify(errContext));
+	    }
+	}
+	
 };
