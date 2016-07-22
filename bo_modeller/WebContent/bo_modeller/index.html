@@ -152,7 +152,7 @@
 		  });		    
 	}])
 	.service('Entity', function($resource) {
-	  return $resource('http://localhost:8081/api/bos/:boId', { boId:'@id' }, {
+	  return $resource('../../js/bo_modeller/bo_header.js/:boId', { boId:'@id' }, {
 		    create: {
 		        method: 'POST'
 		      },
