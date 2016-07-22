@@ -22,7 +22,6 @@ function handleRequest() {
 	
 	// retrieve the id as parameter if exist 
 	var id = xss.escapeSql(request.getParameter(idParameter)) || request.getAttribute("path");
-	console.info("Requested ITEM id: %s", id);
 	var count = xss.escapeSql(request.getParameter('count'));
 	var metadata = xss.escapeSql(request.getParameter('metadata'));
 	var sort = xss.escapeSql(request.getParameter('sort'));
@@ -41,24 +40,29 @@ function handleRequest() {
 		// switch based on method type
 		if (method === 'POST') {
 			// create
+			console.info("POST entity for create");
 			entityBo_items.createBo_items();
 		} else if (method === 'GET') {
 			// read
 			if (id) {
+				console.info("GET entity by id %s", id);
 				entityBo_items.readBo_itemsEntity(id, true);
 			} else if (count !== null) {
 				entityBo_items.countBo_items();
 			} else if (metadata !== null) {
 				entityBo_items.metadataBo_items();
 			} else {
+				console.info("GET Item entities");
 				entityBo_items.readBo_itemsList(null, limit, offset, sort, desc, true);
 			}
 		} else if (method === 'PUT') {
 			// update
+			console.info("PUT Item entities for update");
 			entityBo_items.updateBo_items();    
 		} else if (method === 'DELETE') {
 			// delete
-			if(entityBo_items.isInputParameterValid(idParameter)){
+			console.info("DELETE Item entity by id %s", id);
+			if(entityBo_items.isInputParameterValid(idParameter) || (request.getAttribute("path") && request.getAttribute("path")!==null)){			
 				entityBo_items.deleteBo_items(id);
 			}
 		} else {

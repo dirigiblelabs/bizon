@@ -22,7 +22,6 @@ function handleRequest() {
 	
 	// retrieve the id as parameter if exist 
 	var id = xss.escapeSql(request.getParameter(idParameter)) || request.getAttribute("path");
-	console.info("Requested HEADER id: %s", id);
 	var count = xss.escapeSql(request.getParameter('count'));
 	var metadata = xss.escapeSql(request.getParameter('metadata'));
 	var sort = xss.escapeSql(request.getParameter('sort'));
@@ -41,24 +40,29 @@ function handleRequest() {
 		// switch based on method type
 		if (method === 'POST') {
 			// create
+			console.info("POST entity for create");
 			entityBo_header.createBo_header();
 		} else if (method === 'GET'){
 			// read
 			if (id) {
+				console.info("GET entity by id %s", id);
 				entityBo_header.readBo_headerEntity(id, true);
 			} else if (count !== null) {
 				entityBo_header.countBo_header();
 			} else if (metadata !== null) {
 				entityBo_header.metadataBo_header();
 			} else {
+				console.info("GET entities");
 				entityBo_header.readBo_headerList(limit, offset, sort, desc, true);
 			}
 		} else if (method === 'PUT') {
 			// update
+			console.info("PUT entity by id %s for update", id);
 			entityBo_header.updateBo_header(true);    
 		} else if (method === 'DELETE') {
 			// delete
-			if(entityBo_header.isInputParameterValid(idParameter)){
+			console.info("DELETE entity by id %s", id);
+			if(entityBo_header.isInputParameterValid(idParameter) || (request.getAttribute("path") && request.getAttribute("path") != null) ){
 				entityBo_header.deleteBo_header(id, true);
 			}
 		} else {
