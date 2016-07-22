@@ -54,6 +54,8 @@ exports.createBo_items = function(item, printResultInResponse) {
         sql += ")";
 
         var statement = connection.prepareStatement(sql);
+        item = createSQLEntity(item);
+        
         var i = 0;
         var id = datasource.getSequence('BO_ITEMS_BOI_ID').next();
         statement.setInt(++i, id);
@@ -66,6 +68,7 @@ exports.createBo_items = function(item, printResultInResponse) {
         statement.setShort(++i, item.boi_pk);
         statement.setString(++i, item.boi_default);
         statement.executeUpdate();
+                		        
         if(printResultInResponse)
         	response.println(id);
         return id;
@@ -163,11 +166,65 @@ function createEntity(resultSet) {
     result.boi_name = resultSet.getString("BOI_NAME");
     result.boi_column = resultSet.getString("BOI_COLUMN");
 	result.boi_type = resultSet.getInt("BOI_TYPE");
+	result.boi_type = codeToStringItemTypeMapping(result.boi_type);
 	result.boi_length = resultSet.getInt("BOI_LENGTH");
     result.boi_null = resultSet.getShort("BOI_NULL");
+    if(result.boi_null === 0){
+    	result.boi_null = false;
+	} else {
+		result.boi_null = true;
+	}
     result.boi_pk = resultSet.getShort("BOI_PK");
+    if(result.boi_pk === 0){
+    	result.boi_pk = false;
+	} else {
+		result.boi_pk = true;
+	}
     result.boi_default = resultSet.getString("BOI_DEFAULT");
     return result;
+}
+
+//Prepare a JSON object for insert into DB
+function createSQLEntity(item) {
+    if(item){
+		item.boi_type = stringToCodeItemTypeMapping(item.boi_type);
+		console.info("Item type: %s", item.boi_type);
+		if(item.boi_null===undefined){
+			item.boi_null = 1;
+		} else {
+	    	if(item.boi_null === true){
+	    		item.boi_null = 1;
+	    	} else {
+	    	   	item.boi_null = 0;
+		   	}
+	
+	    }
+	   	console.info("Item nullable: %s", item.boi_null);
+	   	if(item.boi_pk===undefined){
+			item.boi_pk = 0;
+		} else {
+	    	if(item.boi_pk === true){
+	    		item.boi_pk = 1;
+	    	} else {
+	    	   	item.boi_pk = 0;
+		   	}
+	
+	    }    
+	    console.info("Item length: %s", item.boi_length);
+	   	if(item.boi_length===undefined){
+			item.boi_length = 0;
+		} else {
+	    	if(item.boi_length === true){
+	    		item.boi_length = 1;
+	    	} else {
+	    	   	item.boi_length = 0;
+		   	}
+	
+	    }    
+	   	console.info("Item pk: %s", item.boi_pk);
+	}	
+	console.info(item);
+	return item;
 }
 
 function convertToDateString(date) {
@@ -175,6 +232,34 @@ function convertToDateString(date) {
     var month = date.getMonth() < 10 ? "0" + date.getMonth() : date.getMonth();
     var dateOfMonth = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
     return fullYear + "/" + month + "/" + dateOfMonth;
+}
+
+function stringToCodeItemTypeMapping(typeName) {
+	if(!isNaN(parseInt(typeName))){
+		return typeName;
+	}
+	if(typeName === 'Integer')
+		return 1;
+	if(typeName === 'String')
+		return 2;
+	if(typeName === 'Boolean')
+		return 3;
+	if(typeName === 'Relationship')
+		return 1000;
+}
+
+function codeToStringItemTypeMapping(code) {
+	if(isNaN(parseInt(code))){
+		return code;
+	}
+	if(code === 1)
+		return 'Integer';
+	if(code === 2)
+		return 'String';
+	if(code === 3)
+		return 'Boolean';
+	if(code === 1000)
+		return 'Relationship';
 }
 
 // update entity by id
@@ -203,7 +288,10 @@ exports.updateBo_items = function(item, printResultInResponse) {
         sql += ",";
         sql += "BOI_DEFAULT = ?";
         sql += " WHERE BOI_ID = ?";
+        
         var statement = connection.prepareStatement(sql);
+        item = createSQLEntity(item);
+
         var i = 0;
         statement.setInt(++i, item.boi_boh_id);
         statement.setString(++i, item.boi_name);

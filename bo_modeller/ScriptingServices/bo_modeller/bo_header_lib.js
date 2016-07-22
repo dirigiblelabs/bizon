@@ -34,22 +34,22 @@ exports.createBo_header = function() {
 
         var statement = connection.prepareStatement(sql);
         var i = 0;
-        var id = datasource.getSequence('BO_HEADER_BOH_ID').next();
-        statement.setInt(++i, id);
+        header.boh_id = datasource.getSequence('BO_HEADER_BOH_ID').next();
+        statement.setInt(++i,  header.boh_id);
         statement.setString(++i, header.boh_name);
         statement.setString(++i, header.boh_table);
         statement.setString(++i, header.boh_description);
         statement.executeUpdate();
-        
+
         if(header.properties && header.properties.length>0){
         	for(var j=0; j<header.properties.length; j++){
         		var property = header.properties[j];
+        		property.boi_boh_id = header.boh_id;
 				boItemLib.createBo_items(property, false);
     		}
     	}
-
-		response.println(id);
-        return id;
+		response.println( header.boh_id);
+        return  header.boh_id;
     } catch(e) {
         var errorCode = response.BAD_REQUEST;
         exports.printError(errorCode, errorCode, e.message, sql);
