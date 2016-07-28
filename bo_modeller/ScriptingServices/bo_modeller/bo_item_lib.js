@@ -423,24 +423,24 @@ exports.http = {
 	dispatch: function(urlParameters){
 		var method = request.getMethod().toUpperCase();
 		if('POST' === method){
-			this.createBO_Item();
+			this.create();
 		} else if('PUT' === method){
-			this.updateBO_Item();
+			this.update();
 		} else if('DELETE' === method){
-			this.deleteBO_Item(urlParameters.id);
+			this.remove(urlParameters.id);
 		} else if('GET' === method){
 			if(urlParameters){
 				if(urlParameters.id){
-					this.readBO_Item(urlParameters.id);
+					this.get(urlParameters.id);
 				} else if(urlParameters.metadata){
-					this.metadataBO_Items();
+					this.metadata();
 				} else if(urlParameters.count){
-					this.countBO_Items();
+					this.count();
 				} else if(urlParameters.list){
-					this.readBO_ItemsList(urlParameters.list.headerId, urlParameters.list.limit, urlParameters.list.offset, urlParameters.list.sort, urlParameters.list.desc);
+					this.query(urlParameters.list.headerId, urlParameters.list.limit, urlParameters.list.offset, urlParameters.list.sort, urlParameters.list.desc);
 				}
 			} else {
-				this.readBO_ItemsList();
+				this.query();
 			}
 		} else {
 			this.printError(response.BAD_REQUEST, 4, "Invalid HTTP Method", method);
@@ -448,7 +448,7 @@ exports.http = {
 
 	}, 
 
-	createBO_Item: function(){
+	create: function(){
 		var input = request.readInputText();
 	    var item = JSON.parse(input);
 	    try{
@@ -462,7 +462,7 @@ exports.http = {
 		}
 	},
 	
-	updateBO_Item: function() {
+	update: function() {
 		var input = request.readInputText();
 	    var item = JSON.parse(input);
 	    try{
@@ -475,7 +475,7 @@ exports.http = {
 		}
 	},
 	
-	deleteBO_Item: function(id) {
+	remove: function(id) {
 	    try{
 			exports.deleteBo_items(id);
 			response.setStatus(response.NO_CONTENT);
@@ -486,7 +486,7 @@ exports.http = {
 		}
 	},
 	
-	readBO_Item: function(id){
+	get: function(id){
 		//id is mandatory parameter and an integer
 		if(id === undefined || isNaN(parseInt(id))) {
 			this.printError(response.BAD_REQUEST, 1, "Invallid id parameter: " + id);
@@ -506,7 +506,7 @@ exports.http = {
 		}		
 	},
 	
-	readBO_ItemsList: function(headerId, limit, offset, sort, desc){
+	query: function(headerId, limit, offset, sort, desc){
 		if (headerId === undefined) {
 			headerId = null;
 		}
@@ -544,7 +544,7 @@ exports.http = {
 		}		
 	},
 	
-	countBO_Items: function(){
+	count: function(){
 	    try{
 			var itemsCount = exports.countBo_items();
 			response.setHeader("Content-Type", "text/plain");
@@ -556,7 +556,7 @@ exports.http = {
 		}		
 	},
 	
-	metadataBO_Items: function(){
+	metadata: function(){
  		try{
 			var entityMetadata = exports.metadataBo_items();
 			response.setHeader("Content-Type", "application/json");

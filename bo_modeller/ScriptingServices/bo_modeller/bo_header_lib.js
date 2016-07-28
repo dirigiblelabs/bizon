@@ -296,24 +296,24 @@ exports.http = {
 	dispatch: function(urlParameters){
 		var method = request.getMethod().toUpperCase();
 		if('POST' === method){
-			this.createBO_Header();
+			this.create();
 		} else if('PUT' === method){
-			this.updateBO_Header(urlParameters.cascaded);
+			this.update(urlParameters.cascaded);
 		} else if('DELETE' === method){
-			this.deleteBO_Header(urlParameters.id, urlParameters.cascaded);
+			this.remove(urlParameters.id, urlParameters.cascaded);
 		} else if('GET' === method){
 			if(urlParameters){
 				if(urlParameters.id){
-					this.readBO_Header(urlParameters.id, urlParameters.expanded);
+					this.get(urlParameters.id, urlParameters.expanded);
 				} else if(urlParameters.metadata){
-					this.metadataBO_Headers();
+					this.metadata();
 				} else if(urlParameters.count){
-					this.countBO_Headers();
+					this.count();
 				} else if(urlParameters.list){
-					this.readBO_HeadersList(urlParameters.list.limit, urlParameters.list.offset, urlParameters.list.sort, urlParameters.list.desc, urlParameters.expanded);
+					this.query(urlParameters.list.limit, urlParameters.list.offset, urlParameters.list.sort, urlParameters.list.desc, urlParameters.expanded);
 				}
 			} else {
-				this.readBO_HeadersList();
+				this.query();
 			}
 		} else {
 			this.printError(response.BAD_REQUEST, 4, "Invalid HTTP Method", method);
@@ -321,7 +321,7 @@ exports.http = {
 
 	}, 
 
-	createBO_Header: function(){
+	create: function(){
 		var input = request.readInputText();
 	    var item = JSON.parse(input);
 	    try{
@@ -335,7 +335,7 @@ exports.http = {
 		}
 	},
 	
-	updateBO_Header: function(cascaded) {
+	update: function(cascaded) {
 		var input = request.readInputText();
 	    var item = JSON.parse(input);
 	    try{
@@ -348,7 +348,7 @@ exports.http = {
 		}
 	},
 	
-	deleteBO_Header: function(id, cascaded) {
+	remove: function(id, cascaded) {
 	    try{
 			exports.deleteBo_header(id, cascaded);
 			response.setStatus(response.NO_CONTENT);
@@ -359,7 +359,7 @@ exports.http = {
 		}
 	},
 	
-	readBO_Header: function(id, expanded){
+	get: function(id, expanded){
 		//id is mandatory parameter and an integer
 		if(id === undefined || isNaN(parseInt(id))) {
 			this.printError(response.BAD_REQUEST, 1, "Invallid id parameter: " + id);
@@ -379,7 +379,7 @@ exports.http = {
 		}		
 	},
 	
-	readBO_HeadersList: function(limit, offset, sort, desc, expanded){
+	query: function(limit, offset, sort, desc, expanded){
 		if (offset === undefined || offset === null) {
 			offset = 0;
 		} else if(isNaN(parseInt(offset)) || offset<0) {
@@ -414,7 +414,7 @@ exports.http = {
 		}		
 	},
 	
-	countBO_Headers: function(){
+	count: function(){
 	    try{
 			var itemsCount = exports.countBo_header();
 			response.setHeader("Content-Type", "text/plain");
@@ -426,7 +426,7 @@ exports.http = {
 		}		
 	},
 	
-	metadataBO_Headers: function(){
+	metadata: function(){
  		try{
 			var entityMetadata = exports.metadataBo_header();
 			response.setHeader("Content-Type", "application/json");
