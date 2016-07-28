@@ -83,7 +83,7 @@
 				<div class="list-group" >
 				  <a class="list-group-item selected-{{entry._selected_}}" ng-repeat="entry in selectedItemDetails|filter:searchText|orderBy:'boi_name'">
 				  	<div style="display:inline-block">
-						<div class="list-item-title"><span class="required" ng-show="boi_nullable">*</span>{{entry.boi_name}} <div ng-show="entry.boi_key" style="display: inline-block"><i class="fa fa-key"></i></div></div>
+						<div class="list-item-title"><span class="required" ng-show="boi_nullable">*</span>{{entry.boi_name}} <div ng-show="entry.boi_pk" style="display: inline-block"><i class="fa fa-key"></i></div></div>
 						<div class="list-item-subtitle">{{entry.boi_type}}</div>						  	
 				  	</div>
 					<div class="btn-group pull-right">

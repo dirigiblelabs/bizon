@@ -162,6 +162,7 @@ function createEntity(resultSet) {
 		result.boi_pk = true;
 	}
     result.boi_default = resultSet.getString("BOI_DEFAULT");
+    console.info(">>> " + result);
     return result;
 }
 
@@ -169,37 +170,21 @@ function createEntity(resultSet) {
 function createSQLEntity(item) {
     if(item){
 		item.boi_type = stringToCodeItemTypeMapping(item.boi_type);
-		console.info("Item type: %s", item.boi_type);
 		if(item.boi_null === null || item.boi_null === undefined || item.boi_null === true){
 			item.boi_null = 1;
 		} else {
     	   	item.boi_null = 0;
 	    }
-	   	console.info("Item nullable: %s", item.boi_null);
-	   	if(item.boi_pk===undefined){
+	   	if(item.boi_pk === null || item.boi_pk === undefined || item.boi_pk === false){
 			item.boi_pk = 0;
 		} else {
-	    	if(item.boi_pk === true){
-	    		item.boi_pk = 1;
-	    	} else {
-	    	   	item.boi_pk = 0;
-		   	}
-	
-	    }    
-	    console.info("Item length: %s", item.boi_length);
-	   	if(item.boi_length===undefined){
-			item.boi_length = 0;
-		} else {
-	    	if(item.boi_length === true){
-	    		item.boi_length = 1;
-	    	} else {
-	    	   	item.boi_length = 0;
-		   	}
-	
-	    }    
-	   	console.info("Item pk: %s", item.boi_pk);
+	    	item.boi_pk = 1;	
+	    }
+	  	if(item.boi_default === undefined){
+	  		item.boi_default = null;
+  		}
 	}	
-	console.info(item);
+	console.info('<<< ' + item);
 	return item;
 }
 
