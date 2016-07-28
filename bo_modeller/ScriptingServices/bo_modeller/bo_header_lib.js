@@ -9,7 +9,7 @@ var boItemLib = require("bo_modeller/bo_item_lib");
 var datasource = database.getDatasource();
 
 // create entity by parsing JSON object from request body
-exports.createBo_header = function(header) {
+exports.insert = function(header) {
     var connection = datasource.getConnection();
     try {
         var sql = "INSERT INTO BO_HEADER (";
@@ -43,7 +43,7 @@ exports.createBo_header = function(header) {
         	for(var j=0; j<header.properties.length; j++){
         		var property = header.properties[j];
         		property.boi_boh_id = header.boh_id;
-				boItemLib.createBo_items(property);
+				boItemLib.insert(property);
     		}
     	}
         return  header.boh_id;
@@ -57,7 +57,7 @@ exports.createBo_header = function(header) {
 };
 
 // read single entity by id and print as JSON object to response
-exports.readBo_headerEntity = function(id, expanded) {
+exports.find = function(id, expanded) {
     var connection = datasource.getConnection();
     try {
         var header;
@@ -74,7 +74,7 @@ exports.readBo_headerEntity = function(id, expanded) {
     	}
 		if(expanded){
 			//limit, offset, sort, order?
-		   var properties = boItemLib.readBo_itemsList(header.boh_id, null, null, null, null);
+		   var properties = boItemLib.list(header.boh_id, null, null, null, null);
 		   if(properties){
 		   	 header.properties = properties;
 	   	   }
@@ -89,7 +89,7 @@ exports.readBo_headerEntity = function(id, expanded) {
 };
 
 // read all entities and print them as JSON array to response
-exports.readBo_headerList = function(limit, offset, sort, desc, expanded) {
+exports.list = function(limit, offset, sort, desc, expanded) {
     var connection = datasource.getConnection();
     try {
         var headers = [];
@@ -113,7 +113,7 @@ exports.readBo_headerList = function(limit, offset, sort, desc, expanded) {
         	var header = createEntity(resultSet);
         	if(expanded){        	
         	   //separate limit, offset, sort, order?
-			   var properties = boItemLib.readBo_itemsList(header.boh_id, null, null, null, null);
+			   var properties = boItemLib.list(header.boh_id, null, null, null, null);
 			   if(properties) {
 			   	 header.properties = properties;
 		   	   }
@@ -147,7 +147,7 @@ function convertToDateString(date) {
 }
 
 // update Header entity by id, optionally upserting its Items composition
-exports.updateBo_header = function(header, cascaded) {
+exports.update = function(header, cascaded) {
 
     var connection = datasource.getConnection();
     try {
@@ -172,9 +172,9 @@ exports.updateBo_header = function(header, cascaded) {
         		for(var j=0; j<header.properties.length;j++){
         			var item = header.properties[j];
         			if(item.id){
-        				boItemLib.updateBo_items(item);
+        				boItemLib.update(item);
         			} else {
-        				boItemLib.createBo_items(item);
+        				boItemLib.insert(item);
         			}
         		}	
         	}
@@ -189,7 +189,7 @@ exports.updateBo_header = function(header, cascaded) {
 };
 
 // delete entity
-exports.deleteBo_header = function(id, cascaded) {
+exports.remove = function(id, cascaded) {
     var connection = datasource.getConnection();
     try {
     	var sql = "DELETE FROM BO_HEADER WHERE " + exports.pkToSQL();
@@ -198,10 +198,10 @@ exports.deleteBo_header = function(id, cascaded) {
         statement.executeUpdate();
         
         if(cascaded){
-	       	var properties = boItemLib.readBo_itemsEntity(id);
+	       	var properties = boItemLib.find(id);
 	       	if(properties){
 	       		for(var i=0;i<properties.length;i++){
-	       			boItemLib.deleteBo_items(properties[i].id);
+	       			boItemLib.remove(properties[i].id);
 	   			}
 	   		}    	
     	}
@@ -214,7 +214,7 @@ exports.deleteBo_header = function(id, cascaded) {
     }
 };
 
-exports.countBo_header = function() {
+exports.count = function() {
     var count = 0;
     var connection = datasource.getConnection();
     try {
@@ -233,7 +233,7 @@ exports.countBo_header = function() {
     return count;
 };
 
-exports.metadataBo_header = function() {
+exports.metadata = function() {
 	var entityMetadata = {
 		name: 'bo_header',
 		type: 'object',
@@ -325,7 +325,7 @@ exports.http = {
 		var input = request.readInputText();
 	    var item = JSON.parse(input);
 	    try{
-			item.id = exports.createBo_header(item);
+			item.id = exports.insert(item);
 			response.setStatus(response.OK);
 			response.setHeader('Location', $.getRequest().getRequestURL().toString() + '/' + item.id);
 		} catch(e) {
@@ -339,7 +339,7 @@ exports.http = {
 		var input = request.readInputText();
 	    var item = JSON.parse(input);
 	    try{
-			item.id = exports.updateBo_header(item, cascaded);
+			item.id = exports.update(item, cascaded);
 			response.setStatus(response.NO_CONTENT);
 		} catch(e) {
     	    var errorCode = response.INTERNAL_SERVER_ERROR ;
@@ -350,7 +350,7 @@ exports.http = {
 	
 	remove: function(id, cascaded) {
 	    try{
-			exports.deleteBo_header(id, cascaded);
+			exports.remove(id, cascaded);
 			response.setStatus(response.NO_CONTENT);
 		} catch(e) {
     	    var errorCode = response.INTERNAL_SERVER_ERROR;
@@ -366,7 +366,7 @@ exports.http = {
 		}
 
 	    try{
-			var item = exports.readBo_headerEntity(id, expanded);
+			var item = exports.find(id, expanded);
 			if(!item){
         		this.printError(response.NOT_FOUND, 1, "Record with id: " + id + " does not exist.");
 			}
@@ -404,7 +404,7 @@ exports.http = {
 			}
 		}
 	    try{
-			var items = exports.readBo_headerList(limit, offset, sort, desc, expanded);
+			var items = exports.list(limit, offset, sort, desc, expanded);
 	        var jsonResponse = JSON.stringify(items, null, 2);
 	    	response.println(jsonResponse);      	
 		} catch(e) {
@@ -416,7 +416,7 @@ exports.http = {
 	
 	count: function(){
 	    try{
-			var itemsCount = exports.countBo_header();
+			var itemsCount = exports.count();
 			response.setHeader("Content-Type", "text/plain");
 	    	response.println(itemsCount);      	
 		} catch(e) {
@@ -428,7 +428,7 @@ exports.http = {
 	
 	metadata: function(){
  		try{
-			var entityMetadata = exports.metadataBo_header();
+			var entityMetadata = exports.metadata();
 			response.setHeader("Content-Type", "application/json");
 			response.println(JSON.stringify(entityMetadata));
 		} catch(e) {

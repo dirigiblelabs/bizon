@@ -8,7 +8,7 @@ var database = require("db/database");
 var datasource = database.getDatasource();
 
 // Parse JSON entity into SQL and insert in db. Returns the new record id.
-exports.createBo_items = function(item) {
+exports.insert = function(item) {
 
 	if(item.boi_type === undefined || item.type === null){
 		throw new Error('Invalid type: ' + item.type);
@@ -82,7 +82,7 @@ exports.createBo_items = function(item) {
 };
 
 // Reads a single entity by id, parsed into JSON object 
-exports.readBo_itemsEntity = function(id) {
+exports.find = function(id) {
     var connection = datasource.getConnection();
     try {
         var item;
@@ -104,7 +104,7 @@ exports.readBo_itemsEntity = function(id) {
 };
 
 // Read all entities, parse and return them as an array of JSON objets
-exports.readBo_itemsList = function(headerId, limit, offset, sort, desc) {
+exports.list = function(headerId, limit, offset, sort, desc) {
     var connection = datasource.getConnection();
     try {
         var items = [];
@@ -239,7 +239,7 @@ function codeToStringItemTypeMapping(code) {
 }
 
 // update entity from a JSON object. Returns the id of the updated entity.
-exports.updateBo_items = function(item) {
+exports.update = function(item) {
 
 	if(item.boi_id === undefined || item.boi_id === null){
 		throw new Error('Invalid id: ' + item.id);
@@ -294,7 +294,7 @@ exports.updateBo_items = function(item) {
 };
 
 // delete entity by id. Returns the id of the deleted entity.
-exports.deleteBo_items = function(id) {
+exports.remove = function(id) {
     var connection = datasource.getConnection();
     try {
     	var sql = "DELETE FROM BO_ITEMS WHERE " + exports.pkToSQL();
@@ -311,7 +311,7 @@ exports.deleteBo_items = function(id) {
 };
 
 
-exports.countBo_items = function() {
+exports.count = function() {
     var count = 0;
     var connection = datasource.getConnection();
     try {
@@ -330,7 +330,7 @@ exports.countBo_items = function() {
     return count;
 };
 
-exports.metadataBo_items = function() {
+exports.metadata = function() {
 	var entityMetadata = {
 		name: 'bo_items',
 		type: 'object',
@@ -452,7 +452,7 @@ exports.http = {
 		var input = request.readInputText();
 	    var item = JSON.parse(input);
 	    try{
-			item.id = exports.createBo_items(item);
+			item.id = exports.insert(item);
 			response.setStatus(response.OK);
 			response.setHeader('Location', $.getRequest().getRequestURL().toString() + '/' + item.id);
 		} catch(e) {
@@ -466,7 +466,7 @@ exports.http = {
 		var input = request.readInputText();
 	    var item = JSON.parse(input);
 	    try{
-			item.id = exports.updateBo_items(item);
+			item.id = exports.update(item);
 			response.setStatus(response.NO_CONTENT);
 		} catch(e) {
     	    var errorCode = response.INTERNAL_SERVER_ERROR ;
@@ -477,7 +477,7 @@ exports.http = {
 	
 	remove: function(id) {
 	    try{
-			exports.deleteBo_items(id);
+			exports.remove(id);
 			response.setStatus(response.NO_CONTENT);
 		} catch(e) {
     	    var errorCode = response.INTERNAL_SERVER_ERROR;
@@ -493,7 +493,7 @@ exports.http = {
 		}
 
 	    try{
-			var item = exports.readBo_itemsEntity(id);
+			var item = exports.find(id);
 			if(!item){
         		this.printError(response.NOT_FOUND, 1, "Record with id: " + id + " does not exist.");
 			}
@@ -534,7 +534,7 @@ exports.http = {
 			}
 		}
 	    try{
-			var items = exports.readBo_itemsList(headerId, limit, offset, sort, desc);
+			var items = exports.list(headerId, limit, offset, sort, desc);
 	        var jsonResponse = JSON.stringify(items, null, 2);
 	    	response.println(jsonResponse);      	
 		} catch(e) {
@@ -546,7 +546,7 @@ exports.http = {
 	
 	count: function(){
 	    try{
-			var itemsCount = exports.countBo_items();
+			var itemsCount = exports.count();
 			response.setHeader("Content-Type", "text/plain");
 	    	response.println(itemsCount);      	
 		} catch(e) {
@@ -558,7 +558,7 @@ exports.http = {
 	
 	metadata: function(){
  		try{
-			var entityMetadata = exports.metadataBo_items();
+			var entityMetadata = exports.metadata();
 			response.setHeader("Content-Type", "application/json");
 			response.println(entityMetadata);
 		} catch(e) {
