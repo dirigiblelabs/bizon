@@ -1,0 +1,110 @@
+<style>	
+	.editable-click { 
+	  color: inherit;
+	  border-bottom: inherit;
+	}
+	.editable-click:hover { 
+	  color: #2a6496 !important;
+	  border-bottom-color: inherit;
+	  cursor: pointer;
+  	  border-radius: 4px;
+	  box-shadow: 0 0 5px #2a6496;
+	  
+	  -webkit-transition: all 0.20s ease-in-out;
+	  -moz-transition: all 0.20s ease-in-out;
+	  -ms-transition: all 0.20s ease-in-out;
+	  -o-transition: all 0.20s ease-in-out;
+	  
+	  display: inline-block;
+	  min-width: 120px;	  
+	}
+	.detail {
+	    box-shadow: 0px 0px 20px 2px rgba(0,0,0,0.75);
+	    z-index: 1000;
+	}
+</style>
+<!--<div class="detail col-xs-8 col-md-10">-->
+<div class="detail col-xs-12 col-md-12">
+		
+	<header class="header">
+      <div class="btn-group pull-right">
+   		<button class="btn btn-success" ng-click="detailsEditorVm.saveItem()">
+		  <i class="fa fa-check" aria-hidden="true"></i>
+		</button>
+   		<button type="reset" class="btn" ng-click="detailsEditorVm.cancelEdit()">
+		  <i class="fa fa-ban" aria-hidden="true"></i>
+		</button>
+      </div>
+    </header>
+			
+	<section class="object-header fluid-container">
+		<section>
+			<div class="object-image">
+				<i class="fa fa-th"></i>
+			</div>
+			<div class="object-title">
+				<p class="title" editable-text="detailsEditorVm.selectedEntity.boh_name">{{detailsEditorVm.selectedEntity.boh_name}}</p>
+	    		<p class="subtitle" editable-text="detailsEditorVm.selectedEntity.boh_description">{{detailsEditorVm.selectedEntity.boh_description}}</p>											
+			</div>
+		</section>
+		<section class="object-attributes">
+      		<div>
+      			<label><i class="fa fa-key"></i></label>
+      			<span editable-select="detailsEditorVm.selectedItem.boh_key" e-ng-options="s.value as s.text for s in [{text:'Id', value:'Id'}, {text:'Property 1', value:'Property 1'}, {text:'Property 2', value:'Property 2'}]">{{detailsEditorVm.selectedItem.boh_key}}</span>
+      		</div>
+			<div>
+				<label><i class="fa fa-table"></i></label>
+      			<span editable-select="detailsEditorVm.selectedItem.boh_table" e-ng-options="s.value as s.text for s in [{text:'TBL_A', value:'TBL_A'}, {text:'TBL_B', value:'TBL_B'}, {text:'TBL_C', value:'TBL_C'}]">{{detailsEditorVm.selectedItem.boh_table}}</span>
+      		</div>				      		
+		</section>					    		
+	</section>	
+		
+	<div class="content">
+		<ul class="nav nav-tabs">
+		  <li role="presentation" class="active"><a ng-click="detailsEditorVm.showProperties()" role="tab" data-toggle="tab">Properties</a></li>
+		  <li role="presentation"><a ng-click="detailsEditorVm.showRelationships()" role="tab" data-toggle="tab">Relationships <i class="glyphicon glyphicon-link pull-right"></i></a></li>
+		</ul>
+
+		<div class="toolbar btn-group pull-left">
+	   		<button type="submit" class="btn btn-primary" ng-click="detailsEditorVm.openPropertyEditor()">
+			  <i class="fa fa-plus" aria-hidden="true"></i>
+			</button>
+		</div>	
+		<div class="toolbar btn-group pull-right">
+			<div class="inner-addon left-addon">
+			    <i class="glyphicon glyphicon-search"></i>	
+			    <input type="search" class="quick-search" placeholder="Search" ng-model="searchText"/>
+			</div>
+		</div>
+
+		<div class="tab-content">
+		
+			<div class="tab-pane fade in active">
+				
+				<div class="items-list">
+		
+					<div ng-hide="detailsEditorVm.selectedEntity.items[0]" class="nodata-text">No Items</div>
+						<div class="list-group">
+						  <a class="list-group-item selected-{{entry._selected_}}" ng-repeat="entry in detailsEditorVm.selectedEntity.items|filter:searchText|orderBy:'boi_name'">
+							<div style="display:inline-block">
+								<div class="list-group-item-heading">{{entry.boi_name}}</div>
+								<div class="list-group-item-text">{{entry.boi_description}}</div>
+							</div>
+							<div class="btn-group pull-right">
+			   					<button class="btn btn-primary" ng-click="detailsEditorVm.openPropertyEditor(entry)">
+								  <i class="fa fa-pencil" aria-hidden="true"></i>
+								</button>
+								<button class="btn btn-danger" ng-click="detailsEditorVm.deleteProperty(entry)">
+								  <i class="glyphicon glyphicon-remove" aria-hidden="true"></i>
+								</button>
+							</div>					
+						  </a>
+						</div>
+					</div>	
+
+			</div>	
+		</div>	
+
+	</div>		
+		
+</div>

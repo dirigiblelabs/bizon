@@ -11,7 +11,11 @@
 <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.css">
 <link rel="stylesheet" href="css/xeditable.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/css/bootstrap3/bootstrap-switch.min.css">
+
 <link rel="stylesheet" href="css/default.css">
+<link rel="stylesheet" media="min-device-width: 800px" href="css/default.css" />
+<!-- TODO: add stylesheets for different device sizes with coressponding media queries-->
+
 </head>
 
 <body ng-app="businessObjects">
@@ -23,7 +27,7 @@
 			<header class="page-title"><h1 class="h2">Business Objects Explorer</h1></header>
 			
 			<div class="page-content">
-				<div ui-view="master" ng-show="items" class="master col-xs-12 col-md-2 no-gutter-left"></div>
+				<div ui-view="master" ng-show="masterVm.items.length" class="master col-xs-12 col-md-2 no-gutter-left"></div>
 				<div ui-view="detail"></div>
 			</div>
 			<div ui-view="notifications" class="notification-bar"></div>
@@ -45,164 +49,99 @@
 	<script src="js/xeditable.js"></script>	
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/js/bootstrap-switch.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.15.0/jquery.validate.min.js"></script>
+	<script src="js/ng-infinite-scroll.js"></script>	
 	
 	<script>
-	
-	function ItemBaseController(Entity, $state, $stateParams){
-	};
-	
-	ItemBaseController.prototype.createItem = function(){
-		this.Entity.save({
-			"boh_name":"Business Object Name",
-			"boh_table": "BO_TABLE_NAME",
-			"boh_description":"Description for business object",
-			"boh_key":"Id",
-
-			"properties": [{
-				"boi_name":"Id",
-				"boi_type":"Integer",
-				"boi_nullable":0,
-				"boi_key": true
-			}]
-				}).$promise
-		.then(function(newItem){
-			$stateParams.boId = newItem.boh_id;
-			$stateParams.message = {
-				text: 'New Buisness Object successfully created.',
-				type: 'alert-success'
-			}
-			$state.go($state.current, $stateParams, {reload: true});
-		})
-	};
-	
-	ItemBaseController.prototype.deleteItem = function(itemId){
-		Entity.remove({boId: itemId}).$promise
-		.then(function(){
-			//$state.reload();
-			delete $stateParams.boId;
-			$stateParams.message = {
-					text: 'Buisness Object successfully deleted.',
-					type: 'alert-success'
-				}
-			$state.go($state.current, $stateParams, {reload: true, location:false, inherit: false});
-		});
-	};
-	
-	function MasterController(Entity, $state, $stateParams){
-		ItemBaseController.call(this, Entity, $state, $stateParams);
-	};
-	
-	MasterController.prototype = Object.create(ItemBaseController.prototype);
-	
-	
-	angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.bootstrap', 'xeditable'])
+	angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.bootstrap', 'xeditable', 'infinite-scroll'])
 	.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
-		
+
 		$urlRouterProvider.otherwise("/");
 		
 		$stateProvider
-		.state('items', {
+		.state('list', {
 			  url: "/",
 		      params: {
 		    	  message: undefined  
 		      },
 		      views: {
 		          'master': {
-		              templateUrl: 'partials/master-list.html',
-		              controller: 'MasterListCtrl'
+		              templateUrl: 'views/master-list.html',
+		              controller: 'MasterListCtrl',
+		              controllerAs: 'masterVm'
 		          },
 		          'detail': {
-		              templateUrl: 'partials/empty.html',
+		              templateUrl: 'views/empty.html',
+		              controller: 'EmptyCtrl',
+		              controllerAs: 'emptyVm'
 		          },
 		          'notifications': {
-		              templateUrl: 'partials/notifications.html',
-		              controller: 'NotificationsCtrl'
+		              templateUrl: 'views/notifications.html',
+		              controller: 'NotificationsCtrl',
+		              controllerAs: 'messagesVm'
 		          }
 		      }
 		    })
-		.state('items.select', {
-			  url: ":boId",
-		      params: {
-		    	  items: undefined,
-				  selectedItem: undefined
-		      },
-		      views: {
+		.state('list.entity', {
+			url: ":boId",
+		    params: {
+			  	selectedEntity: undefined
+		    }, 
+			resolve: { 
+	            selectedEntity: ['$stateParams',
+	                function($stateParams) {
+	                	return $stateParams.selectedEntity;
+                }]
+            },
+            views: {
 		    	  'detail@': {
-					  templateUrl: "partials/detail_view.html",
-					  controller: 'DetailsCtrl'
+					  templateUrl: "views/detail_view.html",
+					  controller: 'DetailsCtrl',
+		              controllerAs: 'detailsVm'
 			      }
-		      }
-		    })
-		.state('items.select.edit', {
+		     }
+		   })
+		.state('list.entity.edit', {
 			  url: "edit",
 		      params: {
 		    	  items: undefined,
-		    	  selectedItem: undefined,
-		    	  itemForEdit: undefined,
+		    	  selectedEntity: undefined,
+		    	  entityForEdit: undefined,
 		    	  message: {value: undefined}  
 		      },
 		      views: {
 		          'master@': {
-		              templateUrl: 'partials/master-list.html',
-		              controller: 'MasterListCtrl'
+		              templateUrl: 'views/none.html'
 		          },
 			      'detail@': {
-					  templateUrl: "partials/detail_editor.html",
-					  controller: 'EditCtrl'
+					  templateUrl: "views/detail_editor.html",
+					  controller: 'EditCtrl',
+		              controllerAs: 'detailsEditorVm'
 			      }
 		      }
 		    })
-		.state("items.select.edit.property", {
-			url: "propertyAdd",
+		.state("list.entity.edit.items", {
+			url: "property",
 		    params: {
-				selectedItem: undefined,
-				property: undefined,
+				selectedEntity: undefined,
+				item: undefined,
 				message: {value: undefined}
 		    },
 		    onEnter: ['$stateParams', '$state', '$uibModal', function($stateParams, $state, $modal) {
 		    	
-		    	function goBack(_selectedItem) {
-		        	$state.go("items.select.edit", {selectedItem: _selectedItem}, {location:false});
+		    	function goBack(_selectedEntity) {
+		        	$state.go("list.entity.edit", {selectedEntity: _selectedEntity}, {location:false});
 		        }
 		    	
 		        var modalInstance = $modal.open({
 		        	animation: true,
-		            templateUrl: "partials/propertyEditor.html",
+		            templateUrl: "views/propertyEditor.html",
 		            resolve: {
-		            	selectedItem: function() { 
-		            		return $stateParams.selectedItem; 
+		            	selectedEntity: function() { 
+		            		return $stateParams.selectedEntity; 
 		            	}
 		            },
-		            controller: 'PropertyEditorCtrl'
-		        });
-		        modalInstance.rendered.then(function(){
-					//do something if necessary
-		        });
-		        modalInstance.result.then(goBack, goBack);
-		    }]
-		  })
-		.state("items.select.edit.object", {
-			url: "obj",
-		    params: {
-				selectedItem: undefined,
-				property: undefined,
-				message: {value: undefined}
-		    },
-		    onEnter: ['$stateParams', '$state', '$uibModal', function($stateParams, $state, $modal) {
-		    	
-		    	function goBack(_selectedItem) {
-		        	$state.go("items.select.edit", {selectedItem: _selectedItem}, {location:false});
-		        }
-		    	
-		        var modalInstance = $modal.open({
-		        	animation: true,
-		            templateUrl: "partials/objectEditor.html",
-		            resolve: {
-		            	selectedItem: function() { 
-		            		return $stateParams.selectedItem; 
-		            	}
-		            },
-		            controller: 'ObjectEditorCtrl'
+		            controller: 'PropertyEditorCtrl',
+		            controllerAs: 'propsEditorVm'
 		        });
 		        modalInstance.rendered.then(function(){
 		        	var $validator = $('.modal-body form').validate({
@@ -226,144 +165,368 @@
 		        });
 		        modalInstance.result.then(goBack, goBack);
 		    }]
-		  });		    
-	}])	
-	.service('Entity', function($resource) {
-	  /* return $resource('../../js/bo_modeller/bo_header.js/:boId', { boId:'@id' }, { */
-	  return $resource('http://localhost:8081/api/bos/:boId', { boId:'@id' }, {		  
-		    create: {
-		        method: 'POST'
-		      },
-		    update: {
-		        method: 'PUT'
-		      }
-		    });
+		  });	
+	}])
+	.service('ResourceSvcConfiguration', function() {
+	
+		return {
+			cfg: {
+			    save: {
+			        method: 'POST',
+			        interceptor: {
+		                response: function(res) {
+		                	var location = res.headers('Location');
+		                	if(location){
+		                		var id = location.substring(location.lastIndexOf('/')+1);
+		                		angular.extend(res.resource, { "mdh_id": id });
+	                		} else {
+	                			console.error('Cannot infer id after save operation. HTTP Response Header "Location" is missing: ' + location);
+	            			}
+	                        return res.resource;
+		                }
+		            }, 
+		            isArray: false
+			    },
+			    update: {
+			        method: 'PUT'
+			    }
+		    }
+		}
 	})
-	.controller('MasterListCtrl', ['Entity', '$scope', 'orderByFilter', '$rootScope', '$state', '$stateParams', '$window', function (Entity, $scope, orderBy, $rootScope, $state, $stateParams, $window) {
+	.service('Entity', ['$resource', 'ResourceSvcConfiguration', function($resource, ResourceSvcConfiguration) {
+	  	var res = $resource('../../js/sample_master_detail/md_header.js/:boId', { boId:'@id' }, ResourceSvcConfiguration.cfg);
 		
-		/*Controller invoked upon routing or navigation click events*/
+		res.newObjectTemplate = {
+				"mdh_name":"Business Object Name",
+				"mdh_description":"Description for business object"
+			};
+			
+		return res;
+	}])
+	.service('EntityCount', ['$resource', 'ResourceSvcConfiguration', function($resource, ResourceSvcConfiguration) {
+		var cfg = angular.copy(ResourceSvcConfiguration.cfg);
+		cfg.query = {method:'GET', isArray:false};
+	  	return $resource('../../js/sample_master_detail/md_header.js?count=true', { }, cfg);
+	}])	
+	.service('Item', ['$resource', 'ResourceSvcConfiguration', function($resource, ResourceSvcConfiguration) {
+	
+	  	var res = $resource('../../js/sample_master_detail/md_item.js/:boId', { boId:'@id' }, ResourceSvcConfiguration.cfg);
 		
-		$scope.items = $stateParams.items;
-		$scope.selectedItem= $stateParams.selectedItem;
 		
-		$scope.isDisabled = $stateParams.itemForEdit!==undefined;
+		res.newObjectTemplate = {
+					"mdi_name":"Item",
+					"mdi_description":"Description for Item"
+				};
+				
+		return res;
+	}])	
+	.service('masterDataSvc', ['Entity', 'EntityCount', 'Item',  '$q', '$timeout', function(Entity, EntityCount, Item, $q, $timeout) {
+	
+		function createMasterDataTemplateObject(){
+			var obj = angular.copy(Entity.newObjectTemplate);
+			obj.items = [];
+			for(var i = 0; i < 3; i++){
+				var item = angular.copy(Item.newObjectTemplate);
+				item.mdi_name += ' ' +i;
+				obj.items.push(item);
+			}
+			return obj;
+		}
 		
-		$scope.sortByPropertyName = 'boh_name';
-	    $scope.reverse = false;//ASC
+		this.masterDataTemplateObject = createMasterDataTemplateObject();
 		
-	 	$scope.sortBy = function(propertyName) {
-		    $scope.reverse = (propertyName !== null && $scope.propertyName === propertyName)
-		        ? !$scope.reverse : false;
-		    $scope.sortByPropertyName = propertyName;
-		    $scope.items = orderBy($scope.items, $scope.sortByPropertyName, $scope.reverse);
+		this.batchLoadedMasterData = [];
+		this.querySettings;
+	
+		/* make sure that sort and order properties of settings have not changed when paging and after the first page has been loaded. purge and start over again otehrwise */
+		this.query = function(settings){
+			this.querySettings = settings;
+			settings.expanded = (settings && settings.expanded!==undefined) || true;
+			var deferred = $q.defer();
+			Entity.query(settings).$promise
+			.then(jQuery.proxy(function(data){
+				if(this.querySettings.limit)
+					this.batchLoadedMasterData = [].concat(this.batchLoadedMasterData, data);//append next page of data
+				else
+					this.batchLoadedMasterData = data;//overwrite
+				deferred.resolve(data);
+			}, this), function(error){
+				deferred.resolve(error);
+			});
+			return deferred.promise;
 		};
 		
-		$scope.selectItem = function(item){
-			if(!$scope.selectedItem && !item || ($scope.selectedItem && $scope.selectedItem.boh_id === item.boh_id))//noops
-				return;
-			if(item){
-				$scope.selectedItem = item;// save the selected item
-				$state.go('items.select', {
-					selectedItem: item,
-					boId: item.boh_id
-				})
-			}
-		}
-
-		function init(){
-			var itemId = $state.params.boId;
-			if(!$scope.items){
-				Entity.query().$promise
-				.then(function(result){
-					if(result && result.length>0){
-						
-						$scope.items = result;//initialize the items to display
-						$scope.sortBy($scope.sortByPropertyName);
-						
-						itemId = itemId || result[0].boh_id;					
-						var item = findItemById(result, itemId);
-						if(item === undefined){
-							fireLocationError.apply(this);
-							item = result[0];	
-						}
-						$scope.selectItem.apply($scope, [item]);//set the requested item selected
-						
-					} else {
-						if(itemId !== undefined){
-							fireLocationError.apply($scope);
-							$state.go('items', $stateParams);
+		/* 
+			Looks up an object with the given id in the currently loaded data, and if instructed by the reloadDataOnDemand parameter, 
+			will lookup remotely the data service and reload the list to feature this item too.
+			Note: With progessive loading and pagination patterns it is possible that an item exists but has not been loaded from remote service yet.
+				  The second parameter addresses precisely these situations.	
+		*/
+		this.get = function(id, lookupRemotelyOnDemand){
+			var itemHit = this.batchLoadedMasterData.filter(function(item){
+					if(item.mdh_id == id ){
+						return true;
+					}
+					return false;
+				})[0];
+			if(itemHit) {
+				return $q.when(itemHit);
+			} else if(lookupRemotelyOnDemand) {
+				var deferred = $q.defer();
+				Entity.get(id).$promise
+				.then(function(item){
+					deferred.resolve(item);
+					//now load the data set that contains this item with adapted offset constraint on the query					
+					var _itemHit, busy;
+					while(_itemHit == undefined){
+						this.settings.offset = this.batchLoadedMasterData.length;//move to next page
+						busy = true;
+						this.query(this.settings)
+						.then(function(){
+							this.get(id, false).then(
+							function(_item){
+								itemHit = _item;
+							});	
+						}, function(_error){
+							deferred.reject(_error);
+						})
+						.finally(function(){
+							busy = false;
+						});
+						while(busy){
+							$timeout(50);//block waiting for the query operation to complete
 						}
 					}
-				});	
+
+				}, function(error){
+					// TODO: check if not found vs any other error
+					//deferred.reject(error);
+					deferred.resolve();
+				});
+				return deferred.promise;
 			}
-		}
+			return;
+		};
 		
-		function findItemById(items, itemId){
-			var item;
-			for(var i=0; i< items.length; i++){
-				if(items[i].boh_id == itemId ){
-					item = items[i];
-					break;
-				}
+		this.count = function(){
+			return EntityCount.query().$promise;
+		};
+		
+		this.hasNext = function(){
+			var deferred = $q.defer();
+			var self = this;
+			this.count().then(function(_data){
+				if(_data.count > 0 && _data.count > self.batchLoadedMasterData.length)
+					deferred.resolve(true);	
+				else
+					deferred.resolve(false);	
+			});
+			return deferred.promise;
+		};
+		
+		this.next = function(){
+			var deferred = $q.defer();
+			var self = this;
+			this.hasNext().then(function(_hasNext){
+				if(_hasNext){
+					self.querySettings.offset = self.batchLoadedMasterData.length;
+					self.query(self.querySettings)
+					.then(function(_data){
+						deferred.resolve(self.batchLoadedMasterData);
+					}, 
+					function(error){
+						deferred.reject(error);
+					});
+				}	
+			});
+			return deferred.promise;
+		};
+
+		this.create = function(cascaded, template){
+			var reqParams = {};
+			reqParams.cascaded = cascaded || true;
+			return Entity.save(reqParams, template || this.masterDataTemplateObject).$promise;
+		};
+		
+		this.update = function(header){
+			if(header.items){
+				var items = header.items.filter(function(item){
+					if(!item.action){
+						return false;
+					}
+					return true;
+				});
+				var promises = items.map(function(item) {
+									var action = item.action;
+									delete item.action;
+									if(action === 'remove') {
+							        	return Item.remove({boId: item.mdi_id}).$promise;
+						        	} else {
+						        		return Item[action]({boId: item.mdi_id}, item).$promise;
+					        		}
+						    	});
 			}
-			return item;
-		}
+
+			promises.unshift(Entity.update({boId: header.mdh_id}, header).$promise);
+	    	return $q.all(promises);
+		};	
 		
-		function fireLocationError(){
-			$stateParams.message = {
-					text:$window.location.href + " is not valid application path. Check the URL and try again.",
-					type: 'alert-danger'
+		this.remove = function(headerId, cascaded){
+			var reqParams = {};
+			if(cascaded)
+				reqParams.cascaded = cascaded;
+			reqParams.boId = headerId;
+			return Entity.remove(reqParams).$promise;
+		};
+		
+		this.serviceErrorMessageFormatter = function(message, errorPayload){
+			if(errorPayload.data.err.code){
+				message += ': [' + errorPayload.data.err.code + '] ';
 			}
-		}
-		
-		init.apply(this);
-		
-		$scope.createItem = function(){
-			Entity.save({
-						"boh_name":"Business Object Name",
-						"boh_table": "BO_TABLE_NAME",
-						"boh_description":"Description for business object",
-						"boh_key":"Id",
-		
-						"properties": [{
-							"boi_name":"Id",
-							"boi_type":"Integer",
-							"boi_nullable":0,
-							"boi_key": true
-						}]
-					}).$promise
+			if(errorPayload.data.err.message){
+				message += ' ' + errorPayload.data.err.message;
+			}
+			return message;
+		};
+				
+	}])
+	.controller('EmptyCtrl', ['masterDataSvc', '$log', '$state', '$stateParams', function (masterDataSvc, $log, $state, $stateParams) {
+	
+		this.createItem = function(){
+			masterDataSvc.create()
 			.then(function(newItem){
-				$stateParams.boId = newItem.boh_id;
+				$stateParams.boId = newItem.mdh_id;
 				$stateParams.message = {
 					text: 'New Buisness Object successfully created.',
 					type: 'alert-success'
-				}
-				$state.go($state.current, $stateParams, {reload: true});
+				};
+			}, function(reason){
+				var message = masterDataSvc.serviceErrorMessageFormatter('Creating new Buisness Object failed', reason);
+				$log.error(message);			
+				$stateParams.message = {
+						text: message,
+						type: 'alert-danger'
+				};
 			})
-		}
+			.finally(function(){
+				$state.go($state.current, $stateParams, {reload: true});
+			});
+		};
+	
+	}])
+	.controller('MasterListCtrl', ['masterDataSvc', '$log', '$state', '$stateParams', '$window', function (masterDataSvc, $log, $state, $stateParams, $window) {
+
+		this.items = masterDataSvc.batchLoadedMasterData;
+		this.querySettings = {
+			limit: 5,
+			sort: 'mdh_name',
+			order: 'ASC'
+		};
+				
+		function init(){
+			var itemId = $state.params.boId;//requested item id
+			if(this.items.length > 0) {
+				
+				itemId = $state.params.boId || this.items[0].mdh_id;//in case no item id has been explicitly requested, preselect the id of the first one in the list
+				masterDataSvc.get(itemId, true)
+				.then(jQuery.proxy(function(item){
+						if(item === undefined){
+							fireLocationError.apply(this);
+							item = this.items[0];
+						}
+						this.selectItem.apply(this, [item]);//set the item to be selected
+					}, this),
+					function(error){
+						handleServiceError('Looking up Buisness Object failed', error);
+					});
+				
+			}
+		};
 		
-		$scope.deleteItem = function(itemId){
-			Entity.remove({boId: itemId}).$promise
+		function fireLocationError(){
+			$log.debug('The requested application path ' + $window.location.href + " is not valid.");
+			$stateParams.message = {
+					text: $window.location.href + ' is not valid application path. Check the URL and try again.',
+					type: 'alert-danger'
+			};
+		}
+
+		this.selectItem = function(item){
+			this.selectedEntity = item;
+			$stateParams = angular.extend($stateParams, {
+				selectedEntity: item,
+				boId: item.mdh_id
+			});
+			$state.go('list.entity', $stateParams);
+		};
+		
+		this.createItem = function(){
+			masterDataSvc.create()
+			.then(function(newItem){
+				$stateParams.boId = newItem.mdh_id;
+				$stateParams.message = {
+					text: 'New Buisness Object successfully created.',
+					type: 'alert-success'
+				};
+			}, function(reason){
+				handleServiceError('Creating new Buisness Object failed', reason);
+			})
+			.finally(function(){
+				$state.go($state.current, $stateParams, {reload: true});
+			});
+		};
+		
+		this.deleteItem = function(itemId){
+			masterDataSvc.remove(itemId)
 			.then(function(){
-				//$state.reload();
 				delete $stateParams.boId;
 				$stateParams.message = {
 						text: 'Buisness Object successfully deleted.',
 						type: 'alert-success'
-					}
-				$state.go($state.current, $stateParams, {reload: true, location:false, inherit: false});
-			})
-		}
+					};
+				$state.go($state.current, $stateParams, {reload: true, location:true, inherit: false});
+			}, function(reason){
+				handleServiceError('Deleting Buisness Object failed', reason);
+				$state.go('^', $stateParams, {reload: true});
+			});
+		};
 		
+		function handleServiceError(text, errorPayload){
+			var message = masterDataSvc.serviceErrorMessageFormatter(text, errorPayload);
+			$log.error(message);			
+			$stateParams.message = {
+					text: message,
+					type: 'alert-danger'
+			};
+		};
+		
+		this.next = function(){
+			//implement request for next data set for infinite scroll 
+			var self = this;
+			masterDataSvc.querySettings = this.querySettings;
+			masterDataSvc.hasNext()
+			.then(function(_hasMore){
+				self.hasMore = _hasMore;				
+				if(self.hasMore){
+					masterDataSvc.next().then(function(_items){
+						self.items = _items;
+						init.apply(self);
+					});
+				}
+			});
+
+		};
+		
+		this.hasMore;
+
 	}])
-	.controller('DetailsCtrl', ['Entity', '$scope', '$state', '$stateParams' , function (Entity, $scope, $state, $stateParams) {
+	.controller('DetailsCtrl', ['masterDataSvc', 'selectedEntity', '$log', '$state', '$stateParams' , function (masterDataSvc, selectedEntity, $log, $state, $stateParams) {
 		
-		$scope.selectedItem = $stateParams.selectedItem;
-		$scope.selectedItemDetails;
-				
-		$scope.showProperties = function(){
-			if($scope._selectedItemDetails){
-				$scope.selectedItemDetails = $scope._selectedItemDetails.filter(function(v, i, arr){
+		this.selectedEntity = selectedEntity;
+	//FIXME!!!	
+		this.showProperties = function(){
+			if(this._selectedItemDetails){
+				this.selectedItemDetails = this._selectedItemDetails.filter(function(v, i, arr){
 					if(!v.boi_type || v.boi_type!=='Relationship'){
 						return true;
 					}
@@ -374,16 +537,16 @@
 		
 		function showDetails(item){
 			if(item){
-				$scope._selectedItemDetails = item.properties;
-				$scope.showProperties.apply(this);//Initial content to show	
+				this._selectedItemDetails = item.properties;
+				this.showProperties.apply(this);//Initial content to show	
 			}
 		}
 		
-		showDetails($scope.selectedItem);
+		showDetails(this.selectedEntity);
 		
-		$scope.showRelationships = function(){
-			if($scope._selectedItemDetails){
-				$scope.selectedItemDetails = $scope._selectedItemDetails.filter(function(v, i, arr){
+		this.showRelationships = function(){
+			if(this._selectedItemDetails){
+				this.selectedItemDetails = this._selectedItemDetails.filter(function(v, i, arr){
 					if(v.boi_type && v.boi_type==='Relationship'){
 						return true;
 					}
@@ -392,48 +555,60 @@
 			}
 		};
 		
-		$scope.startEdit = function() {
-		    $stateParams.itemForEdit = angular.copy($scope.selectedItem);		    
-		    $state.go("items.select.edit", $stateParams, {location:false});
-		}
+		function handleServiceError(text, errorPayload){
+			var message = masterDataSvc.serviceErrorMessageFormatter(text, errorPayload);
+			$log.error(message);			
+			$stateParams.message = {
+					text: message,
+					type: 'alert-danger'
+			};	
+		};
 		
-		$scope.duplicateItem = function() {
-			var duplicateItem = angular.copy($scope.selectedItem, {});
-			delete duplicateItem.boh_id;
-			Entity.save(duplicateItem).$promise
+		this.startEdit = function() {
+		    $stateParams.entityForEdit = angular.copy(this.selectedEntity);		    
+		    $state.go("list.entity.edit", $stateParams, {location:false});
+		};
+		
+		this.duplicateItem = function() {
+			var duplicateItem = angular.copy(this.selectedEntity, {});
+			delete duplicateItem.mdh_id;
+			masterDataSvc.create(undefined, duplicateItem)
 				.then(function(newItem){
-					$stateParams.boId = newItem.boh_id;
+					$stateParams.boId = newItem.mdh_id;
+					$stateParams.message = {
+						text: 'Buisness Object successfully duplicated.',
+						type: 'alert-success'
+					};					
 					$state.go($state.current, $stateParams, {reload: true, location:true, inherit: true});
+				}, function(reason){
+					handleServiceError('Duplicating Buisness Object failed', reason);
+					$state.go('^', $stateParams, {reload: true});
 				});
-		}
+		};
 		
-		$scope.deleteItem = function() {
-			Entity.remove({boId: $scope.selectedItem.boh_id}).$promise
+		this.deleteItem = function() {
+			masterDataSvc.remove(this.selectedEntity.mdh_id)
 			.then(function(){
-				//$state.reload();
 				delete $stateParams.boId;
 				$stateParams.message = {
 						text: 'Buisness Object successfully deleted.',
 						type: 'alert-success'
-					}
-				$state.go($state.current, $stateParams, {reload: true, location:false, inherit: false});
-			})
-		}
+					};
+				$state.go($state.current, $stateParams, {reload: true, location:true, inherit: false});
+			}, function(reason){
+					handleServiceError('Deleting Buisness Object failed', reason);
+					$state.go('^', $stateParams, {reload: true});
+				});
+		};
 		
 	}])
-	.controller('EditCtrl', ['Entity', '$scope', '$rootScope','$state', '$stateParams', function (Entity, $scope, $rootScope, $state, $stateParams) {
-		
-		$scope.selectedItem = $stateParams.itemForEdit;
-		$scope.selectedItemDetails;
-		
-		function showDetails (item){
-			$scope._selectedItemDetails = item.properties;
-			$scope.showProperties.apply(this);//Initial content to show
-		}
-		
-		$scope.showProperties = function(){
-			if($scope._selectedItemDetails){
-				$scope.selectedItemDetails = $scope._selectedItemDetails.filter(function(v, i, arr){
+	.controller('EditCtrl', ['masterDataSvc', '$log', '$state', '$stateParams', function (masterDataSvc, $log, $state, $stateParams) {
+
+		this.selectedEntity = selectedEntity;
+	//FIXME!!!	
+		this.showProperties = function(){
+			if(this._selectedItemDetails){
+				this.selectedItemDetails = this._selectedItemDetails.filter(function(v, i, arr){
 					if(!v.boi_type || v.boi_type!=='Relationship'){
 						return true;
 					}
@@ -442,11 +617,18 @@
 			}
 		};
 		
-		showDetails.apply(this, [$scope.selectedItem]);
+		function showDetails(item){
+			if(item){
+				this._selectedItemDetails = item.properties;
+				this.showProperties.apply(this);//Initial content to show	
+			}
+		}
 		
-		$scope.showRelationships = function(){
-			if($scope._selectedItemDetails){
-				$scope.selectedItemDetails = $scope._selectedItemDetails.filter(function(v, i, arr){
+		showDetails(this.selectedEntity);
+		
+		this.showRelationships = function(){
+			if(this._selectedItemDetails){
+				this.selectedItemDetails = this._selectedItemDetails.filter(function(v, i, arr){
 					if(v.boi_type && v.boi_type==='Relationship'){
 						return true;
 					}
@@ -455,49 +637,58 @@
 			}
 		};
 		
-		$scope.openPropertyEditor = function(property){
-			$state.go('items.select.edit.property', {
-				selectedItem: $scope.selectedItem,
-				property: property
+		this.openPropertyEditor = function(item){
+			$state.go('list.entity.edit.items', {
+				selectedEntity: this.selectedEntity,
+				item: item
 			}, {location: false});
-		},
+		};
 		
-		$scope.openObjectEditor = function(property){
-			$state.go('items.select.edit.object', {
-				selectedItem: $scope.selectedItem,
-				property: property
-			}, {location: false});
-		}
-		
-		$scope.deleteProperty = function(property){
-			for(var i=0; i< $scope.selectedItem.properties.length; i++){
-				if($scope.selectedItem.properties[i] === property){
-					$scope.selectedItem.properties.splice(i,1);
-					showDetails.apply(this, [$scope.selectedItem]);
+		this.deleteProperty = function(item){
+			for(var i=0; i< this.selectedEntity.items.length; i++){
+				if(this.selectedEntity.items[i] === item){
+					this.selectedEntity.items.splice(i,1);
 					break;
 				}
 			}
-		}
+			$stateParams.entityForEdit.items = $stateParams.entityForEdit.items.map(
+				function(currItem){
+					if(currItem.mdi_id && currItem.mdi_id === item.mdi_id){
+						currItem.action = 'remove';
+					}
+					return currItem;
+				});
+		};
 		
-		$scope.cancelEdit = function() {
+		this.cancelEdit = function() { 
 			delete $stateParams.boIdedit;
-			delete $stateParams.itemForEdit;
+			delete $stateParams.entityForEdit;
 		    $state.go("^", $stateParams);
-		}
+		};
 		
-		$scope.saveItem = function() {
-		    Entity.update($scope.selectedItem).$promise
-		    	.then(function(item){
-					$state.go('items.select', {boId: $scope.selectedItem.boi_id})	
-		    	})
-		}
+		this.saveItem = function() {
+			var self = this;
+		    masterDataSvc.update(this.selectedEntity).then(
+		    		function(){
+						$state.go('^', {boId: self.selectedEntity.mdh_id, selectedEntity:self.selectedEntity}, {reload: true, location:false});
+			    	}, 
+		    		function(reason){
+			    		var message = masterDataSvc.serviceErrorMessageFormatter('Updating Buisness Object failed', reason);
+						$log.error(message);
+						$stateParams.message = {
+								text: message,
+								type: 'alert-danger'
+						}				
+						$state.go($state.current, $stateParams, {reload: false});
+					});
+		};
 				
 	}])
-	.controller('PropertyEditorCtrl', ['$scope', '$stateParams', 'selectedItem', '$timeout', function($scope, $stateParams, selectedItem, $timeout) {
+	.controller('PropertyEditorCtrl', ['$scope', '$stateParams', 'selectedEntity', function($scope, $stateParams, selectedEntity) {
     	
 		var isNewProperty;
 		
-		$scope.typeOptions = [{
+		this.typeOptions = [{
 								id: '1',
 								val: 'Integer'
 							},{
@@ -508,13 +699,13 @@
 								val: 'Boolean'
 							}];
 		
-		$scope.selectedTypeOption = {
+		this.selectedTypeOption = {
 				id: '3',
 				val: 'String'
 			};
 		
-		$scope.typeSelectionChanged = function(){
-			$scope.property.type = $scope.selectedTypeOption.val;
+		this.typeSelectionChanged = function(){
+			this.property.type = this.selectedTypeOption.val;
 		}
 		
 		$scope.$on('$viewContentLoaded', function(event) {
@@ -524,139 +715,69 @@
 		    });
 		
 		function init(){
-			isNewProperty = $stateParams.property === undefined ? true : false;
-			if(isNewProperty){
-				$scope.property = {
-					type: "String"
-				}
+			isNewProperty = $stateParams.item === undefined ? true : false;
+			if(isNewProperty) {
+				this.item = {
+					mdi_name: "Item Name",
+					mdi_mdh_id: $stateParams.selectedEntity.mdh_id
+				};
 			} else {
-				$scope.property = $stateParams.property;
-			}
-			for(var i=0; i<$scope.typeOptions.length; i++){
-				if($scope.typeOptions[i].val === $scope.property.boi_type){
-					$scope.selectedTypeOption = $scope.typeOptions[i];
-					break;
-				}
+				this.item = $stateParams.item;
 			}
 		}
         
-        $scope.cancel = function() {
-          $scope.$dismiss($stateParams.selectedItem);
+       this.cancel = function() {
+          $scope.$dismiss($stateParams.selectedEntity);
         };
 
-        $scope.ok = function() {
+        this.ok = function() {
           
 	      if(isNewProperty){
-	      	selectedItem.properties.push($scope.property);      		
-	      	$stateParams.itemForEdit = $stateParams.selectedItem = selectedItem;
+	      	this.item.action = 'save';
+	      	selectedEntity.items.push(this.item);
+	      	$stateParams.entityForEdit = $stateParams.selectedEntity = selectedEntity;
 	      } else {
-	    	selectedItem = $stateParams.itemForEdit = $stateParams.selectedItem; 
+	      	this.item.action = 'update';
+	    	selectedEntity = $stateParams.entityForEdit = $stateParams.selectedEntity; 
 	      }
-          $scope.$close(selectedItem);
+          $scope.$close(selectedEntity);
         };
         
         init.apply(this);
         
       }])
-	.controller('ObjectEditorCtrl', ['$scope', '$stateParams', 'selectedItem', '$timeout', function($scope, $stateParams, selectedItem, $timeout) {
-    	
-		var isNewProperty;
-		
-		$scope.typeOptions = [{
-								id: '1',
-								val: 'A'
-							},{
-								id: '2',
-								val: 'B'
-							},{
-								id: '3',
-								val: 'C'
-							}];
-		
-		$scope.selectedTypeOption = {
-				id: '3',
-				val: 'String'
-			};
-		
-		$scope.typeSelectionChanged = function(){
-			$scope.property.type = $scope.selectedTypeOption.val;
-		}
-		
-		$scope.$on('$viewContentLoaded', function(event) {
-		      $timeout(function() {
-		    	//$("form [type='checkbox']").bootstrapSwitch();
-		      },0);
-		    });
-		
-		function init(){
-			isNewProperty = $stateParams.property === undefined ? true : false;
-			if(isNewProperty){
-				$scope.property = {
-					type: "String"
-				}
-			} else {
-				$scope.property = $stateParams.property;
-			}
-			for(var i=0; i<$scope.typeOptions.length; i++){
-				if($scope.typeOptions[i].val === $scope.property.boi_type){
-					$scope.selectedTypeOption = $scope.typeOptions[i];
-					break;
-				}
-			}
-		}
-        
-        $scope.cancel = function() {
-          $scope.$dismiss($stateParams.selectedItem);
-        };
-
-        $scope.ok = function() {
-          
-	      if(isNewProperty){
-	      	selectedItem.properties.push($scope.property);      		
-	      	$stateParams.itemForEdit = $stateParams.selectedItem = selectedItem;
-	      } else {
-	    	selectedItem = $stateParams.itemForEdit = $stateParams.selectedItem; 
-	      }
-          $scope.$close(selectedItem);
-        };
-        
-        init.apply(this);
-        
-      }])      
-	.controller('NotificationsCtrl', ['$scope', '$timeout', '$animate', '$stateParams', function ($scope, $timeout, $animate, $stateParams) {
+	.controller('NotificationsCtrl', ['$timeout', '$stateParams', function ($timeout, $stateParams) {
 		
 		var messageEl = $('.alert');
-		$scope.message = $stateParams.message;
+		this.message = $stateParams.message;
 		
-		$scope.hide = hideMessage;
+		this.hide = hideMessage;
 		
 		var timer;
 		
-		if($scope.message){
+		if(this.message){
 			
-			$scope.messageTypeClass = $scope.message.type || 'alert-danger';
-			
+			this.messageTypeClass = this.message.type || 'alert-danger';
+			var self = this;			
 			timer = $timeout(5000)
 				.then(function(){
-					hideMessage.apply(this);
+					hideMessage.apply(self);
 				});	
 		}
 		
 		function hideMessage(element){
-			if($scope.message){
+			if(this.message){
 				element = element || messageEl;
 				$(element).fadeTo('slow', 0, function(){
 					$(element).parent().slideUp('slow', function(){
-						$scope.message = undefined;
+						this.message = undefined;
 						$timeout.cancel(timer);
-						$scope.$apply();
 					});
 				});	
 			}
 		}
-		
 
-		$scope.destroy = function(){
+		this.destroy = function(){
 			if(timer){
 				$timeout.cancel(timer);
 			}

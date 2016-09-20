@@ -1,0 +1,70 @@
+<div class="detail col-xs-8 col-md-10">
+	<header class="header">
+      <div class="btn-group">
+   		<button type="submit" class="btn btn-primary" ng-click="detailsVm.startEdit()">
+		  <i class="fa fa-pencil" aria-hidden="true"></i>
+		</button>
+   		<button type="submit" class="btn btn-primary" ng-click="detailsVm.duplicateItem()">
+		  <i class="fa fa-files-o" aria-hidden="true"></i>
+		</button>
+		<button class="btn btn-danger" ng-click="detailsVm.deleteItem()">
+		  <i class="glyphicon glyphicon-remove" aria-hidden="true"></i>
+		</button>
+      </div>
+    </header>
+
+	<section class="object-header fluid-container">
+		<section>
+			<div class="object-image">
+				<i class="fa fa-th"></i>
+			</div>
+			<div class="object-title">
+				<p class="title">{{detailsVm.selectedEntity.boh_name}}</p>
+	    		<p class="subtitle">{{detailsVm.selectedEntity.boh_description}}</p>						
+			</div>
+		</section>
+		<section class="object-attributes">
+      		<div>
+      			<label><i class="fa fa-key"></i></label>
+      			<span>{{detailsVm.selectedItem.boh_key}}</span>
+      		</div>
+			<div>
+				<label><i class="fa fa-table"></i></label>
+      			<span>{{detailsVm.selectedItem.boh_table}}</span>
+      		</div>				      							    		
+		</section>
+	</section>
+								
+	<div class="list-content">	
+
+		<ul class="nav nav-tabs">
+		  <li role="presentation" class="active"><a ng-click="detailsVm.showProperties()" role="tab" data-toggle="tab">Properties</a></li>
+		  <li role="presentation"><a ng-click="detailsVm.showRelationships()" role="tab" data-toggle="tab">Relationships <i class="glyphicon glyphicon-link pull-right"></i></a></li>
+		</ul>
+	
+		<div class="toolbar btn-group pull-right">
+			<div class="inner-addon left-addon">
+			    <i class="glyphicon glyphicon-search"></i>	
+			    <input type="search" class="quick-search" placeholder="Search" ng-model="searchText"/>
+			</div>
+		</div>
+
+		<div class="tab-content">
+		
+			<div class="tab-pane fade in active">
+	
+				<div class="items-list">
+					<div ng-hide="detailsVm.selectedEntity.items[0]" class="nodata-text">No Items</div>
+					<div class="list-group">
+					  <a class="list-group-item selected-{{entry._selected_}}" ng-repeat="entry in detailsVm.selectedEntity.items|filter:searchText|orderBy:'boi_name'">
+						<div class="list-group-item-heading">{{entry.boi_name}}</div>
+						<div class="list-group-item-text">{{entry.boi_description}}</div>
+					  </a>
+					</div>
+
+				</div>	
+			</div>	
+		</div>
+
+	</div>
+</div>

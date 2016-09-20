@@ -17,11 +17,11 @@
 	}
 	
 	.page-title {
-	  width: 100%;
-	  padding: 2rem 0px 1rem 0;
-	  margin-bottom: 3rem;
+	  margin: 2rem 0rem 4rem 0rem;
 	  border-bottom: 2px solid #eee;
-	  flex: 1 auto;
+	  flex: 0 3 auto;
+	  overflow: hidden;
+	  min-width:0px;
 	}
 	
 	.page-title>h1{
@@ -32,10 +32,12 @@
 	}
 	
 	.page-content {
-	  flex: 1 100%;
+	  flex: 1 auto;
+	  flex-wrap: wrap;
 	  display: flex;
+	  flex-direction: row;
       align-items: stretch;
-	  overflow: hidden;
+/*	  overflow: hidden;*/
 	  position: relative;
 	  border: 1px solid #ddd;
 	  border-radius: 5px 5px 0 0;
@@ -47,19 +49,25 @@
 	  bottom: 0;
 	  width: 100%;
 	  margin-bottom: 0;
-	  flex: 1 auto;
+	  flex: 0 1 auto;
 	}
 
 	.master {
+	  flex: 1 auto;
+	  order: 1;
 	  overflow: hidden;
 	  padding-left: 0;
 	  border-right: 1px solid #ddd;
-	  flex: 1 auto;
+	  border-top-left-radius: 4px;
 	} 
 	
 	.master .nav {
 	  font-weight: bold;
 	  margin-top: 5.7rem;
+	}
+	
+	.master section{
+	  overflow: auto;
 	}
 	
 	.master .nav>li>a {
@@ -169,41 +177,43 @@
 	  padding-right: 10px;
 	}
 
-/*  	.footer {
-	  position: absolute;
-	  bottom: 0;
-	  width: 100%;
-	  padding-left: 10px;
-	  background-color: #363637;
-	  height: 4em;
-	}
-	
-	.footer>div>button {
-		float:right;
-	}
-	
-	.footer .btn-group{
-	  top: 1rem;
-	  padding-right: 10px;
-	} */
-	
 	.page [class*='col-'] {
 	  padding-right:0;
 	}
 	
 	[ui-view="detail"] {
-		flex: 1 80%;
+	  flex: 1 80%;
+	  order: 2;
+	  flex-wrap: nowrap;
+	  border-top-right-radius: 4px;
 	}
 	
 	.detail {
 	  padding-left: 0;
 	  width: 100%;
 	  height: 100%;
+	  border-top-right-radius: 4px;
 	}
 	
+	/*layout details content*/
+	[ui-view="detail"] .detail {
+	  display: flex;
+      flex-direction: column;
+	}
+	
+	.detail .header {
+	  order: 1;
+	  flex: 1 0 auto;
+	  max-height: 5.6rem; /* max-height = content max height */	  
+	  position: relative; 
+	  border-top-right-radius: 4px;
+	}
+
 	.detail .object-header {
-	  position: absolute;
-	  margin: 5.7rem 0rem 0rem 0rem;
+	  order: 2;
+	  flex: 0 1 auto;
+	  min-height: 11rem; /* min-height = content height */
+	  display: flex;
 	  width: 100%;
 	  padding: 2rem 1rem 1rem 1rem;
 	  background-color: #f2f8fc;
@@ -211,7 +221,7 @@
 	}
 	
 	.detail .object-header section, .detail .object-header .object-title {
-		display: inline-block
+		display: inline-block;
 	}
 	
 	.detail>div[ng-show] {
@@ -225,7 +235,9 @@
 	}
 	
 	.detail .object-header section {
-		margin-right: 10rem;
+		margin-right: 1rem;
+		flex: 1 50%;
+		white-space: nowrap;
 	}
 	
 	.detail .object-header .object-image {
@@ -333,6 +345,33 @@
 	    border-right: 0;
 	}
 	
+	 .items-list {
+		margin-top: 6rem;
+	} 
+	
+	.list-content {
+		order:3;
+	}
+	
+	.list-content .toolbar {
+	  margin: 1.4rem 1rem;
+	}
+	
+	.items-list .list-group {
+	  margin-top: 4.5rem;
+	}
+	
+	.items-list .nodata-text {
+	  padding: 5px;
+	  font-weight: bold;
+	}
+	
+	.items-list .list-group-item {
+	    border-radius: 0;
+	    border-left: 0;
+	    border-right: 0;
+	}
+	
 	.required {
 		color: red;
 		margin-right: 5px;
@@ -343,22 +382,7 @@
 	    float: right;
 	    margin: 6rem 0 0 0;
 	}
-	
-	/* Collapsing Navbar Styles */	
-	@media(min-width:768px) {
-	  .detail .object-header {
-	    -webkit-transition: all .35s;
-	    -moz-transition: all .35s;
-	    transition: all .35s;
-	    /* padding: 15px 0; */
-	    /* Add additional styles here for the UNCOLLAPSED state */
-	  }
-	  .detail .object-header.affix {
-	    padding: 0;
-	    /* Add additional styles here for the COLLAPSED state */
-	  }
-	}
-	
+
 	.alert {
 	  transition: 1s linear all;
 	  -webkit-transition: 1s linear all;

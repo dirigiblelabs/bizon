@@ -1,0 +1,25 @@
+<section>
+
+	<header class="header">
+	  <div class="btn-group">
+		<button type="submit" class="btn btn-primary">
+		  <i class="glyphicon glyphicon-filter" aria-hidden="true"></i>
+		</button>
+      </div>	
+      <div class="btn-group pull-right">
+		<button type="submit" class="btn btn-primary" ng-click="masterVm.createItem()">
+		  <i class="fa fa-plus" aria-hidden="true"></i>
+		</button>
+	  </div>
+    </header>
+
+	<ul class="nav nav-pills nav-stacked" style="margin-top: 5.7rem" infinite-scroll='masterVm.next()' infinite-scroll-distance='3'>
+ 		<li role="presentation" ng-class="{active: masterVm.selectedEntity.boh_id===item.boh_id}" ng-repeat="item in masterVm.items track by item.boh_id">
+ 			<a ng-click="masterVm.selectItem(item)"><i class="fa fa-th-large"></i> {{item.boh_name}} <span ng-click="masterVm.deleteItem(item.boh_id)" class="glyphicon glyphicon-remove pull-right tools-remove" aria-hidden="true"></span></a>
+ 		</li>
+	</ul>
+	<div>
+		<a ng-click='masterVm.next()' ng-show="masterVm.hasMore">More...</a>
+	</div>
+
+</section>
