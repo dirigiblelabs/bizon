@@ -1,0 +1,199 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "0.0.0",
+        "title": "Bo_item Entity Service",
+        "description":"This is a RESTful web service for listing, viewing and managing entities of the type 'Bo_item'"
+    },
+    "basePath":"/services",
+    "tags":[
+      {
+         "name":"Bo_item",
+         "description":"View and manage Bo_item objects"
+      }
+    ],
+    "paths": {
+        "/js/bo_modeller/bo_item.js": {
+            "get": {
+            	"tags":[
+               		"Bo_item"
+            	],
+                "description": "Gets 'Bo_item' objects.\n",
+                "parameters": [
+                    {
+                        "name": "count",
+                        "in": "query",
+                        "description": "Count of all the records",
+                        "required": false,
+                        "type": "boolean"
+                    },
+                    {
+                        "name": "boi_id",
+                        "in": "query",
+                        "description": "Identifier of the 'Bo_item' object",
+                        "required": false,
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "name": "metadata",
+                        "in": "query",
+                        "description": "Metadata of the 'Bo_item' object",
+                        "required": false,
+                        "type": "boolean"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Limit of the objects list",
+                        "required": false,
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "name": "offset",
+                        "in": "query",
+                        "description": "Offset of the objects list",
+                        "required": false,
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort parameter",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "desc",
+                        "in": "query",
+                        "description": "Descending order",
+                        "required": false,
+                        "type": "boolean"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema":{
+		                     "$ref":"#/definitions/Bo_item"
+                        }
+                    }
+                }
+            },
+            "post": {
+            	"tags":[
+               		"Bo_item"
+            	],
+                "description": "Creates a new 'Bo_item' object.\n",
+                "consumes":[
+	               "application/json"
+	            ],
+	            "produces":[
+	               "plain/text"
+	            ],
+	            "parameters":[
+	               {
+	                  "in":"body",
+	                  "name":"body",
+	                  "description":"Bo_item object that needs to be added",
+	                  "required":true,
+	                  "schema":{
+	                     "$ref":"#/definitions/Bo_item"
+	                  }
+	               }
+	            ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema":{
+		                     "$ref":"#/definitions/Bo_item"
+                        }
+                    }
+                }
+            },
+            "put": {
+            	"tags":[
+               		"Bo_item"
+            	],
+                "description": "Updates an existing 'Bo_item' object.\n",
+                "consumes":[
+	               "application/json"
+	            ],
+	            "produces":[
+	               "plain/text"
+	            ],
+	            "parameters":[
+	               {
+	                  "in":"body",
+	                  "name":"body",
+	                  "description":"Bo_item object that needs to be added",
+	                  "required":true,
+	                  "schema":{
+	                     "$ref":"#/definitions/Bo_item"
+	                  }
+	               }
+	            ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema":{
+		                     "$ref":"#/definitions/Bo_item"
+                        }
+                    }
+                }
+            },
+            "delete": {
+            	"tags":[
+               		"Bo_item"
+            	],
+                "description": "Deletes 'Bo_item' objects.\n",
+                "parameters": [
+                    {
+                        "name": "boi_id",
+                        "in": "query",
+                        "description": "Identifier of the 'Bo_item' object",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema":{
+		                     "$ref":"#/definitions/Bo_item"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions":{
+        "Bo_item": {
+	        "type":"object",
+	        "properties": {
+        		"boi_id": {
+	            	"type": 
+        "integer"
+	    		}
+				,
+        		"boi_boh_id": {
+	            	"type": 
+        "integer"
+	    		}
+				,
+        		"boi_name": {
+	            	"type": 
+        "string"
+	    		}
+				,
+        		"boi_description": {
+	            	"type": 
+        "string"
+	    		}
+	        }
+        }
+	}
+}

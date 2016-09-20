@@ -1,0 +1,194 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "0.0.0",
+        "title": "bo_header Entity Service",
+        "description":"This is a RESTful web service for listing, viewing and managing entities of the type 'bo_header'"
+    },
+    "basePath":"/services",
+    "tags":[
+      {
+         "name":"bo_header",
+         "description":"View and manage bo_header objects"
+      }
+    ],
+    "paths": {
+        "/js/bo_modeller/bo_header.js": {
+            "get": {
+            	"tags":[
+               		"bo_header"
+            	],
+                "description": "Gets 'bo_header' objects.\n",
+                "parameters": [
+                    {
+                        "name": "count",
+                        "in": "query",
+                        "description": "Count of all the records",
+                        "required": false,
+                        "type": "boolean"
+                    },
+                    {
+                        "name": "boh_id",
+                        "in": "query",
+                        "description": "Identifier of the 'bo_header' object",
+                        "required": false,
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "name": "metadata",
+                        "in": "query",
+                        "description": "Metadata of the 'bo_header' object",
+                        "required": false,
+                        "type": "boolean"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Limit of the objects list",
+                        "required": false,
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "name": "offset",
+                        "in": "query",
+                        "description": "Offset of the objects list",
+                        "required": false,
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort parameter",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "desc",
+                        "in": "query",
+                        "description": "Descending order",
+                        "required": false,
+                        "type": "boolean"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema":{
+		                     "$ref":"#/definitions/bo_header"
+                        }
+                    }
+                }
+            },
+            "post": {
+            	"tags":[
+               		"bo_header"
+            	],
+                "description": "Creates a new 'bo_header' object.\n",
+                "consumes":[
+	               "application/json"
+	            ],
+	            "produces":[
+	               "plain/text"
+	            ],
+	            "parameters":[
+	               {
+	                  "in":"body",
+	                  "name":"body",
+	                  "description":"bo_header object that needs to be added",
+	                  "required":true,
+	                  "schema":{
+	                     "$ref":"#/definitions/bo_header"
+	                  }
+	               }
+	            ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema":{
+		                     "$ref":"#/definitions/bo_header"
+                        }
+                    }
+                }
+            },
+            "put": {
+            	"tags":[
+               		"bo_header"
+            	],
+                "description": "Updates an existing 'bo_header' object.\n",
+                "consumes":[
+	               "application/json"
+	            ],
+	            "produces":[
+	               "plain/text"
+	            ],
+	            "parameters":[
+	               {
+	                  "in":"body",
+	                  "name":"body",
+	                  "description":"bo_header object that needs to be added",
+	                  "required":true,
+	                  "schema":{
+	                     "$ref":"#/definitions/bo_header"
+	                  }
+	               }
+	            ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema":{
+		                     "$ref":"#/definitions/bo_header"
+                        }
+                    }
+                }
+            },
+            "delete": {
+            	"tags":[
+               		"bo_header"
+            	],
+                "description": "Deletes 'bo_header' objects.\n",
+                "parameters": [
+                    {
+                        "name": "boh_id",
+                        "in": "query",
+                        "description": "Identifier of the 'bo_header' object",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema":{
+		                     "$ref":"#/definitions/bo_header"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions":{
+        "bo_header": {
+	        "type":"object",
+	        "properties": {
+        		"boh_id": {
+	            	"type": 
+        "integer"
+	    		}
+				,
+        		"boh_description": {
+	            	"type": 
+        "string"
+	    		}
+				,
+        		"boh_name": {
+	            	"type": 
+        "string"
+	    		}
+	        }
+        }
+	}
+}
