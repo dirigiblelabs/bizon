@@ -178,7 +178,7 @@
 		                	var location = res.headers('Location');
 		                	if(location){
 		                		var id = location.substring(location.lastIndexOf('/')+1);
-		                		angular.extend(res.resource, { "mdh_id": id });
+		                		angular.extend(res.resource, { "boh_id": id });
 	                		} else {
 	                			console.error('Cannot infer id after save operation. HTTP Response Header "Location" is missing: ' + location);
 	            			}
@@ -194,11 +194,11 @@
 		}
 	})
 	.service('Entity', ['$resource', 'ResourceSvcConfiguration', function($resource, ResourceSvcConfiguration) {
-	  	var res = $resource('../../js/sample_master_detail/md_header.js/:boId', { boId:'@id' }, ResourceSvcConfiguration.cfg);
+	  	var res = $resource('../../js/bo_modeller/bo_header.js/:boId', { boId:'@id' }, ResourceSvcConfiguration.cfg);
 		
 		res.newObjectTemplate = {
-				"mdh_name":"Business Object Name",
-				"mdh_description":"Description for business object"
+				"boh_name":"Business Object Name",
+				"boh_description":"Description for business object"
 			};
 			
 		return res;
@@ -206,16 +206,16 @@
 	.service('EntityCount', ['$resource', 'ResourceSvcConfiguration', function($resource, ResourceSvcConfiguration) {
 		var cfg = angular.copy(ResourceSvcConfiguration.cfg);
 		cfg.query = {method:'GET', isArray:false};
-	  	return $resource('../../js/sample_master_detail/md_header.js?count=true', { }, cfg);
+	  	return $resource('../../js/bo_modeller/bo_header.js?count=true', { }, cfg);
 	}])	
 	.service('Item', ['$resource', 'ResourceSvcConfiguration', function($resource, ResourceSvcConfiguration) {
 	
-	  	var res = $resource('../../js/sample_master_detail/md_item.js/:boId', { boId:'@id' }, ResourceSvcConfiguration.cfg);
+	  	var res = $resource('../../js/bo_modeller/bo_item.js/:boId', { boId:'@id' }, ResourceSvcConfiguration.cfg);
 		
 		
 		res.newObjectTemplate = {
-					"mdi_name":"Item",
-					"mdi_description":"Description for Item"
+					"boi_name":"Item",
+					"boi_description":"Description for Item"
 				};
 				
 		return res;
@@ -227,7 +227,7 @@
 			obj.items = [];
 			for(var i = 0; i < 3; i++){
 				var item = angular.copy(Item.newObjectTemplate);
-				item.mdi_name += ' ' +i;
+				item.boi_name += ' ' +i;
 				obj.items.push(item);
 			}
 			return obj;
@@ -264,7 +264,7 @@
 		*/
 		this.get = function(id, lookupRemotelyOnDemand){
 			var itemHit = this.batchLoadedMasterData.filter(function(item){
-					if(item.mdh_id == id ){
+					if(item.boh_id == id ){
 						return true;
 					}
 					return false;
@@ -360,14 +360,14 @@
 									var action = item.action;
 									delete item.action;
 									if(action === 'remove') {
-							        	return Item.remove({boId: item.mdi_id}).$promise;
+							        	return Item.remove({boId: item.boi_id}).$promise;
 						        	} else {
-						        		return Item[action]({boId: item.mdi_id}, item).$promise;
+						        		return Item[action]({boId: item.boi_id}, item).$promise;
 					        		}
 						    	});
 			}
 
-			promises.unshift(Entity.update({boId: header.mdh_id}, header).$promise);
+			promises.unshift(Entity.update({boId: header.boh_id}, header).$promise);
 	    	return $q.all(promises);
 		};	
 		
@@ -395,7 +395,7 @@
 		this.createItem = function(){
 			masterDataSvc.create()
 			.then(function(newItem){
-				$stateParams.boId = newItem.mdh_id;
+				$stateParams.boId = newItem.boh_id;
 				$stateParams.message = {
 					text: 'New Buisness Object successfully created.',
 					type: 'alert-success'
@@ -419,7 +419,7 @@
 		this.items = masterDataSvc.batchLoadedMasterData;
 		this.querySettings = {
 			limit: 5,
-			sort: 'mdh_name',
+			sort: 'boh_name',
 			order: 'ASC'
 		};
 				
@@ -427,7 +427,7 @@
 			var itemId = $state.params.boId;//requested item id
 			if(this.items.length > 0) {
 				
-				itemId = $state.params.boId || this.items[0].mdh_id;//in case no item id has been explicitly requested, preselect the id of the first one in the list
+				itemId = $state.params.boId || this.items[0].boh_id;//in case no item id has been explicitly requested, preselect the id of the first one in the list
 				masterDataSvc.get(itemId, true)
 				.then(jQuery.proxy(function(item){
 						if(item === undefined){
@@ -455,7 +455,7 @@
 			this.selectedEntity = item;
 			$stateParams = angular.extend($stateParams, {
 				selectedEntity: item,
-				boId: item.mdh_id
+				boId: item.boh_id
 			});
 			$state.go('list.entity', $stateParams);
 		};
@@ -463,7 +463,7 @@
 		this.createItem = function(){
 			masterDataSvc.create()
 			.then(function(newItem){
-				$stateParams.boId = newItem.mdh_id;
+				$stateParams.boId = newItem.boh_id;
 				$stateParams.message = {
 					text: 'New Buisness Object successfully created.',
 					type: 'alert-success'
@@ -542,7 +542,7 @@
 			}
 		}
 		
-		showDetails(this.selectedEntity);
+		showDetails.apply(this, [this.selectedEntity]);
 		
 		this.showRelationships = function(){
 			if(this._selectedItemDetails){
@@ -571,10 +571,10 @@
 		
 		this.duplicateItem = function() {
 			var duplicateItem = angular.copy(this.selectedEntity, {});
-			delete duplicateItem.mdh_id;
+			delete duplicateItem.boh_id;
 			masterDataSvc.create(undefined, duplicateItem)
 				.then(function(newItem){
-					$stateParams.boId = newItem.mdh_id;
+					$stateParams.boId = newItem.boh_id;
 					$stateParams.message = {
 						text: 'Buisness Object successfully duplicated.',
 						type: 'alert-success'
@@ -587,7 +587,7 @@
 		};
 		
 		this.deleteItem = function() {
-			masterDataSvc.remove(this.selectedEntity.mdh_id)
+			masterDataSvc.remove(this.selectedEntity.boh_id)
 			.then(function(){
 				delete $stateParams.boId;
 				$stateParams.message = {
@@ -653,7 +653,7 @@
 			}
 			$stateParams.entityForEdit.items = $stateParams.entityForEdit.items.map(
 				function(currItem){
-					if(currItem.mdi_id && currItem.mdi_id === item.mdi_id){
+					if(currItem.boi_id && currItem.boi_id === item.boi_id){
 						currItem.action = 'remove';
 					}
 					return currItem;
@@ -670,7 +670,7 @@
 			var self = this;
 		    masterDataSvc.update(this.selectedEntity).then(
 		    		function(){
-						$state.go('^', {boId: self.selectedEntity.mdh_id, selectedEntity:self.selectedEntity}, {reload: true, location:false});
+						$state.go('^', {boId: self.selectedEntity.boh_id, selectedEntity:self.selectedEntity}, {reload: true, location:false});
 			    	}, 
 		    		function(reason){
 			    		var message = masterDataSvc.serviceErrorMessageFormatter('Updating Buisness Object failed', reason);
@@ -718,8 +718,8 @@
 			isNewProperty = $stateParams.item === undefined ? true : false;
 			if(isNewProperty) {
 				this.item = {
-					mdi_name: "Item Name",
-					mdi_mdh_id: $stateParams.selectedEntity.mdh_id
+					boi_name: "Item Name",
+					boi_boh_id: $stateParams.selectedEntity.boh_id
 				};
 			} else {
 				this.item = $stateParams.item;

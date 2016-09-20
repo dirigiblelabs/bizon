@@ -10,7 +10,7 @@ var response = require("net/http/response");
 
 var datasource = database.getDatasource();
 
-var itemsEntitySetName = "items";
+var itemsEntitySetName = "properties";
 
 // Parse JSON entity into SQL and insert in db. Returns the new record id.
 exports.insert = function(entity, cascaded) {
@@ -54,7 +54,7 @@ exports.insert = function(entity, cascaded) {
         var statement = connection.prepareStatement(sql);
         
         var i = 0;
-        entity.mdh_id = datasource.getSequence('BO_HEADER_BOH_ID').next();
+        entity.boh_id = datasource.getSequence('BO_HEADER_BOH_ID').next();
         
         statement.setInt(++i,  entity.boh_id);
         statement.setString(++i, entity.boh_name);
@@ -139,7 +139,7 @@ exports.list = function(limit, offset, sort, order, expanded) {
         while (resultSet.next()) {
         	var entity = createEntity(resultSet);
         	if(expanded !== null && expanded!==undefined){
-			   var dependentEntities = mdItems.list(entity.mdh_id, null, null, null, null);
+			   var dependentEntities = boItemLib.list(entity.boh_id, null, null, null, null);
 			   if(dependentEntities) {
 			   	 entity[itemsEntitySetName] = dependentEntities;
 		   	   }
@@ -162,8 +162,8 @@ exports.list = function(limit, offset, sort, order, expanded) {
 function createEntity(resultSet) {
     var entity = {};
 	entity.boh_id = resultSet.getInt("BOH_ID");
-    result.boh_name = resultSet.getString("BOH_NAME");
-    result.boh_table = resultSet.getString("BOH_TABLE");	
+    entity.boh_name = resultSet.getString("BOH_NAME");
+    entity.boh_table = resultSet.getString("BOH_TABLE");	
 	entity.boh_description = resultSet.getString("BOH_DESCRIPTION");
 	if(entity.boh_description === null)
 		delete entity.boh_description;
@@ -173,8 +173,8 @@ function createEntity(resultSet) {
 
 //Prepare a JSON object for insert into DB
 function createSQLEntity(entity) {
-	if(!entity.mdh_description)
-		entity.mdh_description = null;  
+	if(!entity.boh_description)
+		entity.boh_description = null;  
 	console.log("Transformation to DB JSON object finished: " + entity);
 	return entity;
 }
@@ -247,9 +247,9 @@ exports.remove = function(id, cascaded) {
         statement.executeUpdate();
         
 		if(cascaded && id){
-			var persistedItems = mdItems.list(id);
+			var persistedItems = boItemLib.list(id);
 			for(var i = 0; i < persistedItems.length; i++) {
-        		boItemLib.remove(persistedItems[i].mdi_id);
+        		boItemLib.remove(persistedItems[i].boi_id);
 			}
 		}        
         
@@ -476,7 +476,7 @@ exports.http = {
 			}
 		}
 	    try{
-			var items = exports.list(limit, offset, sort, desc, expanded);
+			var items = exports.list(limit, offset, sort, order, expanded);
 	        var jsonResponse = JSON.stringify(items, null, 2);
 	    	response.println(jsonResponse);      	
 		} catch(e) {

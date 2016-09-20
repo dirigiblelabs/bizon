@@ -177,7 +177,7 @@ exports.list = function(headerId, limit, offset, sort, order) {
 //create entity as JSON object from ResultSet current Row
 function createEntity(resultSet) {
     var entity = {};
-	entity.boi_id = entitySet.getInt("BOI_ID");
+	entity.boi_id = resultSet.getInt("BOI_ID");
 	entity.boi_boh_id = resultSet.getInt("BOI_BOH_ID");
     entity.boi_name = resultSet.getString("BOI_NAME");
     entity.boi_column = resultSet.getString("BOI_COLUMN");
@@ -498,7 +498,7 @@ exports.http = {
 				} else if(urlParameters.count){
 					this.count();
 				} else if(urlParameters.list){
-					this.query(urlParameters.list.limit, urlParameters.list.offset, urlParameters.list.sort, urlParameters.list.order);
+					this.query(urlParameters.list.headerId, urlParameters.list.limit, urlParameters.list.offset, urlParameters.list.sort, urlParameters.list.order);
 				}
 			} else {
 				this.query();
@@ -601,7 +601,7 @@ exports.http = {
 			}
 		}
 	    try{
-			var items = exports.list(headerId, limit, offset, sort, desc, expanded);
+			var items = exports.list(headerId, limit, offset, sort, order);
 	        var jsonResponse = JSON.stringify(items, null, 2);
 	    	response.println(jsonResponse);      	
 		} catch(e) {
