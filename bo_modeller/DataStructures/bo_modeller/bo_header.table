@@ -23,7 +23,7 @@
       {
         "name":"BOH_TABLE",
         "type":"VARCHAR",
-        "length":"128",
+        "length":"255",
         "notNull":"true",
         "primaryKey":"false",
         "defaultValue":""

@@ -1,5 +1,5 @@
 {
-  "tableName":"BO_ITEMS",
+  "tableName":"BO_ITEM",
   "columns":
     [
       {

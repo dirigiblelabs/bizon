@@ -17,7 +17,7 @@ exports.insert = function(item) {
 
     var connection = datasource.getConnection();
     try {
-        var sql = "INSERT INTO BO_ITEMS (";
+        var sql = "INSERT INTO BO_ITEM (";
         sql += "BOI_ID";
         sql += ",";
         sql += "BOI_BOH_ID";
@@ -59,7 +59,7 @@ exports.insert = function(item) {
         item = createSQLEntity(item);
         
         var i = 0;
-        var id = datasource.getSequence('BO_ITEMS_BOI_ID').next();
+        var id = datasource.getSequence('BO_ITEM_BOI_ID').next();
         statement.setInt(++i, id);
         statement.setInt(++i, item.boi_boh_id);
         statement.setString(++i, item.boi_name);
@@ -86,7 +86,7 @@ exports.find = function(id) {
     var connection = datasource.getConnection();
     try {
         var item;
-        var sql = "SELECT * FROM BO_ITEMS WHERE " + exports.pkToSQL();
+        var sql = "SELECT * FROM BO_ITEM WHERE " + exports.pkToSQL();
         var statement = connection.prepareStatement(sql);
         statement.setInt(1, id);
         
@@ -112,7 +112,7 @@ exports.list = function(headerId, limit, offset, sort, desc) {
         if (limit !== null && offset !== null) {
             sql += " " + datasource.getPaging().genTopAndStart(limit, offset);
         }
-        sql += " * FROM BO_ITEMS";
+        sql += " * FROM BO_ITEM";
         if(headerId !== null){
         	sql += " WHERE BOI_BOH_ID=" + headerId;
         }
@@ -237,7 +237,7 @@ exports.update = function(item) {
 
     var connection = datasource.getConnection();
     try {
-        var sql = "UPDATE BO_ITEMS SET ";
+        var sql = "UPDATE BO_ITEM SET ";
         sql += "BOI_BOH_ID = ?";
         sql += ",";
         sql += "BOI_NAME = ?";
@@ -283,7 +283,7 @@ exports.update = function(item) {
 exports.remove = function(id) {
     var connection = datasource.getConnection();
     try {
-    	var sql = "DELETE FROM BO_ITEMS WHERE " + exports.pkToSQL();
+    	var sql = "DELETE FROM BO_ITEM WHERE " + exports.pkToSQL();
         var statement = connection.prepareStatement(sql);
         statement.setString(1, id);
         statement.executeUpdate();
@@ -301,7 +301,7 @@ exports.count = function() {
     var count = 0;
     var connection = datasource.getConnection();
     try {
-    	var sql = 'SELECT COUNT(*) FROM BO_ITEMS';
+    	var sql = 'SELECT COUNT(*) FROM BO_ITEM';
         var statement = connection.prepareStatement(sql);
         var rs = statement.executeQuery();
         if (rs.next()) {
@@ -318,7 +318,7 @@ exports.count = function() {
 
 exports.metadata = function() {
 	var entityMetadata = {
-		name: 'bo_items',
+		name: 'bo_item',
 		type: 'object',
 		properties: []
 	};
