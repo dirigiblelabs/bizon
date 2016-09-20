@@ -294,7 +294,9 @@ exports.pkToSQL = function() {
 exports.http = {
 
 	dispatch: function(urlParameters){
+		console.info('>>>>>');
 		var method = request.getMethod().toUpperCase();
+		console.info('>>>>> ' + method);
 		if('POST' === method){
 			this.create();
 		} else if('PUT' === method){

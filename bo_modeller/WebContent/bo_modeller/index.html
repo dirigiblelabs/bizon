@@ -47,6 +47,54 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.15.0/jquery.validate.min.js"></script>
 	
 	<script>
+	
+	function ItemBaseController(Entity, $state, $stateParams){
+	};
+	
+	ItemBaseController.prototype.createItem = function(){
+		this.Entity.save({
+			"boh_name":"Business Object Name",
+			"boh_table": "BO_TABLE_NAME",
+			"boh_description":"Description for business object",
+			"boh_key":"Id",
+
+			"properties": [{
+				"boi_name":"Id",
+				"boi_type":"Integer",
+				"boi_nullable":0,
+				"boi_key": true
+			}]
+				}).$promise
+		.then(function(newItem){
+			$stateParams.boId = newItem.boh_id;
+			$stateParams.message = {
+				text: 'New Buisness Object successfully created.',
+				type: 'alert-success'
+			}
+			$state.go($state.current, $stateParams, {reload: true});
+		})
+	};
+	
+	ItemBaseController.prototype.deleteItem = function(itemId){
+		Entity.remove({boId: itemId}).$promise
+		.then(function(){
+			//$state.reload();
+			delete $stateParams.boId;
+			$stateParams.message = {
+					text: 'Buisness Object successfully deleted.',
+					type: 'alert-success'
+				}
+			$state.go($state.current, $stateParams, {reload: true, location:false, inherit: false});
+		});
+	};
+	
+	function MasterController(Entity, $state, $stateParams){
+		ItemBaseController.call(this, Entity, $state, $stateParams);
+	};
+	
+	MasterController.prototype = Object.create(ItemBaseController.prototype);
+	
+	
 	angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.bootstrap', 'xeditable'])
 	.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
 		
@@ -128,6 +176,35 @@
 		            controller: 'PropertyEditorCtrl'
 		        });
 		        modalInstance.rendered.then(function(){
+					//do something if necessary
+		        });
+		        modalInstance.result.then(goBack, goBack);
+		    }]
+		  })
+		.state("items.select.edit.object", {
+			url: "obj",
+		    params: {
+				selectedItem: undefined,
+				property: undefined,
+				message: {value: undefined}
+		    },
+		    onEnter: ['$stateParams', '$state', '$uibModal', function($stateParams, $state, $modal) {
+		    	
+		    	function goBack(_selectedItem) {
+		        	$state.go("items.select.edit", {selectedItem: _selectedItem}, {location:false});
+		        }
+		    	
+		        var modalInstance = $modal.open({
+		        	animation: true,
+		            templateUrl: "partials/objectEditor.html",
+		            resolve: {
+		            	selectedItem: function() { 
+		            		return $stateParams.selectedItem; 
+		            	}
+		            },
+		            controller: 'ObjectEditorCtrl'
+		        });
+		        modalInstance.rendered.then(function(){
 		        	var $validator = $('.modal-body form').validate({
 		        		errorClass: 'has-error',
 		        		validClass : 'has-success',
@@ -150,9 +227,10 @@
 		        modalInstance.result.then(goBack, goBack);
 		    }]
 		  });		    
-	}])
+	}])	
 	.service('Entity', function($resource) {
-	  return $resource('../../js/bo_modeller/bo_header.js/:boId', { boId:'@id' }, {
+	  /* return $resource('../../js/bo_modeller/bo_header.js/:boId', { boId:'@id' }, { */
+	  return $resource('http://localhost:8081/api/bos/:boId', { boId:'@id' }, {		  
 		    create: {
 		        method: 'POST'
 		      },
@@ -382,6 +460,13 @@
 				selectedItem: $scope.selectedItem,
 				property: property
 			}, {location: false});
+		},
+		
+		$scope.openObjectEditor = function(property){
+			$state.go('items.select.edit.object', {
+				selectedItem: $scope.selectedItem,
+				property: property
+			}, {location: false});
 		}
 		
 		$scope.deleteProperty = function(property){
@@ -473,6 +558,71 @@
         init.apply(this);
         
       }])
+	.controller('ObjectEditorCtrl', ['$scope', '$stateParams', 'selectedItem', '$timeout', function($scope, $stateParams, selectedItem, $timeout) {
+    	
+		var isNewProperty;
+		
+		$scope.typeOptions = [{
+								id: '1',
+								val: 'A'
+							},{
+								id: '2',
+								val: 'B'
+							},{
+								id: '3',
+								val: 'C'
+							}];
+		
+		$scope.selectedTypeOption = {
+				id: '3',
+				val: 'String'
+			};
+		
+		$scope.typeSelectionChanged = function(){
+			$scope.property.type = $scope.selectedTypeOption.val;
+		}
+		
+		$scope.$on('$viewContentLoaded', function(event) {
+		      $timeout(function() {
+		    	//$("form [type='checkbox']").bootstrapSwitch();
+		      },0);
+		    });
+		
+		function init(){
+			isNewProperty = $stateParams.property === undefined ? true : false;
+			if(isNewProperty){
+				$scope.property = {
+					type: "String"
+				}
+			} else {
+				$scope.property = $stateParams.property;
+			}
+			for(var i=0; i<$scope.typeOptions.length; i++){
+				if($scope.typeOptions[i].val === $scope.property.boi_type){
+					$scope.selectedTypeOption = $scope.typeOptions[i];
+					break;
+				}
+			}
+		}
+        
+        $scope.cancel = function() {
+          $scope.$dismiss($stateParams.selectedItem);
+        };
+
+        $scope.ok = function() {
+          
+	      if(isNewProperty){
+	      	selectedItem.properties.push($scope.property);      		
+	      	$stateParams.itemForEdit = $stateParams.selectedItem = selectedItem;
+	      } else {
+	    	selectedItem = $stateParams.itemForEdit = $stateParams.selectedItem; 
+	      }
+          $scope.$close(selectedItem);
+        };
+        
+        init.apply(this);
+        
+      }])      
 	.controller('NotificationsCtrl', ['$scope', '$timeout', '$animate', '$stateParams', function ($scope, $timeout, $animate, $stateParams) {
 		
 		var messageEl = $('.alert');
