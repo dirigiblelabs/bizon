@@ -9,12 +9,30 @@ var datasource = database.getDatasource();
 
 // Parse JSON entity into SQL and insert in db. Returns the new record id.
 exports.insert = function(item) {
-
-	if(item.boi_type === undefined || item.type === null){
-		throw new Error('Invalid type: ' + item.type);
+	
+	console.log('Inserting BO_ITEM entity ' + item);
+	
+	if(item === undefined || item === null){
+		throw new Error('Illegal argument: item is ' + item);
 	}
 	
+	if(item.boi_boh_id === undefined || item.boi_boh_id === null){
+		throw new Error('Illegal boi_boh_id attribute: ' + item.boi_boh_id);
+	}	
 
+	
+	if(item.boi_name === undefined || item.boi_name === null){
+		throw new Error('Illegal boi_name attribute: ' + item.boi_name);
+	}
+
+	if(item.boi_type === undefined || item.boi_type === null){
+		throw new Error('Illegal boi_type attribute: ' + item.boi_type);
+	}
+
+	if(item.boi_column === undefined || item.boi_column === null){
+		throw new Error('Illegal boi_column attribute: ' + item.boi_column);
+	}
+	
     var connection = datasource.getConnection();
     try {
         var sql = "INSERT INTO BO_ITEM (";
@@ -70,19 +88,24 @@ exports.insert = function(item) {
         statement.setShort(++i, item.boi_pk);
         statement.setString(++i, item.boi_default);
         statement.executeUpdate();
-
-        return id;
+        
+        console.log('BO_ITEM entity inserted with boi_id[' + item.boi_id + ']');
+        
+        return item.boi_id;
+        
     } catch(e) {
 		e.errContext = sql;
 		throw e;
     } finally {
         connection.close();
     }
-    return -1;
 };
 
 // Reads a single entity by id, parsed into JSON object 
 exports.find = function(id) {
+
+	console.log('Finding BO_ITEM entity with id ' + id);
+
     var connection = datasource.getConnection();
     try {
         var item;
@@ -93,8 +116,12 @@ exports.find = function(id) {
         var resultSet = statement.executeQuery();
         if (resultSet.next()) {
             item = createEntity(resultSet);
-        } 
+            if(item)
+            	console.log('BO_ITEM entity with id[' + id + '] found');
+        }
+        
         return item;
+
     } catch(e) {
 		e.errContext = sql;
 		throw e;
@@ -104,33 +131,41 @@ exports.find = function(id) {
 };
 
 // Read all entities, parse and return them as an array of JSON objets
-exports.list = function(headerId, limit, offset, sort, desc) {
+exports.list = function(headerId, limit, offset, sort, order) {
+
+	console.log('Listing BO_ITEM entity collection for header id ' + headerId + ' with list operators: limit['+limit+'], offset['+offset+'], sort['+sort+'], order['+order+']');
+
     var connection = datasource.getConnection();
     try {
         var items = [];
         var sql = "SELECT ";
-        if (limit !== null && offset !== null) {
+        if ((limit !== null && limit !== undefined) && (offset !== null && offset !== undefined)) {
             sql += " " + datasource.getPaging().genTopAndStart(limit, offset);
         }
         sql += " * FROM BO_ITEM";
-        if(headerId !== null){
+        if(headerId !== null && headerId !== undefined){
         	sql += " WHERE BOI_BOH_ID=" + headerId;
         }
-        if (sort !== null) {
+        if (sort !== null && sort !== undefined) {
             sql += " ORDER BY " + sort;
         }
-        if (sort !== null && desc !== null) {
-            sql += " DESC ";
+        if ((sort !== null && sort !== undefined) && (order !== null && order !== undefined)) {
+            sql += " " + order;
         }
-        if (limit !== null && offset !== null) {
+        if ((limit !== null && limit !== undefined) && (offset !== null && offset !== undefined)) {
             sql += " " + datasource.getPaging().genLimitAndOffset(limit, offset);
         }
+
         var statement = connection.prepareStatement(sql);
         var resultSet = statement.executeQuery();
         while (resultSet.next()) {
             items.push(createEntity(resultSet));
         }
+        
+        console.log('' + items.length +' BO_ITEM entities found');
+        
         return items;
+        
     }  catch(e) {
 		e.errContext = sql;
 		throw e;
@@ -141,51 +176,52 @@ exports.list = function(headerId, limit, offset, sort, desc) {
 
 //create entity as JSON object from ResultSet current Row
 function createEntity(resultSet) {
-    var result = {};
-	result.boi_id = resultSet.getInt("BOI_ID");
-	result.boi_boh_id = resultSet.getInt("BOI_BOH_ID");
-    result.boi_name = resultSet.getString("BOI_NAME");
-    result.boi_column = resultSet.getString("BOI_COLUMN");
-	result.boi_type = resultSet.getInt("BOI_TYPE");
-	result.boi_type = codeToStringItemTypeMapping(result.boi_type);
-	result.boi_length = resultSet.getInt("BOI_LENGTH");
-    result.boi_null = resultSet.getShort("BOI_NULL");
-    if(result.boi_null === 0){
-    	result.boi_null = false;
+    var entity = {};
+	entity.boi_id = entitySet.getInt("BOI_ID");
+	entity.boi_boh_id = resultSet.getInt("BOI_BOH_ID");
+    entity.boi_name = resultSet.getString("BOI_NAME");
+    entity.boi_column = resultSet.getString("BOI_COLUMN");
+	entity.boi_type = resultSet.getInt("BOI_TYPE");
+	entity.boi_type = codeToStringItemTypeMapping(entity.boi_type);
+	entity.boi_length = resultSet.getInt("BOI_LENGTH");
+    if(entity.boi_length === null)
+    	delete entity.boi_length;	
+    entity.boi_null = resultSet.getShort("BOI_NULL");
+    if(entity.boi_null === 0){
+    	entity.boi_null = false;
 	} else {
-		result.boi_null = true;
+		entity.boi_null = true;
 	}
-    result.boi_pk = resultSet.getShort("BOI_PK");
-    if(result.boi_pk === 0){
-    	result.boi_pk = false;
+    entity.boi_pk = resultSet.getShort("BOI_PK");
+    if(entity.boi_pk === 0){
+    	entity.boi_pk = false;
 	} else {
-		result.boi_pk = true;
+		entity.boi_pk = true;
 	}
-    result.boi_default = resultSet.getString("BOI_DEFAULT");
-    return result;
+    entity.boi_default = resultSet.getString("BOI_DEFAULT");
+    if(entity.boi_default === null)
+    	delete entity.boi_default;	    
+    console.log("Transformation from DB JSON object finished: " + entity);
+    return entity;
 }
 
 //Prepare a JSON object for insert into DB
 function createSQLEntity(item) {
-    if(item){
-		item.boi_type = stringToCodeItemTypeMapping(item.boi_type);
-		console.info("Item type: %s", item.boi_type);
-		if(item.boi_null === null || item.boi_null === undefined || item.boi_null === true){
-			item.boi_null = 1;
-		} else {
-    	   	item.boi_null = 0;
-	    }
-	   	if(item.boi_pk === null || item.boi_pk === undefined || item.boi_pk === false){
-			item.boi_pk = 0;
-		} else {
-	    	item.boi_pk = 1;	
-	    }
-	  	if(item.boi_default === undefined){
-	  		item.boi_default = null;
-  		}
-	   	console.info("Item pk: %s", item.boi_pk);
-	}	
-	console.info('<<< ' + item);
+	item.boi_type = stringToCodeItemTypeMapping(item.boi_type);
+	if(item.boi_null === null || item.boi_null === undefined || item.boi_null === true){
+		item.boi_null = 1;
+	} else {
+   	   	item.boi_null = 0;
+    }
+	if(item.boi_pk === null || item.boi_pk === undefined || item.boi_pk === false){
+		item.boi_pk = 0;
+	} else {
+	   	item.boi_pk = 1;	
+	}
+	if(item.boi_default === undefined){
+		item.boi_default = null;
+  	}
+	console.log("Transformation to DB JSON object finished: " + item);
 	return item;
 }
 
@@ -227,13 +263,27 @@ function codeToStringItemTypeMapping(code) {
 // update entity from a JSON object. Returns the id of the updated entity.
 exports.update = function(item) {
 
-	if(item.boi_id === undefined || item.boi_id === null){
-		throw new Error('Invalid id: ' + item.id);
-	}
-	if(item.boi_type === undefined || item.type === null){
-		throw new Error('Invalid type: ' + item.type);
+	console.log('Updating BO_ITEM entity ' + item);
+
+	if(item === undefined || item === null){
+		throw new Error('Illegal argument: item is ' + item);
 	}
 	
+	if(item.boi_id === undefined || item.boi_id === null){
+		throw new Error('Illegal boi_id attribute: ' + item.boi_id);
+	}	
+	
+	if(item.boi_boh_id === undefined || item.boi_boh_id === null){
+		throw new Error('Illegal boi_boh_id attribute: ' + item.boi_boh_id);
+	}	
+	
+	if(item.boi_name === undefined || item.boi_name === null){
+		throw new Error('Illegal boi_name attribute: ' + item.boi_name);
+	}
+
+	if(item.boi_type === undefined || item.boi_type === null){
+		throw new Error('Illegal boi_type attribute: ' + item.boi_type);
+	}
 
     var connection = datasource.getConnection();
     try {
@@ -270,7 +320,11 @@ exports.update = function(item) {
         var id = item.boi_id;
         statement.setInt(++i, id);
         statement.executeUpdate();
-        return id;
+        
+        console.log('BO_ITEM entity with boi_id[' + id + '] updated');
+        
+        return this;
+
     } catch(e) {
 		e.errContext = sql;
 		throw e;
@@ -281,13 +335,20 @@ exports.update = function(item) {
 
 // delete entity by id. Returns the id of the deleted entity.
 exports.remove = function(id) {
+
+	console.log('Deleting BO_ITEM entity with id[' + id + ']');
+
     var connection = datasource.getConnection();
     try {
     	var sql = "DELETE FROM BO_ITEM WHERE " + exports.pkToSQL();
         var statement = connection.prepareStatement(sql);
         statement.setString(1, id);
         statement.executeUpdate();
-        return id;
+        
+        console.log('BO_ITEM entity with boi_id[' + id + '] deleted');        
+        
+        return this;
+        
     }  catch(e) {
 		e.errContext = sql;
 		throw e;
@@ -298,6 +359,9 @@ exports.remove = function(id) {
 
 
 exports.count = function() {
+
+	console.log('Counting BO_ITEM entities');
+
     var count = 0;
     var connection = datasource.getConnection();
     try {
@@ -313,10 +377,16 @@ exports.count = function() {
     } finally {
         connection.close();
     }
+    
+    console.log('' + count + ' BO_ITEMS entities counted');         
+    
     return count;
 };
 
 exports.metadata = function() {
+
+	console.log('Exporting metadata for BO_ITEM type');
+
 	var entityMetadata = {
 		name: 'bo_item',
 		type: 'object',
@@ -406,8 +476,13 @@ exports.pkToSQL = function() {
 
 exports.http = {
 
+	idPropertyName: 'boi_id',
+	validSortPropertyNames: ['boi_id','boi_name','boi_boh_id','boi_column','boi_type','boi_length','boi_null','boi_default'],
+
 	dispatch: function(urlParameters){
 		var method = request.getMethod().toUpperCase();
+		console.log('Dispatching operation request for HTTP Verb['+ method +'] and URL parameters: ' + urlParameters);
+
 		if('POST' === method){
 			this.create();
 		} else if('PUT' === method){
@@ -423,7 +498,7 @@ exports.http = {
 				} else if(urlParameters.count){
 					this.count();
 				} else if(urlParameters.list){
-					this.query(urlParameters.list.headerId, urlParameters.list.limit, urlParameters.list.offset, urlParameters.list.sort, urlParameters.list.desc);
+					this.query(urlParameters.list.limit, urlParameters.list.offset, urlParameters.list.sort, urlParameters.list.order);
 				}
 			} else {
 				this.query();
@@ -431,16 +506,15 @@ exports.http = {
 		} else {
 			this.printError(response.BAD_REQUEST, 4, "Invalid HTTP Method", method);
 		}
-
 	}, 
 
 	create: function(){
 		var input = request.readInputText();
 	    var item = JSON.parse(input);
 	    try{
-			item.id = exports.insert(item);
+			item[this.idPropertyName] = exports.insert(item);
 			response.setStatus(response.OK);
-			response.setHeader('Location', $.getRequest().getRequestURL().toString() + '/' + item.id);
+			response.setHeader('Location', $.getRequest().getRequestURL().toString() + '/' + item[this.idPropertyName]);
 		} catch(e) {
     	    var errorCode = response.INTERNAL_SERVER_ERROR;
         	this.printError(errorCode, errorCode, e.message, e.errContext);
@@ -452,7 +526,7 @@ exports.http = {
 		var input = request.readInputText();
 	    var item = JSON.parse(input);
 	    try{
-			item.id = exports.update(item);
+			item[this.idPropertyName] = exports.update(item);
 			response.setStatus(response.NO_CONTENT);
 		} catch(e) {
     	    var errorCode = response.INTERNAL_SERVER_ERROR ;
@@ -492,7 +566,7 @@ exports.http = {
 		}		
 	},
 	
-	query: function(headerId, limit, offset, sort, desc){
+	query: function(headerId, limit, offset, sort, order){
 		if (headerId === undefined) {
 			headerId = null;
 		}
@@ -500,27 +574,34 @@ exports.http = {
 			offset = 0;
 		} else if(isNaN(parseInt(offset)) || offset<0) {
 			this.printError(response.BAD_REQUEST, 1, "Invallid offset parameter: " + offset + ". Must be a positive integer.");
+			return;
 		}
 
 		if (limit === undefined || limit === null) {
 			limit = 0;
 		}  else if(isNaN(parseInt(limit)) || limit<0) {
 			this.printError(response.BAD_REQUEST, 1, "Invallid limit parameter: " + limit + ". Must be a positive integer.");
+			return;			
 		}
 		if (sort === undefined) {
 			sort = null;
-		} 
-		if (desc === undefined) {
-			desc = null;
-		} else if(desc!==null){
+		} else if( sort !== null && this.validSortPropertyNames.indexOf(sort)<0){
+			this.printError(response.BAD_REQUEST, 1, "Invalid sort by property name: " + sort);
+			return;
+		}
+		if (order === undefined) {
+			order = null;
+		} else if(order!==null){
 			if(sort === null){
-				this.printError(response.BAD_REQUEST, 1, "Parameter desc is invalid without paramter sort to order by.");
-			} else if(desc.toLowerCase()!=='desc' || desc.toLowerCase()!=='asc'){
-				this.printError(response.BAD_REQUEST, 1, "Invallid desc parameter: " + desc + ". Must be either ASC or DESC.");
+				this.printError(response.BAD_REQUEST, 1, "Parameter order is invalid without paramter sort to order by.");
+				return;
+			} else if(['asc', 'desc'].indexOf(order.trim().toLowerCase())){
+				this.printError(response.BAD_REQUEST, 1, "Invallid order parameter: " + order + ". Must be either ASC or DESC.");
+				return;
 			}
 		}
 	    try{
-			var items = exports.list(headerId, limit, offset, sort, desc);
+			var items = exports.list(headerId, limit, offset, sort, desc, expanded);
 	        var jsonResponse = JSON.stringify(items, null, 2);
 	    	response.println(jsonResponse);      	
 		} catch(e) {

@@ -1,15 +1,36 @@
 /* globals $ */
 /* eslint-env node, dirigible */
 
-var request = require("net/http/request");
-var response = require("net/http/response");
 var database = require("db/database");
 var boItemLib = require("bo_modeller/bo_item_lib");
 
+/* required for the exports.http module only */
+var request = require("net/http/request");
+var response = require("net/http/response");
+
 var datasource = database.getDatasource();
 
-// create entity by parsing JSON object from request body
-exports.insert = function(header) {
+var itemsEntitySetName = "items";
+
+// Parse JSON entity into SQL and insert in db. Returns the new record id.
+exports.insert = function(entity, cascaded) {
+
+	console.log('Inserting BO_HEADER entity cascaded['+cascaded+'] :' + entity);
+
+	if(entity === undefined || entity === null){
+		throw new Error('Illegal argument: entity is ' + entity);
+	}
+
+	if(entity.boh_name === undefined || entity.boh_name === null){
+		throw new Error('Illegal boh_name attribute: ' + entity.boh_name);
+	}
+
+	if(cascaded === undefined || cascaded === null){
+		cascaded = false;
+	}
+
+    entity = createSQLEntity(entity);
+
     var connection = datasource.getConnection();
     try {
         var sql = "INSERT INTO BO_HEADER (";
@@ -31,55 +52,58 @@ exports.insert = function(header) {
         sql += ")";
 
         var statement = connection.prepareStatement(sql);
+        
         var i = 0;
-        header.boh_id = datasource.getSequence('BO_HEADER_BOH_ID').next();
-        statement.setInt(++i,  header.boh_id);
-        statement.setString(++i, header.boh_name);
-        statement.setString(++i, header.boh_table);
-        statement.setString(++i, header.boh_description);
+        entity.mdh_id = datasource.getSequence('BO_HEADER_BOH_ID').next();
+        
+        statement.setInt(++i,  entity.boh_id);
+        statement.setString(++i, entity.boh_name);
+        statement.setString(++i, entity.boh_table);
+        statement.setString(++i, entity.boh_description);
+        
         statement.executeUpdate();
 
-        if(header.properties && header.properties.length>0){
-        	for(var j=0; j<header.properties.length; j++){
-        		var property = header.properties[j];
-        		property.boi_boh_id = header.boh_id;
-				boItemLib.insert(property);
-    		}
-    	}
-        return  header.boh_id;
+		if(cascaded){
+			if(entity[itemsEntitySetName] && entity[itemsEntitySetName].length > 0){
+	        	for(var j=0; j<entity[itemsEntitySetName].length; j++){
+	        		var item = entity[itemsEntitySetName][j];
+	        		item.boi_boh_id = entity.boh_id;
+					boItemLib.insert(item);
+	    		}
+	    	}
+		}
+
+        console.log('BO_HEADER entity inserted with boh_id[' +  entity.boh_id + ']');
+
+        return entity.boh_id;
+
     } catch(e) {
 		e.errContext = sql;
 		throw e;
     } finally {
         connection.close();
     }
-    return -1;
 };
 
-// read single entity by id and print as JSON object to response
-exports.find = function(id, expanded) {
+// Reads a single entity by id, parsed into JSON object 
+exports.find = function(id) {
+
+	console.log('Finding BO_HEADER entity with id ' + id);
+
     var connection = datasource.getConnection();
     try {
-        var header;
+        var entity;
         var sql = "SELECT * FROM BO_HEADER WHERE " + exports.pkToSQL();
         var statement = connection.prepareStatement(sql);
         statement.setInt(1, id);
         
         var resultSet = statement.executeQuery();
         if (resultSet.next()) {
-            header = createEntity(resultSet);
+            entity = createEntity(resultSet);
+			if(entity)
+            	console.log('BO_ITEM entity with id[' + id + '] found');
         } 
-        if(!header){
-        	return;
-    	}
-		if(expanded){
-			//limit, offset, sort, order?
-		   var properties = boItemLib.list(header.boh_id, null, null, null, null);
-		   if(properties){
-		   	 header.properties = properties;
-	   	   }
-		}
-		return header;
+        return entity;
     } catch(e) {
 		e.errContext = sql;
 		throw e;
@@ -88,11 +112,14 @@ exports.find = function(id, expanded) {
     }
 };
 
-// read all entities and print them as JSON array to response
-exports.list = function(limit, offset, sort, desc, expanded) {
+// Read all entities, parse and return them as an array of JSON objets
+exports.list = function(limit, offset, sort, order, expanded) {
+
+	console.log('Listing BO_HEADER entity collection expanded['+expanded+'] with list operators: limit['+limit+'], offset['+offset+'], sort['+sort+'], order['+order+']');
+
     var connection = datasource.getConnection();
     try {
-        var headers = [];
+        var entities = [];
         var sql = "SELECT ";
         if (limit !== null && offset !== null) {
             sql += " " + datasource.getPaging().genTopAndStart(limit, offset);
@@ -101,8 +128,8 @@ exports.list = function(limit, offset, sort, desc, expanded) {
         if (sort !== null) {
             sql += " ORDER BY " + sort;
         }
-        if (sort !== null && desc !== null) {
-            sql += " DESC ";
+        if (sort !== null && order !== null) {
+            sql += " " + order;
         }
         if (limit !== null && offset !== null) {
             sql += " " + datasource.getPaging().genLimitAndOffset(limit, offset);
@@ -110,18 +137,20 @@ exports.list = function(limit, offset, sort, desc, expanded) {
         var statement = connection.prepareStatement(sql);
         var resultSet = statement.executeQuery();
         while (resultSet.next()) {
-        	var header = createEntity(resultSet);
-        	if(expanded){        	
-        	   //separate limit, offset, sort, order?
-			   var properties = boItemLib.list(header.boh_id, null, null, null, null);
-			   if(properties) {
-			   	 header.properties = properties;
+        	var entity = createEntity(resultSet);
+        	if(expanded !== null && expanded!==undefined){
+			   var dependentEntities = mdItems.list(entity.mdh_id, null, null, null, null);
+			   if(dependentEntities) {
+			   	 entity[itemsEntitySetName] = dependentEntities;
 		   	   }
 			}
-            headers.push(header);
+            entities.push(entity);
         }
-        return headers;
-    } catch(e) {
+        
+        console.log('' + entities.length +' BO_HEADER entities found');
+        
+        return entities;
+    }  catch(e) {
 		e.errContext = sql;
 		throw e;
     } finally {
@@ -131,12 +160,23 @@ exports.list = function(limit, offset, sort, desc, expanded) {
 
 //create entity as JSON object from ResultSet current Row
 function createEntity(resultSet) {
-    var result = {};
-	result.boh_id = resultSet.getInt("BOH_ID");
+    var entity = {};
+	entity.boh_id = resultSet.getInt("BOH_ID");
     result.boh_name = resultSet.getString("BOH_NAME");
-    result.boh_table = resultSet.getString("BOH_TABLE");
-    result.boh_description = resultSet.getString("BOH_DESCRIPTION");
-    return result;
+    result.boh_table = resultSet.getString("BOH_TABLE");	
+	entity.boh_description = resultSet.getString("BOH_DESCRIPTION");
+	if(entity.boh_description === null)
+		delete entity.boh_description;
+    console.log("Transformation from DB JSON object finished: " + entity);    
+    return entity;
+}
+
+//Prepare a JSON object for insert into DB
+function createSQLEntity(entity) {
+	if(!entity.mdh_description)
+		entity.mdh_description = null;  
+	console.log("Transformation to DB JSON object finished: " + entity);
+	return entity;
 }
 
 function convertToDateString(date) {
@@ -146,11 +186,26 @@ function convertToDateString(date) {
     return fullYear + "/" + month + "/" + dateOfMonth;
 }
 
-// update Header entity by id, optionally upserting its Items composition
-exports.update = function(header, cascaded) {
+// update entity from a JSON object. Returns the id of the updated entity.
+exports.update = function(entity) {
+
+	console.log('Updating BO_HEADER entity ' + entity);
+
+	if(entity === undefined || entity === null){
+		throw new Error('Illegal argument: entity is ' + entity);
+	}
+	
+	if(entity.boh_id === undefined || entity.boh_id === null){
+		throw new Error('Illegal boh_id attribute: ' + entity.boh_id);
+	}
+
+	if(entity.boh_name === undefined || entity.boh_name === null){
+		throw new Error('Illegal boh_name attribute: ' + entity.boh_name);
+	}
 
     var connection = datasource.getConnection();
     try {
+    
         var sql = "UPDATE BO_HEADER SET ";
         sql += "BOH_NAME = ?";
         sql += ",";
@@ -160,26 +215,17 @@ exports.update = function(header, cascaded) {
         sql += " WHERE BOH_ID = ?";
         var statement = connection.prepareStatement(sql);
         var i = 0;
-        statement.setString(++i, header.boh_name);
-        statement.setString(++i, header.boh_table);
-        statement.setString(++i, header.boh_description);
-        var id = header.boh_id;
+        statement.setString(++i, entity.boh_name);
+        statement.setString(++i, entity.boh_table);
+        statement.setString(++i, entity.boh_description);
+        var id = entity.boh_id;
         statement.setInt(++i, id);
         statement.executeUpdate();
+            
+        console.log('BO_HEADER entity with boh_id[' + id + '] updated');
         
-        if(cascaded){
-        	if(header.properties && header.properties.length>0){
-        		for(var j=0; j<header.properties.length;j++){
-        			var item = header.properties[j];
-        			if(item.id){
-        				boItemLib.update(item);
-        			} else {
-        				boItemLib.insert(item);
-        			}
-        		}	
-        	}
-        }
-        return id;
+        return this;
+        
     } catch(e) {
 		e.errContext = sql;
 		throw e;
@@ -188,8 +234,11 @@ exports.update = function(header, cascaded) {
     }
 };
 
-// delete entity
+// delete entity by id. Returns the id of the deleted entity.
 exports.remove = function(id, cascaded) {
+
+	console.log('Deleting BO_HEADER entity with id[' + id + '], cascaded['+cascaded+']');
+
     var connection = datasource.getConnection();
     try {
     	var sql = "DELETE FROM BO_HEADER WHERE " + exports.pkToSQL();
@@ -197,15 +246,17 @@ exports.remove = function(id, cascaded) {
         statement.setString(1, id);
         statement.executeUpdate();
         
-        if(cascaded){
-	       	var properties = boItemLib.find(id);
-	       	if(properties){
-	       		for(var i=0;i<properties.length;i++){
-	       			boItemLib.remove(properties[i].id);
-	   			}
-	   		}    	
-    	}
-        return id;
+		if(cascaded && id){
+			var persistedItems = mdItems.list(id);
+			for(var i = 0; i < persistedItems.length; i++) {
+        		boItemLib.remove(persistedItems[i].mdi_id);
+			}
+		}        
+        
+        console.log('BO_HEADER entity with boh_id[' + id + '] deleted');                
+        
+        return this;
+
     } catch(e) {
 		e.errContext = sql;
 		throw e;
@@ -215,6 +266,9 @@ exports.remove = function(id, cascaded) {
 };
 
 exports.count = function() {
+
+	console.log('Counting BO_HEADER entities');
+
     var count = 0;
     var connection = datasource.getConnection();
     try {
@@ -230,10 +284,16 @@ exports.count = function() {
     } finally {
         connection.close();
     }
+    
+    console.log('' + count + ' BO_HEADER entities counted');
+
     return count;
 };
 
 exports.metadata = function() {
+
+	console.log('Exporting metadata for BO_HEADER type');
+
 	var entityMetadata = {
 		name: 'bo_header',
 		type: 'object',
@@ -243,8 +303,8 @@ exports.metadata = function() {
 	var propertyboh_id = {
 		name: 'boh_id',
 		type: 'integer',
-	key: 'true',
-	required: 'true'
+		key: 'true',
+		required: 'true'
 	};
     entityMetadata.properties.push(propertyboh_id);
 
@@ -266,7 +326,7 @@ exports.metadata = function() {
 	};
     entityMetadata.properties.push(propertyboh_description);
 
-	return entityMetadata;
+	return JSON.stringify(entityMetadata);
 };
 
 exports.getPrimaryKeys = function() {
@@ -293,12 +353,15 @@ exports.pkToSQL = function() {
 
 exports.http = {
 
+	idPropertyName: 'boh_id',
+	validSortPropertyNames: ['boh_id','boh_name','boh_table','boh_description'],
+
 	dispatch: function(urlParameters){
-		console.info('>>>>>');
 		var method = request.getMethod().toUpperCase();
-		console.info('>>>>> ' + method);
+		console.log('Dispatching operation request for HTTP Verb['+ method +'] and URL parameters: ' + urlParameters);
+
 		if('POST' === method){
-			this.create();
+			this.create(urlParameters.cascaded);
 		} else if('PUT' === method){
 			this.update(urlParameters.cascaded);
 		} else if('DELETE' === method){
@@ -312,7 +375,7 @@ exports.http = {
 				} else if(urlParameters.count){
 					this.count();
 				} else if(urlParameters.list){
-					this.query(urlParameters.list.limit, urlParameters.list.offset, urlParameters.list.sort, urlParameters.list.desc, urlParameters.expanded);
+					this.query(urlParameters.list.limit, urlParameters.list.offset, urlParameters.list.sort, urlParameters.list.order, urlParameters.expanded);
 				}
 			} else {
 				this.query();
@@ -320,16 +383,15 @@ exports.http = {
 		} else {
 			this.printError(response.BAD_REQUEST, 4, "Invalid HTTP Method", method);
 		}
-
 	}, 
 
-	create: function(){
+	create: function(cascaded){
 		var input = request.readInputText();
 	    var item = JSON.parse(input);
 	    try{
-			item.id = exports.insert(item);
+			item[this.idPropertyName] = exports.insert(item, cascaded);
 			response.setStatus(response.OK);
-			response.setHeader('Location', $.getRequest().getRequestURL().toString() + '/' + item.id);
+			response.setHeader('Location', $.getRequest().getRequestURL().toString() + '/' + item[this.idPropertyName]);
 		} catch(e) {
     	    var errorCode = response.INTERNAL_SERVER_ERROR;
         	this.printError(errorCode, errorCode, e.message, e.errContext);
@@ -341,7 +403,7 @@ exports.http = {
 		var input = request.readInputText();
 	    var item = JSON.parse(input);
 	    try{
-			item.id = exports.update(item, cascaded);
+			item[this.idPropertyName] = exports.update(item, cascaded);
 			response.setStatus(response.NO_CONTENT);
 		} catch(e) {
     	    var errorCode = response.INTERNAL_SERVER_ERROR ;
@@ -371,6 +433,7 @@ exports.http = {
 			var item = exports.find(id, expanded);
 			if(!item){
         		this.printError(response.NOT_FOUND, 1, "Record with id: " + id + " does not exist.");
+        		return;
 			}
 			var jsonResponse = JSON.stringify(item, null, 2);
 	        response.println(jsonResponse);        	
@@ -381,28 +444,35 @@ exports.http = {
 		}		
 	},
 	
-	query: function(limit, offset, sort, desc, expanded){
+	query: function(limit, offset, sort, order, expanded){
 		if (offset === undefined || offset === null) {
 			offset = 0;
 		} else if(isNaN(parseInt(offset)) || offset<0) {
 			this.printError(response.BAD_REQUEST, 1, "Invallid offset parameter: " + offset + ". Must be a positive integer.");
+			return;
 		}
 
 		if (limit === undefined || limit === null) {
 			limit = 0;
 		}  else if(isNaN(parseInt(limit)) || limit<0) {
 			this.printError(response.BAD_REQUEST, 1, "Invallid limit parameter: " + limit + ". Must be a positive integer.");
+			return;			
 		}
 		if (sort === undefined) {
 			sort = null;
-		} 
-		if (desc === undefined) {
-			desc = null;
-		} else if(desc!==null){
+		} else if( sort !== null && this.validSortPropertyNames.indexOf(sort)<0){
+			this.printError(response.BAD_REQUEST, 1, "Invalid sort by property name: " + sort);
+			return;
+		}
+		if (order === undefined) {
+			order = null;
+		} else if(order!==null){
 			if(sort === null){
-				this.printError(response.BAD_REQUEST, 1, "Parameter desc is invalid without paramter sort to order by.");
-			} else if(desc.toLowerCase()!=='desc' || desc.toLowerCase()!=='asc'){
-				this.printError(response.BAD_REQUEST, 1, "Invallid desc parameter: " + desc + ". Must be either ASC or DESC.");
+				this.printError(response.BAD_REQUEST, 1, "Parameter order is invalid without paramter sort to order by.");
+				return;
+			} else if(['asc', 'desc'].indexOf(order.trim().toLowerCase())){
+				this.printError(response.BAD_REQUEST, 1, "Invallid order parameter: " + order + ". Must be either ASC or DESC.");
+				return;
 			}
 		}
 	    try{
@@ -419,20 +489,22 @@ exports.http = {
 	count: function(){
 	    try{
 			var itemsCount = exports.count();
-			response.setHeader("Content-Type", "text/plain");
-	    	response.println(itemsCount);      	
+/*			response.setHeader("Content-Type", "text/plain");*/			
+			response.setHeader("Content-Type", "application/json");//TMP to accommodate the ui which handles only json
+/*	    	response.println(itemsCount);      	 */
+	    	response.println('{"count":'+itemsCount+'}'); 
 		} catch(e) {
     	    var errorCode = response.INTERNAL_SERVER_ERROR ;
         	this.printError(errorCode, errorCode, e.message, e.errContext);
         	throw e;
-		}		
+		}
 	},
 	
 	metadata: function(){
  		try{
 			var entityMetadata = exports.metadata();
 			response.setHeader("Content-Type", "application/json");
-			response.println(JSON.stringify(entityMetadata));
+			response.println(entityMetadata);
 		} catch(e) {
     	    var errorCode = response.INTERNAL_SERVER_ERROR ;
         	this.printError(errorCode, errorCode, e.message, e.errContext);
