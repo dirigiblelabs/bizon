@@ -172,13 +172,13 @@
 	.service('modalService', ['$uibModal', function ($uibModal) {
 		/* http://weblogs.asp.net/dwahlin/building-an-angularjs-modal-service */
 		
-		//TODO: add 'Don't show this dialog' option 
+		//TODO: add 'Don't show this dialog again' option 
 		
         var modalDefaults = {
             backdrop: true,
             keyboard: true,
             modalFade: true,
-            templateUrl: '/views/modal.html'
+            templateUrl: 'views/modal.html'
         };
 
         var modalOptions = {
@@ -207,13 +207,13 @@
             angular.extend(tempModalOptions, modalOptions, customModalOptions);
 
             if (!tempModalDefaults.controller) {
-                tempModalDefaults.controller = function ($scope, $modalInstance) {
+                tempModalDefaults.controller = function ($scope, $uibModalInstance) {
                     $scope.modalOptions = tempModalOptions;
                     $scope.modalOptions.ok = function (result) {
-                        $modalInstance.close(result);
+                        $uibModalInstance.close(result);
                     };
-                    $scope.modalOptions.close = function (result) {
-                        $modalInstance.dismiss('cancel');
+                    $scope.modalOptions.close = function () {
+                        $uibModalInstance.dismiss('cancel');
                     };
                 }
             }
@@ -520,7 +520,7 @@
 		};
 	
 	}])
-	.controller('MasterListCtrl', ['masterDataSvc', '$log', '$q', '$state', '$stateParams', '$window', function (masterDataSvc, $log, $q, $state, $stateParams, $window) {
+	.controller('MasterListCtrl', ['masterDataSvc', 'modalService', '$log', '$q', '$state', '$stateParams', '$window', function (masterDataSvc, modalService, $log, $q, $state, $stateParams, $window) {
 
 		this.items = masterDataSvc.getLoadedData();
 		this.selectedEntity = masterDataSvc.selection[0];
@@ -597,25 +597,37 @@
 			});
 		};
 		
-		this.deleteItem = function(itemId){
-			self.busy = true;
-			masterDataSvc.remove(itemId)
-			.then(function(){
-				delete $stateParams.boId;
-				delete $stateParams.selectedEntity;
-				$stateParams.message = {
-						text: 'Buisness Object successfully deleted.',
-						type: 'alert-success'
-					};
-				$state.go('^', $stateParams, {reload: true, location:true, inherit: false});
-			})
-			.catch(function(reason){
-				handleServiceError('Deleting Buisness Object failed', reason);
-				$state.go('^', $stateParams, {reload: true});
-			})
-			.finally(function(){
-				initList.apply(self);
-			});
+		this.deleteItem = function(entity){
+			
+			var modalOptions = {
+	            closeButtonText: 'Cancel',
+	            actionButtonText: 'Delete entity',
+	            headerText: 'Delete "' + entity.boh_name + '"?',
+	            bodyText: 'Are you sure you want to delete this entity?'
+	        };
+	
+	        modalService.showModal({}, modalOptions)
+	        .then(function (result) {
+				self.busy = true;
+				masterDataSvc.remove(entity.boh_id)
+				.then(function(){
+					delete $stateParams.boId;
+					delete $stateParams.selectedEntity;
+					$stateParams.message = {
+							text: 'Buisness Object successfully deleted.',
+							type: 'alert-success'
+						};
+					$state.go('^', $stateParams, {reload: true, location:true, inherit: false});
+				})
+				.catch(function(reason){
+					handleServiceError('Deleting Buisness Object failed', reason);
+					$state.go('^', $stateParams, {reload: true});
+				})
+				.finally(function(){
+					initList.apply(self);
+				});	        
+	        });
+	        
 		};
 		
 		function handleServiceError(text, errorPayload){
@@ -647,9 +659,11 @@
 		};
 
 	}])
-	.controller('DetailsCtrl', ['masterDataSvc', 'selectedEntity', '$log', '$state', '$stateParams' , function (masterDataSvc, selectedEntity, $log, $state, $stateParams) {
+	.controller('DetailsCtrl', ['masterDataSvc', 'modalService', 'selectedEntity', '$log', '$state', '$stateParams' , function (masterDataSvc, modalService, selectedEntity, $log, $state, $stateParams) {
 		
 		this.selectedEntity = selectedEntity;
+		var self = this;
+		
 	//FIXME!!!	
 		this.showProperties = function(){
 			if(this._selectedItemDetails){
@@ -697,41 +711,63 @@
 		};
 		
 		this.duplicateItem = function() {
-			var duplicateItem = angular.copy(this.selectedEntity, {});
-			delete duplicateItem.boh_id;
-			masterDataSvc.create(undefined, duplicateItem)
-				.then(function(newItem){
-					$stateParams.boId = newItem.boh_id;
-					$stateParams.message = {
-						text: 'Buisness Object successfully duplicated.',
-						type: 'alert-success'
-					};					
-					$state.go($state.current, $stateParams, {reload: true, location:true, inherit: true});
-				}, function(reason){
-					handleServiceError('Duplicating Buisness Object failed', reason);
-					$state.go('^', $stateParams, {reload: true});
-				});
+			var modalOptions = {
+	            closeButtonText: 'Cancel',
+	            actionButtonText: 'Duplicate entity',
+	            headerText: 'Duplicate "' + self.selectedEntity.boh_name + '"?',
+	            bodyText: 'Are you sure you want to duplicate this entity?'
+	        };
+	
+	        modalService.showModal({}, modalOptions)
+	        .then(function () {
+				var duplicateItem = angular.copy(self.selectedEntity, {});
+				delete duplicateItem.boh_id;
+				masterDataSvc.create(undefined, duplicateItem)
+					.then(function(newItem){
+						$stateParams.boId = newItem.boh_id;
+						$stateParams.message = {
+							text: 'Buisness Object successfully duplicated.',
+							type: 'alert-success'
+						};					
+						$state.go($state.current, $stateParams, {reload: true, location:true, inherit: true});
+					}, function(reason){
+						handleServiceError('Duplicating Buisness Object failed', reason);
+						$state.go('^', $stateParams, {reload: true});
+					});        	
+        	});
 		};
 		
 		this.deleteItem = function() {
-			masterDataSvc.remove(this.selectedEntity.boh_id)
-			.then(function(){
-				delete $stateParams.boId;			
-				$stateParams.message = {
-						text: 'Buisness Object successfully deleted.',
-						type: 'alert-success'
-					};
-				$state.go($state.current, $stateParams, {reload: true, location:true, inherit: false});
-			}, function(reason){
-					handleServiceError('Deleting Buisness Object failed', reason);
-					$state.go('^', $stateParams, {reload: true});
-			});
+			var modalOptions = {
+	            closeButtonText: 'Cancel',
+	            actionButtonText: 'Delete entity',
+	            headerText: 'Delete "' + self.selectedEntity.boh_name + '"?',
+	            bodyText: 'Are you sure you want to delete this entity?'
+	        };
+	
+	        modalService.showModal({}, modalOptions)
+	        .then(function () {
+				masterDataSvc.remove(self.selectedEntity.boh_id)
+				.then(function(){
+					delete $stateParams.boId;			
+					$stateParams.message = {
+							text: 'Buisness Object successfully deleted.',
+							type: 'alert-success'
+						};
+					$state.go($state.current, $stateParams, {reload: true, location:true, inherit: false});
+				}, function(reason){
+						handleServiceError('Deleting Buisness Object failed', reason);
+						$state.go('^', $stateParams, {reload: true});
+				});
+        	
+        	});
 		};
 		
 	}])
-	.controller('EditCtrl', ['masterDataSvc', 'selectedEntity', '$log', '$state', '$stateParams', function (masterDataSvc, selectedEntity, $log, $state, $stateParams) {
+	.controller('EditCtrl', ['masterDataSvc', 'modalService', 'selectedEntity', '$log', '$state', '$stateParams', function (masterDataSvc, modalService, selectedEntity, $log, $state, $stateParams) {
 
 		this.selectedEntity = selectedEntity;
+		var self = this;
 	//FIXME!!!	
 		this.showProperties = function(){
 			if(this._selectedItemDetails){
@@ -772,42 +808,63 @@
 		};
 		
 		this.deleteProperty = function(item){
-			for(var i=0; i< this.selectedEntity.properties.length; i++){
-				if(this.selectedEntity.properties[i] === item){
-					this.selectedEntity.properties.splice(i,1);
-					break;
-				}
-			}
-			$stateParams.entityForEdit.properties = $stateParams.entityForEdit.properties.map(
-				function(currItem){
-					if(currItem.boi_id && currItem.boi_id === item.boi_id){
-						currItem.action = 'remove';
+			var modalOptions = {
+	            closeButtonText: 'Cancel',
+	            actionButtonText: 'Delete',
+	            headerText: 'Delete property "' + item.boi_name + '"?',
+	            bodyText: 'Are you sure you want to delete this property?'
+	        };
+	        
+	        modalService.showModal({}, modalOptions)
+	        .then(function () {
+				for(var i=0; i< self.selectedEntity.properties.length; i++){
+					if(self.selectedEntity.properties[i] === item){
+						self.selectedEntity.properties.splice(i,1);
+						break;
 					}
-					return currItem;
-				});
+				}
+				$stateParams.entityForEdit.properties = $stateParams.entityForEdit.properties.map(
+					function(currItem){
+						if(currItem.boi_id && currItem.boi_id === item.boi_id){
+							currItem.action = 'remove';
+						}
+						return currItem;
+					});				
+	        });
+	        
 		};
 		
 		this.cancelEdit = function() { 
-			delete $stateParams.boIdedit;
-			delete $stateParams.entityForEdit;
-		    $state.go("^", $stateParams);
+			var modalOptions = {
+	            closeButtonText: 'Cancel',
+	            actionButtonText: 'OK',
+	            headerText: 'Changes will be lost. Cancel editing "' + self.selectedEntity.boh_name + '"?',
+	            bodyText: 'Are you sure you want to cancel your changes?'
+	        };
+	
+	        modalService.showModal({}, modalOptions)
+	        .then(function () {
+				delete $stateParams.boIdedit;
+				delete $stateParams.entityForEdit;
+			    $state.go("^", $stateParams);
+	        });
 		};
 		
 		this.saveItem = function() {
-			var self = this;
-		    masterDataSvc.update(this.selectedEntity).then(
-		    		function(){
-						$state.go('^', {boId: self.selectedEntity.boh_id, selectedEntity:self.selectedEntity}, {reload: true, location:false});
-			    	}, 
-		    		function(reason){
-			    		var message = masterDataSvc.serviceErrorMessageFormatter('Updating Buisness Object failed', reason);
-						$log.error(message);
-						$stateParams.message = {
-								text: message,
-								type: 'alert-danger'
-						}				
-						$state.go($state.current, $stateParams, {reload: false});
-					});
+
+		    masterDataSvc.update(this.selectedEntity)
+		    .then(function(){
+				$state.go('^', {boId: self.selectedEntity.boh_id, selectedEntity:self.selectedEntity}, {reload: true, location:false});
+	    	})
+	    	.catch(function(reason){
+	    		var message = masterDataSvc.serviceErrorMessageFormatter('Updating Buisness Object failed', reason);
+				$log.error(message);
+				$stateParams.message = {
+						text: message,
+						type: 'alert-danger'
+				};				
+				$state.go($state.current, $stateParams, {reload: false});
+			});	  
 		};
 				
 	}])

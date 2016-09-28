@@ -15,7 +15,7 @@
 
 	<ul class="nav nav-pills nav-stacked" style="margin-top: 5.7rem" infinite-scroll='masterVm.next()' infinite-scroll-disabled="masterVm.busy">
  		<li role="presentation" ng-class="{active: masterVm.selectedEntity.boh_id===item.boh_id}" ng-repeat="item in masterVm.items track by item.boh_id">
- 			<a ng-click="masterVm.selectItem(item)"><i class="fa fa-th-large"></i> {{item.boh_name}} <span ng-click="masterVm.deleteItem(item.boh_id)" class="glyphicon glyphicon-remove pull-right tools-remove" aria-hidden="true"></span></a>
+ 			<a ng-click="masterVm.selectItem(item)"><i class="fa fa-th-large"></i> {{item.boh_name}} <span ng-click="masterVm.deleteItem(item)" class="glyphicon glyphicon-remove pull-right tools-remove" aria-hidden="true"></span></a>
  		</li>
 	</ul>
 	<div>
