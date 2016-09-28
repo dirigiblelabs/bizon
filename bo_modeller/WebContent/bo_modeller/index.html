@@ -538,10 +538,11 @@
 		function initList(selectedEntity) {
 			this.items = masterDataSvc.getLoadedData();
 			if(this.items.length > 0) {
+				var selectedEntityId;
 				if(!selectedEntity){
-					selectedEntity = this.items[0];
+					selectedEntityId = $state.params.boId || this.items[0].boh_id;
 				}
-				masterDataSvc.get(selectedEntity.boh_id, true)
+				masterDataSvc.get(selectedEntityId, true)
 				.then(function(item){
 					if(item === undefined){
 						fireLocationError.apply(self);
