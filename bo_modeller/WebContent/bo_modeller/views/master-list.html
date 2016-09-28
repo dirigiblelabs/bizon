@@ -1,11 +1,12 @@
 <section>
 
-	<header class="header">
-	  <div class="btn-group">
+	<header class="header text-center">
+	  <div class="btn-group pull-left">
 		<button type="submit" class="btn btn-primary">
 		  <i class="glyphicon glyphicon-filter" aria-hidden="true"></i>
 		</button>
-      </div>	
+      </div>
+      <span style="display: inline-block; margin: 1.8rem auto; color: white">{{masterVm.items.length}} / {{masterVm.count}}</span>
       <div class="btn-group pull-right">
 		<button type="submit" class="btn btn-primary" ng-click="masterVm.createItem()">
 		  <i class="fa fa-plus" aria-hidden="true"></i>
@@ -13,13 +14,19 @@
 	  </div>
     </header>
 
-	<ul class="nav nav-pills nav-stacked" infinite-scroll='masterVm.next()' infinite-scroll-disabled="masterVm.busy">
- 		<li role="presentation" ng-class="{active: masterVm.selectedEntity.boh_id===item.boh_id}" ng-repeat="item in masterVm.items track by item.boh_id">
- 			<a ng-click="masterVm.selectItem(item)"><i class="fa fa-th-large"></i> {{item.boh_name}} <span ng-click="masterVm.deleteItem(item)" class="glyphicon glyphicon-remove pull-right tools-remove" aria-hidden="true"></span></a>
- 		</li>
-	</ul>
-	<div>
-		<a ng-click='masterVm.next()' ng-show="masterVm.hasMore">More...</a>
+	<div class="scrollable">
+		<ul class="nav nav-pills nav-stacked" infinite-scroll='masterVm.next()' infinite-scroll-disabled="masterVm.busy" style="bottom:4rem">
+	 		<li role="presentation" ng-class="{active: masterVm.selectedEntity.boh_id===item.boh_id}" ng-repeat="item in masterVm.items track by item.boh_id">
+	 			<a ng-click="masterVm.selectItem(item)"><i class="fa fa-th-large"></i> {{item.boh_name}} <span ng-click="masterVm.deleteItem(item)" class="glyphicon glyphicon-remove pull-right tools-remove" aria-hidden="true"></span></a>
+	 		</li>
+		</ul>
+		<ul class="nav nav-pills ghost-list-item-active" ng-show="masterVm.hasMore">
+			<li>
+				<a href="#" click="return false;" ng-click='masterVm.next()'>
+					<p>More</p>
+					<span>[{{masterVm.items.length}} / {{masterVm.count}}]</span>					
+				</a>
+			</li>
+		</ul>
 	</div>
-
 </section>

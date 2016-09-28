@@ -64,9 +64,41 @@
 	
 	.master .nav {
 	  font-weight: bold;
-	  margin-top: 5.7rem;
 	}
 	
+	.scrollable {
+	  position: absolute;
+	  width: 100%;
+	  overflow-y: auto;
+	  top: 4em;
+	  bottom: 0;
+	}
+	
+	.nav.ghost-list-item-active {
+	  background-color: #f5f5f5;
+	  margin: auto !important; 
+	  text-align: center;
+	  border-top: 1px solid #ddd;
+	  border-bottom: 1px solid #ddd;
+	}
+	
+	.nav.ghost-list-item-active>li{
+	  width: 100%;
+	  height: 6rem;
+	}
+	
+	.nav.ghost-list-item-active>li>a{
+	  height: 100%;
+	  line-height: 1.5rem;
+	  width: 100%;
+	}
+
+	.nav.ghost-list-item-active>li>a>span {
+	  display: inline-block; 
+	  width: 100%; 
+	  font-size: 1.2rem;
+	}
+
 	.master section{
 	  overflow: auto;
 	}

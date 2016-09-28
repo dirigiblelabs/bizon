@@ -503,6 +503,7 @@
 
 		this.items = masterDataSvc.getLoadedData();
 		this.selectedEntity = masterDataSvc.selection[0];
+		this.count;
 		this.hasMore;
 		this.busy = false;
 		
@@ -537,6 +538,7 @@
 					masterDataSvc.hasMore()
 					.then(function(_hasMore){
 						self.hasMore = _hasMore;
+						self.count = masterDataSvc._itemsCount;
 					});
 				})
 				.catch(function(error){
