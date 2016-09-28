@@ -531,7 +531,7 @@
 						fireLocationError.apply(self);
 						item = self.items[0];
 					}
-					return self.selectItem.apply(self, [item]);//set the item to be selected
+					return self.selectItem.apply(self, [item]);//select the selection candidate
 				})
 				.then(function(){
 					masterDataSvc.hasMore()

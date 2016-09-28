@@ -22,6 +22,7 @@
 	  flex: 0 3 auto;
 	  overflow: hidden;
 	  min-width:0px;
+	  min-height: 4rem;
 	}
 	
 	.page-title>h1{
