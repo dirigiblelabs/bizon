@@ -246,7 +246,7 @@
 			        method: 'PUT'
 			    }
 		    }
-		}
+		};
 	})
 	.service('Entity', ['$resource', 'ResourceSvcConfiguration', function($resource, ResourceSvcConfiguration) {
 	  	var res = $resource('../../js/bo_modeller/bo_header.js/:boId', { boId:'@id' }, ResourceSvcConfiguration.cfg);
@@ -345,39 +345,16 @@
 			if(itemHit) {
 				return $q.when(itemHit);
 			} else if(lookupRemotelyOnDemand) {
-				var deferred = $q.defer();
-				Entity.get(id).$promise
+				return Entity.get({boId:id}).$promise
 				.then(function(item){
-					deferred.resolve(item);
-					//now load the data set that contains this item with adapted offset constraint on the query					
-					var _itemHit, busy;
-					while(_itemHit == undefined){
-						self.settings.offset = self.batchLoadedMasterData.length;//move to next page
-						busy = true;
-						query.apply(self, [self.settings])
-						.then(function(){
-							self.get(id, false).then(
-							function(_item){
-								itemHit = _item;
-							});	
-						}, function(_error){
-							deferred.reject(_error);
-						})
-						.finally(function(){
-							busy = false;
-						});
-						while(busy){
-							$timeout(50);//block waiting for the query operation to complete
-						}
+					if(item){
+						return self.next.apply(self);
 					}
-
+					return;
 				})
-				.catch(function(error){
-					// TODO: check if not found vs any other error
-					//deferred.reject(error);
-					deferred.resolve();
+				.then(function(){
+					return self.get.apply(self, [id, lookupRemotelyOnDemand]);
 				});
-				return deferred.promise;
 			}
 			return;
 		};
@@ -428,16 +405,17 @@
 			var deferred = $q.defer();
 			Entity.save(reqParams, template || this.masterDataTemplateObject).$promise
 			.then(function(entity){
-					refresh.apply(self)
-					.then(function(){
-						deferred.resolve(entity);
-					}, function(refreshErr){
-						deferred.reject(refreshErr);
-					});
-				},
-				function(saveErr){
-					deferred.reject(saveErr);
+				refresh.apply(self)
+				.then(function(){
+					deferred.resolve(entity);
+				})
+				.catch(function(refreshErr){
+					deferred.reject(refreshErr);
 				});
+			})
+			.catch(function(saveErr){
+				deferred.reject(saveErr);
+			});
 			return deferred.promise;
 		};
 		
@@ -450,17 +428,18 @@
 					return true;
 				});
 				var promises = items.map(function(item) {
-									var action = item.action;
-									delete item.action;
-									if(action === 'remove') {
-							        	return Item.remove({boId: item.boi_id}).$promise;
-						        	} else {
-						        		return Item[action]({boId: item.boi_id}, item).$promise;
-					        		}
-						    	});
+					var action = item.action;
+					delete item.action;
+					if(action === 'remove') {
+			        	return Item.remove({boId: item.boi_id}).$promise;
+		        	} else {
+		        		return Item[action]({boId: item.boi_id}, item).$promise;
+	        		}
+		    	});
 			}
 
 			promises.unshift(Entity.update({boId: header.boh_id}, header).$promise);
+			promises.push(refresh.apply(self));
 	    	return $q.all(promises);
 		};	
 		
@@ -540,15 +519,25 @@
 			if(this.items.length > 0) {
 				var selectedEntityId;
 				if(!selectedEntity){
-					selectedEntityId = $state.params.boId || this.items[0].boh_id;
+					selectedEntityId = $stateParams.boId || $state.params.boId || this.items[0].boh_id;
+				} else {
+					selectedEntityId = selectedEntity.boh_id;
 				}
 				masterDataSvc.get(selectedEntityId, true)
 				.then(function(item){
+					//the list might have been expanded to search for an entity by deep link so it needs to be initialized again.
+					self.items = masterDataSvc.getLoadedData();
 					if(item === undefined){
 						fireLocationError.apply(self);
 						item = self.items[0];
 					}
-					self.selectItem.apply(self, [item]);//set the item to be selected
+					return self.selectItem.apply(self, [item]);//set the item to be selected
+				})
+				.then(function(){
+					masterDataSvc.hasMore()
+					.then(function(_hasMore){
+						self.hasMore = _hasMore;
+					});
 				})
 				.catch(function(error){
 					handleServiceError('Looking up Buisness Object failed', error);
@@ -644,12 +633,6 @@
 			self.busy = true;
 			masterDataSvc.querySettings = this.querySettings;
 			$q.when(masterDataSvc.next())
-			.then(function(){
-				masterDataSvc.hasMore()
-				.then(function(_hasMore){
-					self.hasMore = _hasMore;
-				});
-			})
 			.catch(function(err){
 				console.error(err);
 				//..
@@ -847,7 +830,7 @@
 	        .then(function () {
 				delete $stateParams.boIdedit;
 				delete $stateParams.entityForEdit;
-			    $state.go("^", $stateParams);
+			    $state.go('^', $stateParams);
 	        });
 		};
 		
@@ -855,7 +838,7 @@
 
 		    masterDataSvc.update(this.selectedEntity)
 		    .then(function(){
-				$state.go('^', {boId: self.selectedEntity.boh_id, selectedEntity:self.selectedEntity}, {reload: true, location:false});
+				$state.go('^', {boId: self.selectedEntity.boh_id, selectedEntity:self.selectedEntity}, {reload: 'list', location:false});
 	    	})
 	    	.catch(function(reason){
 	    		var message = masterDataSvc.serviceErrorMessageFormatter('Updating Buisness Object failed', reason);
