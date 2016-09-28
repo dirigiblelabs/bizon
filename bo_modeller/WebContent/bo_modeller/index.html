@@ -53,6 +53,7 @@
 	
 	<script>
 	angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.bootstrap', 'xeditable', 'infinite-scroll'])
+	.value('THROTTLE_MILLISECONDS', 1000)
 	.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
 
 		$urlRouterProvider.otherwise("/");
@@ -61,7 +62,8 @@
 		.state('list', {
 			  url: "/",
 		      params: {
-		    	  message: undefined  
+		    	  message: undefined,
+		    	  selectedEntity: undefined
 		      },
 		      views: {
 		          'master': {
@@ -167,6 +169,59 @@
 		    }]
 		  });	
 	}])
+	.service('modalService', ['$uibModal', function ($uibModal) {
+		/* http://weblogs.asp.net/dwahlin/building-an-angularjs-modal-service */
+		
+		//TODO: add 'Don't show this dialog' option 
+		
+        var modalDefaults = {
+            backdrop: true,
+            keyboard: true,
+            modalFade: true,
+            templateUrl: '/views/modal.html'
+        };
+
+        var modalOptions = {
+            closeButtonText: 'Close',
+            actionButtonText: 'OK',
+            headerText: 'Proceed?',
+            bodyText: 'Perform this action?'
+        };
+
+        this.showModal = function (customModalDefaults, customModalOptions) {
+            if (!customModalDefaults) 
+            	customModalDefaults = {};
+            customModalDefaults.backdrop = 'static';
+            return this.show(customModalDefaults, customModalOptions);
+        };
+
+        this.show = function (customModalDefaults, customModalOptions) {
+            //Create temp objects to work with since we're in a singleton service
+            var tempModalDefaults = {};
+            var tempModalOptions = {};
+
+            //Map angular-ui modal custom defaults to modal defaults defined in service
+            angular.extend(tempModalDefaults, modalDefaults, customModalDefaults);
+
+            //Map modal.html $scope custom properties to defaults defined in service
+            angular.extend(tempModalOptions, modalOptions, customModalOptions);
+
+            if (!tempModalDefaults.controller) {
+                tempModalDefaults.controller = function ($scope, $modalInstance) {
+                    $scope.modalOptions = tempModalOptions;
+                    $scope.modalOptions.ok = function (result) {
+                        $modalInstance.close(result);
+                    };
+                    $scope.modalOptions.close = function (result) {
+                        $modalInstance.dismiss('cancel');
+                    };
+                }
+            }
+
+            return $uibModal.open(tempModalDefaults).result;
+        };
+
+    }])
 	.service('ResourceSvcConfiguration', function() {
 	
 		return {
@@ -185,7 +240,7 @@
 	                        return res.resource;
 		                }
 		            }, 
-		            isArray: false
+		            isArray: true
 			    },
 			    update: {
 			        method: 'PUT'
@@ -198,7 +253,8 @@
 		
 		res.newObjectTemplate = {
 				"boh_name":"Business Object Name",
-				"boh_description":"Description for business object"
+				"boh_table":"Tbl",
+				"boh_description":"Description for business object",
 			};
 			
 		return res;
@@ -215,45 +271,62 @@
 		
 		res.newObjectTemplate = {
 					"boi_name":"Item",
-					"boi_description":"Description for Item"
+					"boi_column":"Item",
+					"boi_type": "String"			
 				};
-				
 		return res;
 	}])	
 	.service('masterDataSvc', ['Entity', 'EntityCount', 'Item',  '$q', '$timeout', function(Entity, EntityCount, Item, $q, $timeout) {
 	
 		function createMasterDataTemplateObject(){
 			var obj = angular.copy(Entity.newObjectTemplate);
-			obj.items = [];
+			obj.properties = [];
 			for(var i = 0; i < 3; i++){
 				var item = angular.copy(Item.newObjectTemplate);
 				item.boi_name += ' ' +i;
-				obj.items.push(item);
+				item.boi_column += i;
+				obj.properties.push(item);
 			}
 			return obj;
 		}
 		
 		this.masterDataTemplateObject = createMasterDataTemplateObject();
-		
-		this.batchLoadedMasterData = [];
+		this.batchLoadedMasterData = [];//data cache
 		this.querySettings;
-	
+		this.selection = [];
+		
+		var self = this;
+		
+		this.getLoadedData = function(){
+			return this.batchLoadedMasterData;
+		};
+			
 		/* make sure that sort and order properties of settings have not changed when paging and after the first page has been loaded. purge and start over again otehrwise */
-		this.query = function(settings){
+		function query(settings){
 			this.querySettings = settings;
 			settings.expanded = (settings && settings.expanded!==undefined) || true;
 			var deferred = $q.defer();
 			Entity.query(settings).$promise
 			.then(jQuery.proxy(function(data){
-				if(this.querySettings.limit)
-					this.batchLoadedMasterData = [].concat(this.batchLoadedMasterData, data);//append next page of data
-				else
-					this.batchLoadedMasterData = data;//overwrite
+				if(self.querySettings.limit){
+					if(!self.querySettings.offset)
+						self.batchLoadedMasterData = data;//invalidate cached data
+					else
+						self.batchLoadedMasterData = [].concat(self.batchLoadedMasterData, data);//append next page of data
+				} else {
+					self.batchLoadedMasterData = data;//overwrite
+				}
 				deferred.resolve(data);
 			}, this), function(error){
 				deferred.resolve(error);
 			});
 			return deferred.promise;
+		};
+		
+		function refresh(){
+			this.batchLoadedMasterData = [];
+			this.querySettings.offset = 0;
+			return query.apply(this, [this.querySettings]);
 		};
 		
 		/* 
@@ -279,11 +352,11 @@
 					//now load the data set that contains this item with adapted offset constraint on the query					
 					var _itemHit, busy;
 					while(_itemHit == undefined){
-						this.settings.offset = this.batchLoadedMasterData.length;//move to next page
+						self.settings.offset = self.batchLoadedMasterData.length;//move to next page
 						busy = true;
-						this.query(this.settings)
+						query.apply(self, [self.settings])
 						.then(function(){
-							this.get(id, false).then(
+							self.get(id, false).then(
 							function(_item){
 								itemHit = _item;
 							});	
@@ -298,7 +371,8 @@
 						}
 					}
 
-				}, function(error){
+				})
+				.catch(function(error){
 					// TODO: check if not found vs any other error
 					//deferred.reject(error);
 					deferred.resolve();
@@ -307,50 +381,69 @@
 			}
 			return;
 		};
-		
+
+		this._itemsCount;
+
 		this.count = function(){
-			return EntityCount.query().$promise;
+			return EntityCount.query().$promise
+			.then(function(_data){
+				self._itemsCount = _data.count;
+				return self._itemsCount;
+			});
 		};
 		
-		this.hasNext = function(){
-			var deferred = $q.defer();
-			var self = this;
-			this.count().then(function(_data){
-				if(_data.count > 0 && _data.count > self.batchLoadedMasterData.length)
-					deferred.resolve(true);	
-				else
-					deferred.resolve(false);	
+		this.hasMore = function() {
+			return self.count()
+			.then(function(){
+				return self._itemsCount > 0 && self._itemsCount > self.batchLoadedMasterData.length;
 			});
-			return deferred.promise;
+		};
+		
+		this.select = function(selection){
+			self.selection = selection;
 		};
 		
 		this.next = function(){
-			var deferred = $q.defer();
-			var self = this;
-			this.hasNext().then(function(_hasNext){
-				if(_hasNext){
+			return this.hasMore()
+			.then(function(_hasMore){
+				if(_hasMore){
 					self.querySettings.offset = self.batchLoadedMasterData.length;
-					self.query(self.querySettings)
-					.then(function(_data){
-						deferred.resolve(self.batchLoadedMasterData);
-					}, 
-					function(error){
-						deferred.reject(error);
+					return query.apply(self, [self.querySettings])
+					.then(function(){
+						return self.batchLoadedMasterData;
 					});
-				}	
+				}
+				return;
 			});
-			return deferred.promise;
+		};
+		
+		this.prev = function(){
+			//TODO: not implemented;
+			throw Error('Not implemented');
 		};
 
 		this.create = function(cascaded, template){
 			var reqParams = {};
 			reqParams.cascaded = cascaded || true;
-			return Entity.save(reqParams, template || this.masterDataTemplateObject).$promise;
+			var deferred = $q.defer();
+			Entity.save(reqParams, template || this.masterDataTemplateObject).$promise
+			.then(function(entity){
+					refresh.apply(self)
+					.then(function(){
+						deferred.resolve(entity);
+					}, function(refreshErr){
+						deferred.reject(refreshErr);
+					});
+				},
+				function(saveErr){
+					deferred.reject(saveErr);
+				});
+			return deferred.promise;
 		};
 		
 		this.update = function(header){
-			if(header.items){
-				var items = header.items.filter(function(item){
+			if(header.properties){
+				var items = header.properties.filter(function(item){
 					if(!item.action){
 						return false;
 					}
@@ -376,7 +469,20 @@
 			if(cascaded)
 				reqParams.cascaded = cascaded;
 			reqParams.boId = headerId;
-			return Entity.remove(reqParams).$promise;
+			var deferred = $q.defer();
+			Entity.remove(reqParams).$promise
+			.then(function(){
+					refresh.apply(self)
+					.then(function(){
+						deferred.resolve();
+					}, function(refreshErr){
+						deferred.reject(refreshErr);
+					});
+				},
+				function(removeErr){
+					deferred.reject(removeErr);
+				});
+			return deferred.promise;
 		};
 		
 		this.serviceErrorMessageFormatter = function(message, errorPayload){
@@ -414,80 +520,101 @@
 		};
 	
 	}])
-	.controller('MasterListCtrl', ['masterDataSvc', '$log', '$state', '$stateParams', '$window', function (masterDataSvc, $log, $state, $stateParams, $window) {
+	.controller('MasterListCtrl', ['masterDataSvc', '$log', '$q', '$state', '$stateParams', '$window', function (masterDataSvc, $log, $q, $state, $stateParams, $window) {
 
-		this.items = masterDataSvc.batchLoadedMasterData;
+		this.items = masterDataSvc.getLoadedData();
+		this.selectedEntity = masterDataSvc.selection[0];
+		this.hasMore;
+		this.busy = false;
+		
 		this.querySettings = {
 			limit: 5,
 			sort: 'boh_name',
 			order: 'ASC'
 		};
 				
-		function init(){
-			var itemId = $state.params.boId;//requested item id
+		var self = this;
+		
+		function initList(selectedEntity) {
+			this.items = masterDataSvc.getLoadedData();
 			if(this.items.length > 0) {
-				
-				itemId = $state.params.boId || this.items[0].boh_id;//in case no item id has been explicitly requested, preselect the id of the first one in the list
-				masterDataSvc.get(itemId, true)
-				.then(jQuery.proxy(function(item){
-						if(item === undefined){
-							fireLocationError.apply(this);
-							item = this.items[0];
-						}
-						this.selectItem.apply(this, [item]);//set the item to be selected
-					}, this),
-					function(error){
-						handleServiceError('Looking up Buisness Object failed', error);
-					});
-				
+				if(!selectedEntity){
+					selectedEntity = this.items[0];
+				}
+				masterDataSvc.get(selectedEntity.boh_id, true)
+				.then(function(item){
+					if(item === undefined){
+						fireLocationError.apply(self);
+						item = self.items[0];
+					}
+					self.selectItem.apply(self, [item]);//set the item to be selected
+				})
+				.catch(function(error){
+					handleServiceError('Looking up Buisness Object failed', error);
+				})
+				.finally(function(){
+					self.busy = false;
+				});
 			}
 		};
 		
 		function fireLocationError(){
 			$log.debug('The requested application path ' + $window.location.href + " is not valid.");
 			$stateParams.message = {
-					text: $window.location.href + ' is not valid application path. Check the URL and try again.',
-					type: 'alert-danger'
+				text: $window.location.href + ' is not valid application path. Check the URL and try again.',
+				type: 'alert-danger'
 			};
 		}
 
 		this.selectItem = function(item){
-			this.selectedEntity = item;
+			masterDataSvc.select([item]);
+			self.selectedEntity = item;
 			$stateParams = angular.extend($stateParams, {
 				selectedEntity: item,
 				boId: item.boh_id
 			});
-			$state.go('list.entity', $stateParams);
+			self.busy = true;
+			$state.go('list.entity', $stateParams, {reload: 'list.entity'});
 		};
 		
 		this.createItem = function(){
 			masterDataSvc.create()
 			.then(function(newItem){
 				$stateParams.boId = newItem.boh_id;
+				$stateParams.selectedItem = newItem;
 				$stateParams.message = {
 					text: 'New Buisness Object successfully created.',
 					type: 'alert-success'
 				};
-			}, function(reason){
+				masterDataSvc.selection = [newItem];
+				initList.apply(self, masterDataSvc.selection[0]);
+			})
+			.catch(function(reason){
 				handleServiceError('Creating new Buisness Object failed', reason);
 			})
 			.finally(function(){
-				$state.go($state.current, $stateParams, {reload: true});
+				$state.go('^', $stateParams, {reload: true});
 			});
 		};
 		
 		this.deleteItem = function(itemId){
+			self.busy = true;
 			masterDataSvc.remove(itemId)
 			.then(function(){
 				delete $stateParams.boId;
+				delete $stateParams.selectedEntity;
 				$stateParams.message = {
 						text: 'Buisness Object successfully deleted.',
 						type: 'alert-success'
 					};
-				$state.go($state.current, $stateParams, {reload: true, location:true, inherit: false});
-			}, function(reason){
+				$state.go('^', $stateParams, {reload: true, location:true, inherit: false});
+			})
+			.catch(function(reason){
 				handleServiceError('Deleting Buisness Object failed', reason);
 				$state.go('^', $stateParams, {reload: true});
+			})
+			.finally(function(){
+				initList.apply(self);
 			});
 		};
 		
@@ -501,23 +628,23 @@
 		};
 		
 		this.next = function(){
-			//implement request for next data set for infinite scroll 
-			var self = this;
+			self.busy = true;
 			masterDataSvc.querySettings = this.querySettings;
-			masterDataSvc.hasNext()
-			.then(function(_hasMore){
-				self.hasMore = _hasMore;				
-				if(self.hasMore){
-					masterDataSvc.next().then(function(_items){
-						self.items = _items;
-						init.apply(self);
-					});
-				}
+			$q.when(masterDataSvc.next())
+			.then(function(){
+				masterDataSvc.hasMore()
+				.then(function(_hasMore){
+					self.hasMore = _hasMore;
+				});
+			})
+			.catch(function(err){
+				console.error(err);
+				//..
+			})
+			.finally(function(){
+				initList.apply(self, [masterDataSvc.selection[0]]);
 			});
-
 		};
-		
-		this.hasMore;
 
 	}])
 	.controller('DetailsCtrl', ['masterDataSvc', 'selectedEntity', '$log', '$state', '$stateParams' , function (masterDataSvc, selectedEntity, $log, $state, $stateParams) {
@@ -589,7 +716,7 @@
 		this.deleteItem = function() {
 			masterDataSvc.remove(this.selectedEntity.boh_id)
 			.then(function(){
-				delete $stateParams.boId;
+				delete $stateParams.boId;			
 				$stateParams.message = {
 						text: 'Buisness Object successfully deleted.',
 						type: 'alert-success'
@@ -598,11 +725,11 @@
 			}, function(reason){
 					handleServiceError('Deleting Buisness Object failed', reason);
 					$state.go('^', $stateParams, {reload: true});
-				});
+			});
 		};
 		
 	}])
-	.controller('EditCtrl', ['masterDataSvc', '$log', '$state', '$stateParams', function (masterDataSvc, $log, $state, $stateParams) {
+	.controller('EditCtrl', ['masterDataSvc', 'selectedEntity', '$log', '$state', '$stateParams', function (masterDataSvc, selectedEntity, $log, $state, $stateParams) {
 
 		this.selectedEntity = selectedEntity;
 	//FIXME!!!	
@@ -624,7 +751,7 @@
 			}
 		}
 		
-		showDetails(this.selectedEntity);
+		showDetails.apply(this, this.selectedEntity);
 		
 		this.showRelationships = function(){
 			if(this._selectedItemDetails){
@@ -645,13 +772,13 @@
 		};
 		
 		this.deleteProperty = function(item){
-			for(var i=0; i< this.selectedEntity.items.length; i++){
-				if(this.selectedEntity.items[i] === item){
-					this.selectedEntity.items.splice(i,1);
+			for(var i=0; i< this.selectedEntity.properties.length; i++){
+				if(this.selectedEntity.properties[i] === item){
+					this.selectedEntity.properties.splice(i,1);
 					break;
 				}
 			}
-			$stateParams.entityForEdit.items = $stateParams.entityForEdit.items.map(
+			$stateParams.entityForEdit.properties = $stateParams.entityForEdit.properties.map(
 				function(currItem){
 					if(currItem.boi_id && currItem.boi_id === item.boi_id){
 						currItem.action = 'remove';
@@ -684,7 +811,7 @@
 		};
 				
 	}])
-	.controller('PropertyEditorCtrl', ['$scope', '$stateParams', 'selectedEntity', function($scope, $stateParams, selectedEntity) {
+	.controller('PropertyEditorCtrl', ['$scope', 'Item', '$stateParams', 'selectedEntity', function($scope, Item, $stateParams, selectedEntity) {
     	
 		var isNewProperty;
 		
@@ -699,13 +826,13 @@
 								val: 'Boolean'
 							}];
 		
-		this.selectedTypeOption = {
-				id: '3',
+		this.selectedTpeOption = {
+				id: '2',
 				val: 'String'
 			};
 		
 		this.typeSelectionChanged = function(){
-			this.property.type = this.selectedTypeOption.val;
+			this.item.type = this.selectedTypeOption.val;
 		}
 		
 		$scope.$on('$viewContentLoaded', function(event) {
@@ -717,10 +844,8 @@
 		function init(){
 			isNewProperty = $stateParams.item === undefined ? true : false;
 			if(isNewProperty) {
-				this.item = {
-					boi_name: "Item Name",
-					boi_boh_id: $stateParams.selectedEntity.boh_id
-				};
+				this.item = angular.copy(Item.newObjectTemplate);
+				this.item.boi_boh_id = $stateParams.selectedEntity.boh_id;
 			} else {
 				this.item = $stateParams.item;
 			}
@@ -734,7 +859,7 @@
           
 	      if(isNewProperty){
 	      	this.item.action = 'save';
-	      	selectedEntity.items.push(this.item);
+	      	selectedEntity.properties.push(this.item);
 	      	$stateParams.entityForEdit = $stateParams.selectedEntity = selectedEntity;
 	      } else {
 	      	this.item.action = 'update';

@@ -26,11 +26,11 @@
 		<section class="object-attributes">
       		<div>
       			<label><i class="fa fa-key"></i></label>
-      			<span>{{detailsVm.selectedItem.boh_key}}</span>
+      			<span>{{detailsVm.selectedEntity.boh_key}}</span>
       		</div>
 			<div>
 				<label><i class="fa fa-table"></i></label>
-      			<span>{{detailsVm.selectedItem.boh_table}}</span>
+      			<span>{{detailsVm.selectedEntity.boh_table}}</span>
       		</div>				      							    		
 		</section>
 	</section>
@@ -54,9 +54,9 @@
 			<div class="tab-pane fade in active">
 	
 				<div class="items-list">
-					<div ng-hide="detailsVm.selectedEntity.items[0]" class="nodata-text">No Items</div>
+					<div ng-hide="detailsVm.selectedEntity.properties[0]" class="nodata-text">No Items</div>
 					<div class="list-group">
-					  <a class="list-group-item selected-{{entry._selected_}}" ng-repeat="entry in detailsVm.selectedEntity.items|filter:searchText|orderBy:'boi_name'">
+					  <a class="list-group-item selected-{{entry._selected_}}" ng-repeat="entry in detailsVm.selectedEntity.properties|filter:searchText|orderBy:'boi_name'">
 						<div class="list-group-item-heading">{{entry.boi_name}}</div>
 						<div class="list-group-item-text">{{entry.boi_description}}</div>
 					  </a>

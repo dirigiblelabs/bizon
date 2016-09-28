@@ -50,16 +50,17 @@
 		<section class="object-attributes">
       		<div>
       			<label><i class="fa fa-key"></i></label>
-      			<span editable-select="detailsEditorVm.selectedItem.boh_key" e-ng-options="s.value as s.text for s in [{text:'Id', value:'Id'}, {text:'Property 1', value:'Property 1'}, {text:'Property 2', value:'Property 2'}]">{{detailsEditorVm.selectedItem.boh_key}}</span>
+      			<span editable-select="detailsEditorVm.selectedEntity.boh_key" e-ng-options="s.value as s.text for s in [{text:'Id', value:'Id'}, {text:'Property 1', value:'Property 1'}, {text:'Property 2', value:'Property 2'}]">{{detailsEditorVm.selectedEntity.boh_key}}</span>
       		</div>
 			<div>
 				<label><i class="fa fa-table"></i></label>
-      			<span editable-select="detailsEditorVm.selectedItem.boh_table" e-ng-options="s.value as s.text for s in [{text:'TBL_A', value:'TBL_A'}, {text:'TBL_B', value:'TBL_B'}, {text:'TBL_C', value:'TBL_C'}]">{{detailsEditorVm.selectedItem.boh_table}}</span>
+      			<span editable-select="detailsEditorVm.selectedEntity.boh_table" e-ng-options="s.value as s.text for s in [{text:'TBL_A', value:'TBL_A'}, {text:'TBL_B', value:'TBL_B'}, {text:'TBL_C', value:'TBL_C'}]">{{detailsEditorVm.selectedEntity.boh_table}}</span>
       		</div>				      		
 		</section>					    		
 	</section>	
 		
-	<div class="content">
+	<div class="list-content">	
+	
 		<ul class="nav nav-tabs">
 		  <li role="presentation" class="active"><a ng-click="detailsEditorVm.showProperties()" role="tab" data-toggle="tab">Properties</a></li>
 		  <li role="presentation"><a ng-click="detailsEditorVm.showRelationships()" role="tab" data-toggle="tab">Relationships <i class="glyphicon glyphicon-link pull-right"></i></a></li>
@@ -83,9 +84,9 @@
 				
 				<div class="items-list">
 		
-					<div ng-hide="detailsEditorVm.selectedEntity.items[0]" class="nodata-text">No Items</div>
+					<div ng-hide="detailsEditorVm.selectedEntity.properties[0]" class="nodata-text">No Items</div>
 						<div class="list-group">
-						  <a class="list-group-item selected-{{entry._selected_}}" ng-repeat="entry in detailsEditorVm.selectedEntity.items|filter:searchText|orderBy:'boi_name'">
+						  <a class="list-group-item selected-{{entry._selected_}}" ng-repeat="entry in detailsEditorVm.selectedEntity.properties|filter:searchText|orderBy:'boi_name'">
 							<div style="display:inline-block">
 								<div class="list-group-item-heading">{{entry.boi_name}}</div>
 								<div class="list-group-item-text">{{entry.boi_description}}</div>

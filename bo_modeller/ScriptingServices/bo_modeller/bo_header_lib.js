@@ -55,7 +55,7 @@ exports.insert = function(entity, cascaded) {
         
         var i = 0;
         entity.boh_id = datasource.getSequence('BO_HEADER_BOH_ID').next();
-        
+         
         statement.setInt(++i,  entity.boh_id);
         statement.setString(++i, entity.boh_name);
         statement.setString(++i, entity.boh_table);
@@ -173,8 +173,11 @@ function createEntity(resultSet) {
 
 //Prepare a JSON object for insert into DB
 function createSQLEntity(entity) {
-	if(!entity.boh_description)
-		entity.boh_description = null;  
+	for(var i in entity){
+		if(entity[i] === undefined){
+			entity[i] = null;
+		}
+	}
 	console.log("Transformation to DB JSON object finished: " + entity);
 	return entity;
 }

@@ -7,6 +7,11 @@ var database = require("db/database");
 
 var datasource = database.getDatasource();
 
+var persistentProperties = {
+	mandatory: ["boi_id", "boi_boh_id", "boi_name","boi_column","boi_type"],
+	optional: ["boi_length", "boi_null", "boi_pk", "boi_default"]
+};
+
 // Parse JSON entity into SQL and insert in db. Returns the new record id.
 exports.insert = function(item) {
 	
@@ -16,21 +21,14 @@ exports.insert = function(item) {
 		throw new Error('Illegal argument: item is ' + item);
 	}
 	
-	if(item.boi_boh_id === undefined || item.boi_boh_id === null){
-		throw new Error('Illegal boi_boh_id attribute: ' + item.boi_boh_id);
-	}	
-
-	
-	if(item.boi_name === undefined || item.boi_name === null){
-		throw new Error('Illegal boi_name attribute: ' + item.boi_name);
-	}
-
-	if(item.boi_type === undefined || item.boi_type === null){
-		throw new Error('Illegal boi_type attribute: ' + item.boi_type);
-	}
-
-	if(item.boi_column === undefined || item.boi_column === null){
-		throw new Error('Illegal boi_column attribute: ' + item.boi_column);
+	for(var i = 0; i< persistentProperties.mandatory.length; i++){
+		var propName = persistentProperties.mandatory[i];
+		if(propName==='boi_id')
+			continue;//Skip validaiton check for id. It's epxected to be null on insert.
+		var propValue = item[propName];
+		if(propValue === undefined || propValue === null){
+			throw new Error('Illegal ' + propName + ' attribute value: ' + propValue);
+		}
 	}
 	
     var connection = datasource.getConnection();
@@ -76,17 +74,18 @@ exports.insert = function(item) {
         var statement = connection.prepareStatement(sql);
         item = createSQLEntity(item);
         
-        var i = 0;
-        var id = datasource.getSequence('BO_ITEM_BOI_ID').next();
-        statement.setInt(++i, id);
-        statement.setInt(++i, item.boi_boh_id);
-        statement.setString(++i, item.boi_name);
-        statement.setString(++i, item.boi_column);
-        statement.setInt(++i, item.boi_type);
-        statement.setInt(++i, item.boi_length);
-        statement.setShort(++i, item.boi_null);
-        statement.setShort(++i, item.boi_pk);
-        statement.setString(++i, item.boi_default);
+        item.boi_id = datasource.getSequence('BO_ITEM_BOI_ID').next();
+        
+        var j = 0;
+        statement.setInt(++j, item.boi_id);
+        statement.setInt(++j, item.boi_boh_id);
+        statement.setString(++j, item.boi_name);
+        statement.setString(++j, item.boi_column);
+        statement.setInt(++j, item.boi_type);
+        statement.setInt(++j, item.boi_length);
+        statement.setShort(++j, item.boi_null);
+        statement.setShort(++j, item.boi_pk);
+        statement.setString(++j, item.boi_default);
         statement.executeUpdate();
         
         console.log('BO_ITEM entity inserted with boi_id[' + item.boi_id + ']');
@@ -207,22 +206,33 @@ function createEntity(resultSet) {
 
 //Prepare a JSON object for insert into DB
 function createSQLEntity(item) {
-	item.boi_type = stringToCodeItemTypeMapping(item.boi_type);
-	if(item.boi_null === null || item.boi_null === undefined || item.boi_null === true){
-		item.boi_null = 1;
-	} else {
-   	   	item.boi_null = 0;
-    }
-	if(item.boi_pk === null || item.boi_pk === undefined || item.boi_pk === false){
-		item.boi_pk = 0;
-	} else {
-	   	item.boi_pk = 1;	
+	var persistentItem = {};
+	for(var i=0;i<persistentProperties.mandatory.length;i++){
+		persistentItem[persistentProperties.mandatory[i]] = item[persistentProperties.mandatory[i]];
 	}
-	if(item.boi_default === undefined){
-		item.boi_default = null;
-  	}
-	console.log("Transformation to DB JSON object finished: " + item);
-	return item;
+	for(var i=0;i<persistentProperties.optional.length;i++){
+		if(item[persistentProperties.optional[i]] !== undefined){
+			persistentItem[persistentProperties.optional[i]] = item[persistentProperties.optional[i]];
+		} else {
+			persistentItem[persistentProperties.optional[i]] = null;
+		}
+	}
+	persistentItem.boi_type = stringToCodeItemTypeMapping(persistentItem.boi_type);
+	if(persistentItem.boi_null === null || persistentItem.boi_null === true){
+		persistentItem.boi_null = 1;
+	} else {
+   	   	persistentItem.boi_null = 0;
+    }
+	if(persistentItem.boi_pk === null || persistentItem.boi_pk === false){
+		persistentItem.boi_pk = 0;
+	} else {
+	   	persistentItem.boi_pk = 1;	
+	}
+	if(persistentItem.boi_length === null){
+		persistentItem.boi_length = 0;
+	}
+	console.log("Transformation to DB JSON object finished: " + persistentItem);
+	return persistentItem;
 }
 
 function convertToDateString(date) {
@@ -232,17 +242,17 @@ function convertToDateString(date) {
     return fullYear + "/" + month + "/" + dateOfMonth;
 }
 
-function stringToCodeItemTypeMapping(typeName) {
-	if(!isNaN(parseInt(typeName))){
-		return typeName;
+function stringToCodeItemTypeMapping(typeIndex) {
+	if(!isNaN(parseInt(typeIndex))){
+		return typeIndex;
 	}
-	if(typeName === 'Integer')
+	if(typeIndex === 'Integer')
 		return 1;
-	if(typeName === 'String')
+	if(typeIndex === 'String')
 		return 2;
-	if(typeName === 'Boolean')
+	if(typeIndex === 'Boolean')
 		return 3;
-	if(typeName === 'Relationship')
+	if(typeIndex === 'Relationship')
 		return 1000;
 }
 
