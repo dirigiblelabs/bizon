@@ -15,12 +15,12 @@
     </header>
 
 	<div class="scrollable">
-		<ul class="nav nav-pills nav-stacked" infinite-scroll='masterVm.next()' infinite-scroll-disabled="masterVm.busy" style="bottom:4rem">
+		<ul class="nav nav-pills nav-stacked" style="bottom:4rem" infinite-scroll='masterVm.next()'  infinite-scroll-disabled="masterVm.busy" infinite-scroll-parent="true">
 	 		<li role="presentation" ng-class="{active: masterVm.selectedEntity.boh_id===item.boh_id}" ng-repeat="item in masterVm.items track by item.boh_id">
 	 			<a ng-click="masterVm.selectItem(item)"><i class="fa fa-th-large"></i> {{item.boh_name}} <span ng-click="masterVm.deleteItem(item)" class="glyphicon glyphicon-remove pull-right tools-remove" aria-hidden="true"></span></a>
 	 		</li>
 		</ul>
-		<ul class="nav nav-pills ghost-list-item-active" ng-show="masterVm.hasMore">
+		<ul class="nav nav-pills ghost-list-item-active" ng-show="masterVm.showLoadMore">
 			<li>
 				<a href="#" click="return false;" ng-click='masterVm.next()'>
 					<p>More</p>

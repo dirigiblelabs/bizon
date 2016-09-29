@@ -53,7 +53,7 @@
 	
 	<script>
 	angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.bootstrap', 'xeditable', 'infinite-scroll'])
-	.value('THROTTLE_MILLISECONDS', 1000)
+	.value('THROTTLE_MILLISECONDS', 500)
 	.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
 
 		$urlRouterProvider.otherwise("/");
@@ -504,15 +504,16 @@
 		this.items = masterDataSvc.getLoadedData();
 		this.selectedEntity = masterDataSvc.selection[0];
 		this.count;
-		this.hasMore;
-		this.busy = false;
+		this.showLoadMore;
+		this.busy;
 		
 		this.querySettings = {
-			limit: 5,
+			limit: 100,
 			sort: 'boh_name',
 			order: 'ASC'
 		};
-				
+		
+		var loadMoreBreakNumber = this.querySettings.limit*2;
 		var self = this;
 		
 		function initList(selectedEntity) {
@@ -535,17 +536,24 @@
 					return self.selectItem.apply(self, [item]);//select the selection candidate
 				})
 				.then(function(){
-					masterDataSvc.hasMore()
-					.then(function(_hasMore){
-						self.hasMore = _hasMore;
-						self.count = masterDataSvc._itemsCount;
-					});
+					if(self.items.length === loadMoreBreakNumber){
+						return masterDataSvc.hasMore()
+						.then(function(_hasMore){
+							self.showLoadMore = _hasMore;
+							loadMoreBreakNumber = loadMoreBreakNumber + self.querySettings*2;
+						});
+					} else {
+						self.showLoadMore = false;
+					}
+					self.count = masterDataSvc._itemsCount;
+					return;
 				})
 				.catch(function(error){
 					handleServiceError('Looking up Buisness Object failed', error);
 				})
 				.finally(function(){
-					self.busy = false;
+					if(!self.showLoadMore)
+						self.busy = false;
 				});
 			}
 		};
@@ -565,7 +573,6 @@
 				selectedEntity: item,
 				boId: item.boh_id
 			});
-			self.busy = true;
 			$state.go('list.entity', $stateParams, {reload: 'list.entity'});
 		};
 		
@@ -632,16 +639,18 @@
 		};
 		
 		this.next = function(){
+			if(!self.busy || (self.busy && self.showLoadMore)){
+				masterDataSvc.querySettings = this.querySettings;
+				$q.when(masterDataSvc.next())
+				.catch(function(err){
+					console.error(err);
+					//..
+				})
+				.finally(function(){
+					initList.apply(self, [masterDataSvc.selection[0]]);
+				});			
+			}
 			self.busy = true;
-			masterDataSvc.querySettings = this.querySettings;
-			$q.when(masterDataSvc.next())
-			.catch(function(err){
-				console.error(err);
-				//..
-			})
-			.finally(function(){
-				initList.apply(self, [masterDataSvc.selection[0]]);
-			});
 		};
 
 	}])
