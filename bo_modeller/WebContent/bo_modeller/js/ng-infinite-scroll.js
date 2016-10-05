@@ -125,7 +125,7 @@ angular.module('infinite-scroll', []).value('THROTTLE_MILLISECONDS', null).direc
           scrollEnabled = !v;
           if (scrollEnabled && checkWhenEnabled) {
             checkWhenEnabled = false;
-//            return handler();
+//            return handler();// FIX: Invoking the handler upon change in disabled attribute is not desirable. It should be strictly on scroll events.
               return handler;
           }
         };

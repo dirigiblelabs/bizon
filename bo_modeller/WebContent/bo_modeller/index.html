@@ -240,7 +240,7 @@
 	                        return res.resource;
 		                }
 		            }, 
-		            isArray: true
+		            isArray: false
 			    },
 			    update: {
 			        method: 'PUT'
@@ -326,7 +326,7 @@
 		function refresh(){
 			this.batchLoadedMasterData = [];
 			this.querySettings.offset = 0;
-			return query.apply(this, [this.querySettings]);
+			return query.apply(this, [this.querySettings]).then(self.count);
 		};
 		
 		/* 
@@ -402,21 +402,13 @@
 		this.create = function(cascaded, template){
 			var reqParams = {};
 			reqParams.cascaded = cascaded || true;
-			var deferred = $q.defer();
-			Entity.save(reqParams, template || this.masterDataTemplateObject).$promise
-			.then(function(entity){
-				refresh.apply(self)
+			return Entity.save(reqParams, template || this.masterDataTemplateObject).$promise
+			.then(function(newItem){
+				return refresh.apply(self)
 				.then(function(){
-					deferred.resolve(entity);
-				})
-				.catch(function(refreshErr){
-					deferred.reject(refreshErr);
+					return newItem;
 				});
-			})
-			.catch(function(saveErr){
-				deferred.reject(saveErr);
 			});
-			return deferred.promise;
 		};
 		
 		this.update = function(header){
@@ -503,7 +495,7 @@
 
 		this.items = masterDataSvc.getLoadedData();
 		this.selectedEntity = masterDataSvc.selection[0];
-		this.count;
+		this.count = masterDataSvc._itemsCount;
 		this.showLoadMore;
 		this.busy;
 		
@@ -550,6 +542,7 @@
 				})
 				.catch(function(error){
 					handleServiceError('Looking up Buisness Object failed', error);
+					$state.go('^', $stateParams, {reload: true});
 				})
 				.finally(function(){
 					if(!self.showLoadMore)
@@ -580,19 +573,20 @@
 			masterDataSvc.create()
 			.then(function(newItem){
 				$stateParams.boId = newItem.boh_id;
-				$stateParams.selectedItem = newItem;
+				$stateParams.selectedEntity = newItem;
 				$stateParams.message = {
 					text: 'New Buisness Object successfully created.',
 					type: 'alert-success'
 				};
 				masterDataSvc.selection = [newItem];
-				initList.apply(self, masterDataSvc.selection[0]);
+				initList.apply(self, [masterDataSvc.selection[0]]);
+				return;
 			})
 			.catch(function(reason){
 				handleServiceError('Creating new Buisness Object failed', reason);
 			})
 			.finally(function(){
-				$state.go('^', $stateParams, {reload: true});
+				$state.go("list.entity", $stateParams, {reload: false});
 			});
 		};
 		
@@ -611,18 +605,20 @@
 				masterDataSvc.remove(entity.boh_id)
 				.then(function(){
 					delete $stateParams.boId;
+					delete $state.params.boId;
 					delete $stateParams.selectedEntity;
+					delete $state.params.selectedEntity;					
 					$stateParams.message = {
 							text: 'Buisness Object successfully deleted.',
 							type: 'alert-success'
 						};
-					$state.go('^', $stateParams, {reload: true, location:true, inherit: false});
+
 				})
 				.catch(function(reason){
 					handleServiceError('Deleting Buisness Object failed', reason);
-					$state.go('^', $stateParams, {reload: true});
 				})
 				.finally(function(){
+					$state.go($state.current, $stateParams, {reload: true});
 					initList.apply(self);
 				});	        
 	        });

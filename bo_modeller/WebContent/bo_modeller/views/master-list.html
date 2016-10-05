@@ -1,6 +1,7 @@
 <section>
 
 	<header class="header text-center">
+	
 	  <div class="btn-group pull-left">
 		<button type="submit" class="btn btn-primary">
 		  <i class="glyphicon glyphicon-filter" aria-hidden="true"></i>
@@ -8,9 +9,17 @@
       </div>
       <span style="display: inline-block; margin: 1.8rem auto; color: white">{{masterVm.items.length}} / {{masterVm.count}}</span>
       <div class="btn-group pull-right">
-		<button type="submit" class="btn btn-primary" ng-click="masterVm.createItem()">
-		  <i class="fa fa-plus" aria-hidden="true"></i>
+		<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+		    <i class="glyphicon glyphicon-menu-hamburger" aria-hidden="true"></i>
 		</button>
+		<ul class="dropdown-menu">
+		  <li><a href="#" ng-click="masterVm.createItem()">New object</a></li>
+		  <li role="separator" class="divider"></li>		    
+		  <li><a href="#">Build app</a></li>
+		</ul>      
+<!--		<button type="submit" class="btn btn-primary" ng-click="masterVm.createItem()">
+		  <i class="fa fa-plus" aria-hidden="true"></i>
+		</button>-->
 	  </div>
     </header>
 
