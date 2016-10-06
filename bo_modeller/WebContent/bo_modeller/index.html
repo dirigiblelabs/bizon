@@ -278,6 +278,14 @@
 				};
 		return res;
 	}])	
+	.service('BuildService', ['$resource', function($resource) {
+	  	return $resource('../../js/bo_modeller/bo_build_svc.js', {}, {
+	  		build: {
+	  			method: 'POST',
+	  			isArray: false
+  			}
+	  	});
+	}])	
 	.service('masterDataSvc', ['Entity', 'Item',  '$q', function(Entity, Item, $q) {
 	
 		function createMasterDataTemplateObject(){
@@ -500,7 +508,7 @@
 		};
 	
 	}])
-	.controller('MasterListCtrl', ['masterDataSvc', 'modalService', '$log', '$q', '$state', '$stateParams', '$window', function (masterDataSvc, modalService, $log, $q, $state, $stateParams, $window) {
+	.controller('MasterListCtrl', ['masterDataSvc', 'BuildService', 'modalService', '$log', '$q', '$state', '$stateParams', '$window', function (masterDataSvc, BuildService, modalService, $log, $q, $state, $stateParams, $window) {
 
 		this.items = masterDataSvc.getLoadedData();
 		this.selectedEntity = masterDataSvc.selection[0];
@@ -657,6 +665,10 @@
 			}
 			self.busy = true;
 		};
+		
+		this.build = function(){
+			BuildService.build(self.items);
+		};
 
 	}])
 	.controller('DetailsCtrl', ['masterDataSvc', 'modalService', 'selectedEntity', '$log', '$state', '$stateParams' , function (masterDataSvc, modalService, selectedEntity, $log, $state, $stateParams) {
@@ -759,7 +771,7 @@
 					handleServiceError('Deleting Buisness Object failed', reason);
 				})
 				.finally(function(){
-					$state.go($state.current, $stateParams, {reload: true, inheirt: false});
+					$state.go('^', $stateParams, {reload: true, inheirt: false});
 				});
         	
         	});
