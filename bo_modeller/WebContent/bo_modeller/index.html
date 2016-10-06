@@ -750,10 +750,12 @@
 							text: 'Buisness Object successfully deleted.',
 							type: 'alert-success'
 						};
-					$state.go($state.current, $stateParams, {reload: true, location:true, inherit: false});
-				}, function(reason){
-						handleServiceError('Deleting Buisness Object failed', reason);
-						$state.go('^', $stateParams, {reload: true});
+				})
+				.catch(function(reason){
+					handleServiceError('Deleting Buisness Object failed', reason);
+				})
+				.finally(function(){
+					$state.go($state.current, $stateParams, {reload: true});
 				});
         	
         	});
