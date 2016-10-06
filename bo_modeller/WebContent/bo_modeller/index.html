@@ -356,6 +356,13 @@
 				})
 				.then(function(){
 					return self.get.apply(self, [id, lookupRemotelyOnDemand]);
+				})
+				.catch(function(response){
+					if(response.status===404){
+						return;
+					} else {
+						throw repsonse.data.err;
+					}
 				});
 			}
 			return;
@@ -543,8 +550,8 @@
 					return;
 				})
 				.catch(function(error){
-					handleServiceError('Looking up Buisness Object failed', error);
-					$state.go('^', $stateParams, {reload: true});
+					handleServiceError('Looking up Buisness Object failed', error.message);
+					$state.go($state.current, $stateParams, {reload: true});
 				})
 				.finally(function(){
 					if(!self.showLoadMore)
@@ -568,7 +575,7 @@
 				selectedEntity: item,
 				boId: item.boh_id
 			});
-			$state.go('list.entity', $stateParams, {reload: 'list.entity'});
+			$state.go('list.entity', $stateParams, {reload: false});
 		};
 		
 		this.createItem = function(){
@@ -620,7 +627,7 @@
 					handleServiceError('Deleting Buisness Object failed', reason);
 				})
 				.finally(function(){
-					$state.go($state.current, $stateParams, {reload: true});
+					$state.go($state.current, $stateParams, {reload: true, inheirt: false});
 					initList.apply(self);
 				});	        
 	        });
@@ -752,7 +759,7 @@
 					handleServiceError('Deleting Buisness Object failed', reason);
 				})
 				.finally(function(){
-					$state.go($state.current, $stateParams, {reload: true});
+					$state.go($state.current, $stateParams, {reload: true, inheirt: false});
 				});
         	
         	});
