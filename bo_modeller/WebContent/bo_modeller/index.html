@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.css">
 <link rel="stylesheet" href="css/xeditable.css">
+<link rel='stylesheet' href='//cdnjs.cloudflare.com/ajax/libs/angular-loading-bar/0.9.0/loading-bar.min.css' type='text/css' media='all' />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/css/bootstrap3/bootstrap-switch.min.css">
 
 <link rel="stylesheet" href="css/default.css">
@@ -49,12 +50,13 @@
 	<script src="js/xeditable.js"></script>	
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/js/bootstrap-switch.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.15.0/jquery.validate.min.js"></script>
-	<script src="js/ng-infinite-scroll.js"></script>	
+	<script src="js/ng-infinite-scroll.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/angular-loading-bar/0.9.0/loading-bar.min.js"></script>
 	
 	<script>
-	angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.bootstrap', 'xeditable', 'infinite-scroll'])
+	angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.bootstrap', 'xeditable', 'infinite-scroll', 'angular-loading-bar'])
 	.value('THROTTLE_MILLISECONDS', 500)
-	.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
+	.config(['$stateProvider', '$urlRouterProvider', 'cfpLoadingBarProvider', function($stateProvider, $urlRouterProvider, cfpLoadingBarProvider) {
 
 		$urlRouterProvider.otherwise("/");
 		
@@ -167,7 +169,10 @@
 		        });
 		        modalInstance.result.then(goBack, goBack);
 		    }]
-		  });	
+		  });
+		  
+		cfpLoadingBarProvider.includeSpinner = false;
+		  
 	}])
 	.service('modalService', ['$uibModal', function ($uibModal) {
 		/* http://weblogs.asp.net/dwahlin/building-an-angularjs-modal-service */
