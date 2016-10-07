@@ -169,6 +169,41 @@
 		        });
 		        modalInstance.result.then(goBack, goBack);
 		    }]
+		  })
+		  .state("list.entity.build", {
+		    params: {
+				message: {value: undefined}
+		    },
+		    onEnter: ['$stateParams', '$state', '$uibModal', function($stateParams, $state, $modal) {
+		    			    	
+		        var modalInstance = $modal.open({
+		        	animation: true,
+		            templateUrl: "views/buildDialog.html",
+		            controller: 'BuildDialogCtrl',
+		            controllerAs: 'builderVm'
+		        });
+		    	
+		        modalInstance.rendered.then(function(){
+		        	var $validator = $('.modal-body form').validate({
+		        		errorClass: 'has-error',
+		        		validClass : 'has-success',
+ 		        		highlight: function (element, errorClass, validClass) {
+				            $(element).closest('.form-group').removeClass('has-success').addClass('has-error');
+				            if($validator.numberOfInvalids()>0)
+				            	$('.modal-footer .btn.btn-success').addClass('disabled');
+				        },
+				        unhighlight: function(element, errorClass, validClass) {
+				        	$(element).closest('.form-group').removeClass('has-error').addClass('has-success');
+				        	if($validator.numberOfInvalids()<1)
+					        	$('.modal-footer .btn.btn-success').removeClass('disabled');	
+				        },
+		 		        success: "has-success"
+		        	});
+		        	$('.form-control[required]').each(function(i){
+		        		$validator.element(this);
+		        	});
+		        });
+		    }]
 		  });
 		  
 		cfpLoadingBarProvider.includeSpinner = false;
@@ -483,7 +518,7 @@
 			return message;
 		};
 				
-	}])
+	}])    
 	.controller('EmptyCtrl', ['masterDataSvc', '$log', '$state', '$stateParams', function (masterDataSvc, $log, $state, $stateParams) {
 	
 		this.createItem = function(){
@@ -508,7 +543,7 @@
 		};
 	
 	}])
-	.controller('MasterListCtrl', ['masterDataSvc', 'BuildService', 'modalService', '$log', '$q', '$state', '$stateParams', '$window', function (masterDataSvc, BuildService, modalService, $log, $q, $state, $stateParams, $window) {
+	.controller('MasterListCtrl', ['masterDataSvc', 'modalService', '$log', '$q', '$state', '$stateParams', '$window', function (masterDataSvc, modalService, $log, $q, $state, $stateParams, $window) {
 
 		this.items = masterDataSvc.getLoadedData();
 		this.selectedEntity = masterDataSvc.selection[0];
@@ -664,10 +699,6 @@
 				});			
 			}
 			self.busy = true;
-		};
-		
-		this.build = function(){
-			BuildService.build(self.items);
 		};
 
 	}])
@@ -942,6 +973,20 @@
         init.apply(this);
         
       }])
+	.controller('BuildDialogCtrl', ['masterDataSvc', 'BuildService', '$scope', function(masterDataSvc, BuildService, $scope) {
+	
+		this.cfg = {};
+		var self = this;
+		this.build = function(){
+			var buildRequestPayload = angular.copy(self.cfg);
+			buildRequestPayload.entities = masterDataSvc.getLoadedData();
+			BuildService.build(buildRequestPayload);
+			$scope.$close();
+		};
+		this.cancel = function(){
+			$scope.$dismiss();
+		};
+	}])
 	.controller('NotificationsCtrl', ['$timeout', '$stateParams', function ($timeout, $stateParams) {
 		
 		var messageEl = $('.alert');
@@ -977,9 +1022,37 @@
 			if(timer){
 				$timeout.cancel(timer);
 			}
-		}
+		};
 				
 	}])
+	.directive('bootstrapSwitch', [
+        function() {
+        	/*http://benjii.me/2014/07/angular-directive-for-bootstrap-switch/*/
+            return {
+                restrict: 'A',
+                require: '?ngModel',
+                link: function(scope, element, attrs, ngModel) {
+                    element.bootstrapSwitch();
+
+                    element.on('switchChange.bootstrapSwitch', function(event, state) {
+                        if (ngModel) {
+                            scope.$apply(function() {
+                                ngModel.$setViewValue(state);
+                            });
+                        }
+                    });
+
+                    scope.$watch(attrs.ngModel, function(newValue, oldValue) {
+                        if (newValue) {
+                            element.bootstrapSwitch('state', true, true);
+                        } else {
+                            element.bootstrapSwitch('state', false, true);
+                        }
+                    });
+                }
+            };
+        }
+    ])	
 	.run(['editableOptions', function(editableOptions)  {
 	  editableOptions.theme = 'bs3'; // bootstrap3 theme. Can be also 'bs2', 'default'
 	}]);
