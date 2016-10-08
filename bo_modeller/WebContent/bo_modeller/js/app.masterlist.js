@@ -158,5 +158,10 @@ angular.module('businessObjects')
 		}
 		self.busy = true;
 	};
+	
+	this.build = function(){
+		$state.go('list.entity.build',$stateParams,{reload:true,location:true});
+	};
+
 
 }]);

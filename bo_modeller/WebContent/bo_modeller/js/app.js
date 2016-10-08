@@ -122,6 +122,7 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		    }]
 		  })
 		  .state("list.entity.build", {
+		  	url: 'build',
 		    params: {
 				message: {value: undefined}
 		    },
