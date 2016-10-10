@@ -26,7 +26,7 @@
 		<section class="object-attributes">
       		<div>
       			<label><i class="fa fa-key"></i></label>
-      			<span>{{detailsVm.selectedEntity.boh_key}}</span>
+      			<span ng-bind="(detailsVm.selectedEntity.properties | filter: {boi_pk:'true'})[0].boi_name"></span>
       		</div>
 			<div>
 				<label><i class="fa fa-table"></i></label>
