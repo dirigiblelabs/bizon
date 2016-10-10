@@ -3,7 +3,6 @@ angular.module('businessObjects')
 
 	this.cfg = {};
 	this.slider = {
-	  value: 3,
 	  options: {
 	  	showTicksValues: true,
 	    stepsArray: [
@@ -24,7 +23,7 @@ angular.module('businessObjects')
 			} else if(self.slider.value === 2){
 				buildRequestPayload.ds = true;
 				buildRequestPayload.svc = true;
-			}  else if(self.slider.value === 2){
+			}  else if(self.slider.value === 3){
 				buildRequestPayload.ds = true;
 				buildRequestPayload.svc = true;
 				buildRequestPayload.web = true;

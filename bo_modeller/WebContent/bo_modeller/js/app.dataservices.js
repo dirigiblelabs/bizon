@@ -46,7 +46,8 @@
 		res.newObjectTemplate = {
 					"boi_name":"Item",
 					"boi_column":"Item",
-					"boi_type": "String"			
+					"boi_type": "String",
+					"boi_null": false,
 				};
 		return res;
 	}])	
@@ -69,6 +70,10 @@
 				item.boi_column += i;
 				obj.properties.push(item);
 			}
+			obj.properties[0].boi_name = "id";
+			obj.properties[0].boi_column = "id";			
+			obj.properties[0].boi_pk = true;
+			obj.properties[0].boi_null = true;			
 			return obj;
 		}
 		
