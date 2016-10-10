@@ -455,3 +455,11 @@
 	.alert.ng-hide-add.ng-add-active {
 	  opacity: 0;
 	}
+
+	.rzslider .rz-tick span.rz-tick-value {
+		display: none;
+	}
+
+    div.rzslider {
+    	margin-bottom: 4rem;
+	}

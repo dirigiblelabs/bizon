@@ -26,8 +26,9 @@
 		      <input name="package" id="package" class="form-control" placeholder="Type Package Name" ng-model="builderVm.cfg.packageName" minlength="1" required="true">
 		    </div>
 		  </div>
-		  <fieldset>
-<!--    	  	  <legend>Application Assets To Generate</legend>-->
+		  <rzslider rz-slider-model="builderVm.slider.value" rz-slider-options="builderVm.slider.options"></rzslider>		  
+		  <!--<fieldset>
+    	  	  <legend>Application Assets To Generate</legend>			  
 			  <div class="form-group">
 		  		<label for="ds" class="col-sm-2 control-label">Data Structure</label>
 			    <div class="col-sm-10">
@@ -50,7 +51,7 @@
 			      </div>
 			    </div>
 			  </div>			  
-    	  </fieldset>
+    	  </fieldset>-->
 		</form>
 	</div>
 	
