@@ -188,7 +188,78 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
                 }
             };
         }
-    ])	
+    ])
+	.directive('msgShow', ['$timeout', function($timeout) {
+            return {
+                restrict: 'A',
+                link: function($scope, $element, $attrs) {
+                    
+                	var expr = $attrs.msgShow;                    
+                    var duration = $attrs.msgShowDuration || 5000;                    
+                    var slideDuration = $attrs.msgSlideDuration || 'slow';
+                    
+                    var self = this;
+					var timer;                    
+                    var msg = $scope.$eval(expr);
+                    
+                    if ( ! msg ) {
+                        $element.hide();
+                    } else {
+                    	show.apply(self, [msg]);
+                	}
+
+                    $scope.$watch(expr, function( newValue, oldValue ) {
+                            // Ignore first-run values since we've already defaulted the element state.
+                            if ( newValue === oldValue ) {
+                                return;
+                            }
+                            
+                            // Show element.
+                            if ( newValue ) {
+								show.apply(self, [newValue]);
+                            // Hide element.
+                            } else {
+                            	hide.apply(self);
+                            }
+                        }
+                    );
+                    
+                    function show(){
+                    	var typeClass = msg.type || 'alert-danger';
+						$element.addClass(typeClass);
+                        var text = $scope.$eval($attrs.msgText) || '';
+                    	$element.append('<span class="msg-text">'+text+'</span>');
+						$element.show();
+						hide.apply(self, [$scope]);
+                	}
+                	
+                	function hide(){
+                		var scope = $scope;
+                		if(scope.messagesVm.nodelay){
+                			hideElement.apply(self);
+            			}else{
+	                    	timer = $timeout(duration)
+	                    	.then(function(){
+	                        	hideElement.apply(self,[timer]);
+							});            			
+        				}
+                	}
+                	
+                	function hideElement(timer){
+						$element.fadeTo(slideDuration, 0, function(){
+                            	$element.find('.msg-text').remove();
+								$element.parent().slideUp(slideDuration, function(){
+									if(timer)
+										$timeout.cancel(timer);
+									$scope.messagesVm.hide();
+								});
+						}) 	
+            		}
+
+                }
+            };
+        }
+    ])	    
 	.run(['editableOptions', function(editableOptions)  {
 	  editableOptions.theme = 'bs3'; // bootstrap3 theme. Can be also 'bs2', 'default'
 	}]);

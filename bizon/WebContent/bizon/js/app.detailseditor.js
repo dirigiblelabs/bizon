@@ -89,7 +89,13 @@ angular.module('businessObjects')
 
 	    masterDataSvc.update(this.selectedEntity)
 	    .then(function(){
-			$state.go('^', {boId: self.selectedEntity.boh_id, selectedEntity:self.selectedEntity}, {reload: 'list', location:false});
+	    	$stateParams.message = {
+					text: 'Business object updated successfully',
+					type: 'alert-success'
+			};
+			$stateParams.boId = self.selectedEntity.boh_id;
+			$stateParams.selectedEntity = self.selectedEntity;
+			$state.go('^', $stateParams, {reload: 'list', location:false, inherit: false});
     	})
     	.catch(function(reason){
     		var message = masterDataSvc.serviceErrorMessageFormatter('Updating Buisness Object failed', reason);
@@ -97,7 +103,7 @@ angular.module('businessObjects')
 			$stateParams.message = {
 					text: message,
 					type: 'alert-danger'
-			};				
+			};
 			$state.go($state.current, $stateParams, {reload: false});
 		});	  
 	};
