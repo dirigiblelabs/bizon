@@ -34,6 +34,7 @@
 				"boh_name":"Business Object Name",
 				"boh_table":"Tbl",
 				"boh_description":"Description for business object",
+				"boh_table":"BO_Tbl"
 			};
 			
 		return res;
