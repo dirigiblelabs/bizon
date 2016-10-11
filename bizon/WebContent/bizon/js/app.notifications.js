@@ -1,11 +1,112 @@
 angular.module('businessObjects')
-.controller('NotificationsCtrl', ['$stateParams', function ($stateParams) {
-	this.message = $stateParams.message;	
-
-	var self = this;	
+.service('Notifications', [function(){
+	
+	return {		
+	
+		MSG_TYPE: Object.freeze({SUCCESS: 0, ERROR: 1}),
+		
+		getMessage: function(){
+			return this.message;
+		},
+		
+		createMessage: function(_text, _type){
+			this.message = {
+				text: _text,
+				type: _type
+			};			
+			return this.message;
+		},
+		
+		createMessageSuccess: function(text){
+			return this.createMessage(text, this.MSG_TYPE.SUCCESS);
+		},
+		
+		createMessageError: function(text){
+			return this.createMessage(text, this.MSG_TYPE.ERROR);
+		}
+		
+	};
+}])
+.controller('NotificationsCtrl', ['Notifications', function (Notifications) {
+	
+	this.message = Notifications.getMessage();
+	var self = this;
+	
 	this.hide = function(){
 		self.nodelay = true;
-		self.message = undefined;
+		self.message = Notifications.message = undefined;
 	};
 			
-}]);
+}])
+.directive('msgShow', ['$timeout', 'Notifications', function($timeout, Notifications) {
+        return {
+            restrict: 'A',
+            link: function($scope, $element, $attrs) {
+                
+            	var expr = $attrs.msgShow;                    
+                var duration = $attrs.msgShowDuration || 5000;                    
+                var slideDuration = $attrs.msgSlideDuration || 'slow';
+                
+                var self = this;
+				var timer;                    
+                var msg = $scope.$eval(expr);
+                
+                if ( ! msg ) {
+                    $element.hide();
+                } else {
+                	show.apply(self, [msg]);
+            	}
+
+                $scope.$watch(expr, function( newValue, oldValue ) {
+                        // Ignore first-run values since we've already defaulted the element state.
+                        if ( newValue === oldValue ) {
+                            return;
+                        }
+                        
+                        // Show element.
+                        if ( newValue ) {
+							show.apply(self, [newValue]);
+                        // Hide element.
+                        } else {
+                        	hide.apply(self);
+                        }
+                    }
+                );
+                
+                function show(){
+                	var typeClass = 'alert-danger';
+                	if(msg.type === Notifications.MSG_TYPE.SUCCESS)
+                		typeClass = 'alert-success';
+					$element.addClass(typeClass);
+                    var text = $scope.$eval($attrs.msgText) || '';
+                	$element.append('<span class="msg-text">'+text+'</span>');
+					$element.show();
+					hide.apply(self, [$scope]);
+            	}
+            	
+            	function hide(){
+            		if($scope.messagesVm.nodelay){
+            			hideElement.apply(self, [timer]);
+            			$scope.messagesVm.nodelay = false;
+        			}else{
+                    	timer = $timeout(duration)
+                    	.then(function(){
+                        	hideElement.apply(self,[timer]);
+						});            			
+    				}
+            	}
+            	
+            	function hideElement(timer){
+					$element.fadeTo(slideDuration, 0, function(){
+                        	$element.find('.msg-text').remove();
+							$element.parent().slideUp(slideDuration, function(){
+								if(timer)
+									$timeout.cancel(timer);
+							});
+					}) 	
+        		}
+
+            }
+        };
+    }
+]);

@@ -1,5 +1,5 @@
 angular.module('businessObjects')
-.controller('EditCtrl', ['masterDataSvc', 'modalService', 'selectedEntity', '$log', '$state', '$stateParams', function (masterDataSvc, modalService, selectedEntity, $log, $state, $stateParams) {
+.controller('EditCtrl', ['masterDataSvc', 'modalService', 'Notifications', 'selectedEntity', '$log', '$state', '$stateParams', function (masterDataSvc, modalService, Notifications, selectedEntity, $log, $state, $stateParams) {
 
 	this.selectedEntity = selectedEntity;
 	var self = this;
@@ -89,10 +89,8 @@ angular.module('businessObjects')
 
 	    masterDataSvc.update(this.selectedEntity)
 	    .then(function(){
-	    	$stateParams.message = {
-					text: 'Business object updated successfully',
-					type: 'alert-success'
-			};
+			$log.debug('Buisness Object updated successfully');
+			Notifications.createMessageSuccess('Buisness Object updated successfully.');					    
 			$stateParams.boId = self.selectedEntity.boh_id;
 			$stateParams.selectedEntity = self.selectedEntity;
 			$state.go('^', $stateParams, {reload: 'list', location:false, inherit: false});
@@ -100,10 +98,7 @@ angular.module('businessObjects')
     	.catch(function(reason){
     		var message = masterDataSvc.serviceErrorMessageFormatter('Updating Buisness Object failed', reason);
 			$log.error(message);
-			$stateParams.message = {
-					text: message,
-					type: 'alert-danger'
-			};
+			Notifications.createMessageError(message);    		
 			$state.go($state.current, $stateParams, {reload: false});
 		});	  
 	};

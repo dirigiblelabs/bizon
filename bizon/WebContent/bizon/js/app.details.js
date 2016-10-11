@@ -1,5 +1,5 @@
 angular.module('businessObjects')
-.controller('DetailsCtrl', ['masterDataSvc', 'modalService', 'selectedEntity', '$log', '$state', '$stateParams' , function (masterDataSvc, modalService, selectedEntity, $log, $state, $stateParams) {
+.controller('DetailsCtrl', ['masterDataSvc', 'modalService', 'Notifications', 'selectedEntity', '$log', '$state', '$stateParams' , function (masterDataSvc, modalService, Notifications, selectedEntity, $log, $state, $stateParams) {
 	
 	this.selectedEntity = selectedEntity;
 	var self = this;
@@ -38,11 +38,8 @@ angular.module('businessObjects')
 	
 	function handleServiceError(text, errorPayload){
 		var message = masterDataSvc.serviceErrorMessageFormatter(text, errorPayload);
-		$log.error(message);			
-		$stateParams.message = {
-				text: message,
-				type: 'alert-danger'
-		};	
+		$log.error(message);
+		Notifications.createMessageError(message);						
 	};
 	
 	this.startEdit = function() {
@@ -65,10 +62,8 @@ angular.module('businessObjects')
 			masterDataSvc.create(undefined, duplicateItem)
 				.then(function(newItem){
 					$stateParams.boId = newItem.boh_id;
-					$stateParams.message = {
-						text: 'Buisness Object successfully duplicated.',
-						type: 'alert-success'
-					};					
+					$log.debug('Buisness Object duplicated successfully');
+					Notifications.createMessageSuccess('Buisness Object duplicated successfully');
 					$state.go($state.current, $stateParams, {reload: true, location:true, inherit: true});
 				}, function(reason){
 					handleServiceError('Duplicating Buisness Object failed', reason);
@@ -90,10 +85,8 @@ angular.module('businessObjects')
 			masterDataSvc.remove(self.selectedEntity.boh_id, true)
 			.then(function(){
 				delete $stateParams.boId;			
-				$stateParams.message = {
-						text: 'Buisness Object successfully deleted.',
-						type: 'alert-success'
-					};
+				$log.debug('Buisness Object deleted successfully');
+				Notifications.createMessageSuccess('Buisness Object deleted successfully.');				
 			})
 			.catch(function(reason){
 				handleServiceError('Deleting Buisness Object failed', reason);

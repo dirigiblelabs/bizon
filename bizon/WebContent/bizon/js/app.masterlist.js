@@ -1,5 +1,5 @@
 angular.module('businessObjects')
-.controller('MasterListCtrl', ['masterDataSvc', 'modalService', '$log', '$q', '$state', '$stateParams', '$window', function (masterDataSvc, modalService, $log, $q, $state, $stateParams, $window) {
+.controller('MasterListCtrl', ['masterDataSvc', 'modalService', 'Notifications', '$log', '$q', '$state', '$stateParams', '$window', function (masterDataSvc, modalService, Notifications, $log, $q, $state, $stateParams, $window) {
 
 	this.items = masterDataSvc.getLoadedData();
 	this.selectedEntity = masterDataSvc.selection[0];
@@ -63,10 +63,7 @@ angular.module('businessObjects')
 	
 	function fireLocationError(){
 		$log.debug('The requested application path ' + $window.location.href + " is not valid.");
-		$stateParams.message = {
-			text: $window.location.href + ' is not valid application path. Check the URL and try again.',
-			type: 'alert-danger'
-		};
+		Notifications.createMessageError($window.location.href + ' is not valid application path. Check the URL and try again.');
 	}
 
 	this.selectItem = function(item){
@@ -84,10 +81,8 @@ angular.module('businessObjects')
 		.then(function(newItem){
 			$stateParams.boId = newItem.boh_id;
 			$stateParams.selectedEntity = newItem;
-			$stateParams.message = {
-				text: 'New Buisness Object successfully created.',
-				type: 'alert-success'
-			};
+			$log.debug('Business Object with id '+newItem.boh_id+' created successfully');
+			Notifications.createMessageSuccess('Business Object created successfully');
 			masterDataSvc.selection = [newItem];
 			initList.apply(self, [masterDataSvc.selection[0]]);
 			return;
@@ -118,10 +113,8 @@ angular.module('businessObjects')
 				delete $state.params.boId;
 				delete $stateParams.selectedEntity;
 				delete $state.params.selectedEntity;					
-				$stateParams.message = {
-						text: 'Buisness Object successfully deleted.',
-						type: 'alert-success'
-					};
+				$log.debug('Business object deleted');
+				Notifications.createMessageSuccess('Buisness Object successfully deleted.');
 
 			})
 			.catch(function(reason){
@@ -137,11 +130,8 @@ angular.module('businessObjects')
 	
 	function handleServiceError(text, errorPayload){
 		var message = masterDataSvc.serviceErrorMessageFormatter(text, errorPayload);
-		$log.error(message);			
-		$stateParams.message = {
-				text: message,
-				type: 'alert-danger'
-		};
+		$log.error('Deleting Buisness Object failed:' + message);
+		Notifications.createMessageError('Deleting Buisness Object failed.');
 	};
 	
 	this.next = function(){
@@ -149,7 +139,7 @@ angular.module('businessObjects')
 			masterDataSvc.querySettings = this.querySettings;
 			$q.when(masterDataSvc.next())
 			.catch(function(err){
-				console.error(err);
+				$log.error(err);
 				//..
 			})
 			.finally(function(){
