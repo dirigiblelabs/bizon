@@ -87,7 +87,7 @@ angular.module('businessObjects')
 
         modalService.showModal({}, modalOptions)
         .then(function () {
-			masterDataSvc.remove(self.selectedEntity.boh_id)
+			masterDataSvc.remove(self.selectedEntity.boh_id, true)
 			.then(function(){
 				delete $stateParams.boId;			
 				$stateParams.message = {

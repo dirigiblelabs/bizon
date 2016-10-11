@@ -112,7 +112,7 @@ angular.module('businessObjects')
         modalService.showModal({}, modalOptions)
         .then(function (result) {
 			self.busy = true;
-			masterDataSvc.remove(entity.boh_id)
+			masterDataSvc.remove(entity.boh_id, true)
 			.then(function(){
 				delete $stateParams.boId;
 				delete $state.params.boId;
