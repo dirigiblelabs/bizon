@@ -14,20 +14,11 @@ angular.module('businessObjects')
 							val: 'Boolean'
 						}];
 	
-	this.selectedTpeOption = {
-			id: '2',
-			val: 'String'
-		};
+	var self = this;
 	
 	this.typeSelectionChanged = function(){
-		this.item.type = this.selectedTypeOption.val;
-	}
-	
-	$scope.$on('$viewContentLoaded', function(event) {
-	      $timeout(function() {
-	    	//$("form [type='checkbox']").bootstrapSwitch();
-	      },0);
-	    });
+		this.item.boi_type = this.selectedTypeOption.val;
+	};
 	
 	function init(){
 		isNewProperty = $stateParams.item === undefined ? true : false;
@@ -37,14 +28,21 @@ angular.module('businessObjects')
 		} else {
 			this.item = $stateParams.item;
 		}
+		this.selectedTypeOption = {
+			id: this.typeOptions.find(function(el){
+					return el.val === self.item.boi_type;
+				}).id,
+			val: this.typeOptions.find(function(el){
+					return el.val === self.item.boi_type;
+				 }).val,
+		};		
 	}
     
    this.cancel = function() {
       $scope.$dismiss($stateParams.selectedEntity);
     };
 
-    this.ok = function() {
-      
+    this.ok = function() {    
       if(isNewProperty){
       	this.item.action = 'save';
       	selectedEntity.properties.push(this.item);
@@ -58,4 +56,4 @@ angular.module('businessObjects')
     
     init.apply(this);
     
-  }])
+}]);

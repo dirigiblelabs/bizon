@@ -23,20 +23,20 @@
 		  <div class="form-group">
 		    <label for="boi_type" class="col-sm-2 control-label" required="true">Type</label>
 		    <div class="col-sm-10 dropdown">
-			    <select name="boi_type" id="boi_type" class="form-control" ng-options="option.val for option in propsEditorVm.typeOptions track by option.id" ng-model="propsEditorVm.selectedTypeOption" ng-change="propsEditorVm.typeSelectionChanged()"></select>
+			    <select name="boi_type" id="boi_type" class="form-control" ng-options="option.val for option in propsEditorVm.typeOptions track by option.id" ng-model="propsEditorVm.selectedTypeOption" ng-change="propsEditorVm.typeSelectionChanged()" ></select>
 		    </div>
 		  </div>
 		  <div class="form-group">
-	  		<label for="boi_nullable" class="col-sm-2 control-label">Optional</label>
+	  		<label for="boi_null" class="col-sm-2 control-label">Optional</label>
 		    <div class="col-sm-10">
-		      	<input name="boi_nullable" id="boi_nullable" type="checkbox" class="checkbox form-control" data-on="Yes" data-off="Off" ng-model="propsEditorVm.item.boi_nullable"/>
+		      	<input name="boi_null" id="boi_null" type="checkbox" class="checkbox form-control" data-on-text="Yes" data-off-text="No" ng-model="propsEditorVm.item.boi_null" bootstrap-switch/>
 		    </div>
 		  </div>		  
 		  <div class="form-group">
 		  	<label for="boi_key" class="col-sm-2 control-label">Key</label>
 		    <div class="col-sm-10">
 		      <div class="checkbox">
-		          <input name="boi_key" id="boi_key" type="checkbox" class="form-control" ng-model="propsEditorVm.item.boi_pk"/>
+		          <input name="boi_key" id="boi_key" type="checkbox" class="form-control" data-on-text="Yes" data-off-text="No" ng-model="propsEditorVm.item.boi_pk" bootstrap-switch/>
 		      </div>
 		    </div>
 		  </div>
@@ -49,7 +49,3 @@
 	</div>
 	
 </div>
-
-<script>
-	$("form [type='checkbox']").bootstrapSwitch();
-</script>
