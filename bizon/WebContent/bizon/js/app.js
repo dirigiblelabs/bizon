@@ -121,6 +121,53 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		        modalInstance.result.then(goBack, goBack);
 		    }]
 		  })
+		.state("list.entity.edit.relations", {
+			url: "relation",
+		    params: {
+				selectedEntity: undefined,
+				item: undefined,
+				message: {value: undefined}
+		    },
+		    onEnter: ['$stateParams', '$state', '$uibModal', function($stateParams, $state, $modal) {
+		    	
+		    	function goBack(_selectedEntity) {
+		        	$state.go("list.entity.edit", {selectedEntity: _selectedEntity}, {location:false});
+		        }
+		    	
+		        var modalInstance = $modal.open({
+		        	animation: true,
+		            templateUrl: "views/relation-editor.html",
+		            resolve: {
+		            	selectedEntity: function() { 
+		            		return $stateParams.selectedEntity; 
+		            	}
+		            },
+		            controller: 'RelationEditorCtrl',
+		            controllerAs: 'relEditorVm'
+		        });
+		        modalInstance.rendered.then(function(){
+		        	var $validator = $('.modal-body form').validate({
+		        		errorClass: 'has-error',
+		        		validClass : 'has-success',
+ 		        		highlight: function (element, errorClass, validClass) {
+				            $(element).closest('.form-group').removeClass('has-success').addClass('has-error');
+				            if($validator.numberOfInvalids()>0)
+				            	$('.modal-footer .btn.btn-success').addClass('disabled');
+				        },
+				        unhighlight: function(element, errorClass, validClass) {
+				        	$(element).closest('.form-group').removeClass('has-error').addClass('has-success');
+				        	if($validator.numberOfInvalids()<1)
+					        	$('.modal-footer .btn.btn-success').removeClass('disabled');	
+				        },
+		 		        success: "has-success"
+		        	});
+		        	$('.form-control[required]').each(function(i){
+		        		$validator.element(this);
+		        	});
+		        });
+		        modalInstance.result.then(goBack, goBack);
+		    }]
+		  })		  
 		  .state("list.entity.build", {
 		  	url: 'build',
 		    params: {

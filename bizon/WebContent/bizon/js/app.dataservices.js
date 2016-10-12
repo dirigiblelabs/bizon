@@ -32,7 +32,6 @@
 		
 		res.newObjectTemplate = {
 				"boh_name":"Business Object Name",
-				"boh_table":"Tbl",
 				"boh_description":"Description for business object",
 				"boh_table":"BO_Tbl"
 			};
@@ -48,7 +47,7 @@
 					"boi_name":"Item",
 					"boi_column":"Item",
 					"boi_type": "String",
-					"boi_null": false,
+					"boi_null": true,
 				};
 		return res;
 	}])	
@@ -71,10 +70,10 @@
 				item.boi_column += i;
 				obj.properties.push(item);
 			}
-			obj.properties[0].boi_name = "id";
-			obj.properties[0].boi_column = "id";			
+			obj.properties[0].boi_name = "BO_ID";
+			obj.properties[0].boi_column = "BO_ID";			
 			obj.properties[0].boi_pk = true;
-			obj.properties[0].boi_null = true;			
+			obj.properties[0].boi_null = false;			
 			return obj;
 		}
 		

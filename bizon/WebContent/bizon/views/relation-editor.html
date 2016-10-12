@@ -1,0 +1,43 @@
+<style>
+	label[class="has-error"] {
+		color: #a94442;
+	}
+</style>
+
+
+<div modal="showModal" close="relEditorVm.cancel()" class="modal-box">
+
+	<div class="modal-header">
+	    <h4>Edit Relation</h4>
+	</div>
+	
+	<div class="modal-body">
+	
+		<form class="form-horizontal">
+		  <div class="form-group">
+		    <label for="boi_name" class="col-sm-2 control-label" required="true">Name</label>
+		    <div class="col-sm-10">
+		      <input name="boi_name" id="boi_name" class="form-control" placeholder="Type Property Name" ng-model="relEditorVm.item.boi_name" minlength="1" required="true">
+		    </div>
+		  </div>
+		  <div class="form-group">
+		    <label for="boi_type" class="col-sm-2 control-label" required="true">Target Object</label>
+		    <div class="col-sm-10 dropdown">
+			    <select name="boi_type" id="boi_type" class="form-control" ng-options="option.val for option in [{id:0, val: 'Entity A'}, {id:1, val: 'Entity B'}, {id:2, val: 'Entity C'}] track by option.id" ng-model="relEditorVm.selectedTypeOption" ng-change="relEditorVm.typeSelectionChanged()" ></select>
+		    </div>
+		  </div>
+		  <div class="form-group">
+	  		<label for="boi_null" class="col-sm-2 control-label">Collection</label>
+		    <div class="col-sm-10">
+		      	<input name="boi_null" id="boi_null" type="checkbox" class="checkbox form-control" data-on-text="Yes" data-off-text="No" ng-model="relEditorVm.item.boi_null" bootstrap-switch/>
+		    </div>
+		  </div>		  
+		</form>
+	</div>
+	
+	<div class="modal-footer">
+	  <button class="btn btn-success" ng-click="relEditorVm.ok()">OK</button>
+	  <button class="btn" ng-click="relEditorVm.cancel()">Cancel</button>
+	</div>
+	
+</div>

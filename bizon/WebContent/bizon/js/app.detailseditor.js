@@ -3,8 +3,10 @@ angular.module('businessObjects')
 
 	this.selectedEntity = selectedEntity;
 	var self = this;
+	var TABS = Object.freeze({PROP_TAB:0, REL_TAB:1});
 	
 	this.showProperties = function(){
+		this.tab = TABS.PROP_TAB;
 		if(this._propertyItems){
 			this.propertyItems = this._propertyItems.filter(function(v){
 				if(!v.boi_type || v.boi_type!=='Relationship'){
@@ -25,6 +27,7 @@ angular.module('businessObjects')
 	showDetails.apply(this, [this.selectedEntity]);
 	
 	this.showRelationships = function(){
+		this.tab = TABS.REL_TAB;	
 		if(this._propertyItems){
 			this.propertyItems = this._propertyItems.filter(function(v){
 				if(v.boi_type && v.boi_type==='Relationship'){
@@ -36,10 +39,17 @@ angular.module('businessObjects')
 	};
 	
 	this.openPropertyEditor = function(item){
-		$state.go('list.entity.edit.items', {
-			selectedEntity: this.selectedEntity,
-			item: item
-		}, {location: false});
+		if(this.tab === TABS.PROP_TAB){
+			$state.go('list.entity.edit.items', {
+				selectedEntity: this.selectedEntity,
+				item: item
+			}, {location: false});			
+		} else if(this.tab === TABS.REL_TAB){
+			$state.go('list.entity.edit.relations', {
+				selectedEntity: this.selectedEntity,
+				item: item
+			}, {location: false});
+		}
 	};
 	
 	this.deleteProperty = function(item){
