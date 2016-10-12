@@ -1,4 +1,34 @@
 angular.module('businessObjects')
+.provider('notificationsConfig', function() {
+	var config = {};
+
+	function setDuration(value){
+		config.duration = value;
+	}
+
+	function getDuration(){
+		return config.duration;
+	}
+	
+	function setSlideDuration(value){
+		config.slideDuration = value;
+	}
+	
+	function getSlideDuration(){
+		return config.slideDuration;
+	}
+
+	return {
+		setDuration: setDuration,
+		setSlideDuration: setSlideDuration,
+		$get: function(){
+			return {
+				getDuration: getDuration,
+				getSlideDuration: getSlideDuration
+			};
+		}
+	};
+})
 .service('Notifications', [function(){
 	
 	return {		
@@ -38,17 +68,20 @@ angular.module('businessObjects')
 	};
 			
 }])
-.directive('msgShow', ['$timeout', 'Notifications', function($timeout, Notifications) {
+.directive('msgShow', ['notificationsConfig', '$timeout', 'Notifications', function(notificationsConfig, $timeout, Notifications) {
         return {
             restrict: 'A',
             link: function($scope, $element, $attrs) {
+            
+            	var MSG_TYPE_CLASS = Object.freeze({SUCCESS: 'alert-success', ERROR: 'alert-danger'});
                 
             	var expr = $attrs.msgShow;                    
-                var duration = $attrs.msgShowDuration || 5000;                    
-                var slideDuration = $attrs.msgSlideDuration || 'slow';
+                var duration = $attrs.msgShowDuration || notificationsConfig.getDuration() || 5000;
+                var slideDuration = $attrs.msgSlideDuration || notificationsConfig.getSlideDuration() || 'slow';
                 
                 var self = this;
-				var timer;                    
+				var timer;
+				
                 var msg = $scope.$eval(expr);
                 
                 if ( ! msg ) {
@@ -58,25 +91,24 @@ angular.module('businessObjects')
             	}
 
                 $scope.$watch(expr, function( newValue, oldValue ) {
-                        // Ignore first-run values since we've already defaulted the element state.
-                        if ( newValue === oldValue ) {
-                            return;
-                        }
-                        
-                        // Show element.
-                        if ( newValue ) {
-							show.apply(self, [newValue]);
-                        // Hide element.
-                        } else {
-                        	hide.apply(self);
-                        }
+                    // Ignore first-run values since we've already defaulted the element state.
+                    if ( newValue === oldValue ) {
+                        return;
                     }
-                );
+                    
+                    // Show element.
+                    if ( newValue ) {
+						show.apply(self, [newValue]);
+                    // Hide element.
+                    } else {
+                    	hide.apply(self);
+                    }
+                });
                 
                 function show(){
-                	var typeClass = 'alert-danger';
+                	var typeClass = MSG_TYPE_CLASS.ERROR;
                 	if(msg.type === Notifications.MSG_TYPE.SUCCESS)
-                		typeClass = 'alert-success';
+                		typeClass = MSG_TYPE_CLASS.SUCCESS;
 					$element.addClass(typeClass);
                     var text = $scope.$eval($attrs.msgText) || '';
                 	$element.append('<span class="msg-text">'+text+'</span>');
@@ -98,12 +130,12 @@ angular.module('businessObjects')
             	
             	function hideElement(timer){
 					$element.fadeTo(slideDuration, 0, function(){
-                        	$element.find('.msg-text').remove();
-							$element.parent().slideUp(slideDuration, function(){
-								if(timer)
-									$timeout.cancel(timer);
-							});
-					}) 	
+	                	$element.find('.msg-text').remove();
+						$element.parent().slideUp(slideDuration, function(){
+							if(timer)
+								$timeout.cancel(timer);
+						});
+					});
         		}
 
             }
