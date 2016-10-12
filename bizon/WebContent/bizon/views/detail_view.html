@@ -56,11 +56,13 @@
 				<div class="items-list">
 					<div ng-hide="detailsVm.selectedEntity.properties[0]" class="nodata-text">No Items</div>
 					<div class="list-group">
-					  <a class="list-group-item selected-{{entry._selected_}}" ng-repeat="entry in detailsVm.selectedEntity.properties|filter:searchText|orderBy:'boi_name'">
-						<div class="list-group-item-heading">
-							<span>{{entry.boi_name}}</span><i style="color: #a94442; font-size:1.1rem; vertical-align: text-top;" class="fa fa-asterisk required" aria-hidden="true" ng-if="entry.boi_pk"></i><span style="color: gray" ng-if="entry.boi_null"> Optional </span>
+					  <a class="list-group-item" ng-repeat="entry in detailsVm.selectedEntity.properties|filter:searchText|orderBy:'boi_name'">
+						<div class="list-group-item-title">
+							<span ng-class="{emphasized: !entry.boi_null}">{{entry.boi_name}}</span><i class="fa fa-asterisk required" aria-hidden="true" ng-if="!entry.boi_null"></i>
+							<i class="fa fa-key" aria-hidden="true" ng-if="entry.boi_pk"></i>
+							<span class="optional" ng-if="entry.boi_null">(optional)</span>
 						</div>
-						<div class="list-group-item-text">{{entry.boi_description}}</div>
+						<div class="list-group-item-text">Data Type: <span style="color: gray; font-style: italic">{{entry.boi_type}}<span></div>
 					  </a>
 					</div>
 
