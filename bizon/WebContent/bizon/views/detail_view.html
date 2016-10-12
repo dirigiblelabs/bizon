@@ -38,8 +38,8 @@
 	<div class="list-content">	
 
 		<ul class="nav nav-tabs">
-		  <li role="presentation" class="active"><a ng-click="detailsVm.showProperties()" role="tab" data-toggle="tab">Properties</a></li>
-		  <li role="presentation"><a ng-click="detailsVm.showRelationships()" role="tab" data-toggle="tab">Relationships <i class="glyphicon glyphicon-link pull-right"></i></a></li>
+		  <li role="presentation" class="active"><a href ng-click="detailsVm.showProperties()" role="tab" data-toggle="tab">Properties</a></li>
+		  <li role="presentation"><a href ng-click="detailsVm.showRelationships()" role="tab" data-toggle="tab">Relationships <i class="glyphicon glyphicon-link pull-right"></i></a></li>
 		</ul>
 	
 		<div class="toolbar btn-group pull-right">
@@ -54,9 +54,9 @@
 			<div class="tab-pane fade in active">
 	
 				<div class="items-list">
-					<div ng-hide="detailsVm.selectedEntity.properties[0]" class="nodata-text">No Items</div>
+					<div ng-hide="detailsVm.propertyItems.length" class="nodata-text">No Items</div>
 					<div class="list-group">
-					  <a class="list-group-item" ng-repeat="entry in detailsVm.selectedEntity.properties|filter:searchText|orderBy:'boi_name'">
+					  <a class="list-group-item" ng-repeat="entry in detailsVm.propertyItems|filter:searchText|orderBy:'boi_name'">
 						<div class="list-group-item-title">
 							<span ng-class="{emphasized: !entry.boi_null}">{{entry.boi_name}}</span><i class="fa fa-asterisk required" aria-hidden="true" ng-if="!entry.boi_null"></i>
 							<i class="fa fa-key" aria-hidden="true" ng-if="entry.boi_pk"></i>
@@ -65,7 +65,6 @@
 						<div class="list-group-item-text">Data Type: <span style="color: gray; font-style: italic">{{entry.boi_type}}<span></div>
 					  </a>
 					</div>
-
 				</div>	
 			</div>	
 		</div>

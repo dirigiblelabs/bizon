@@ -4,10 +4,9 @@ angular.module('businessObjects')
 	this.selectedEntity = selectedEntity;
 	var self = this;
 	
-//FIXME!!!	
 	this.showProperties = function(){
-		if(this._selectedItemDetails){
-			this.selectedItemDetails = this._selectedItemDetails.filter(function(v, i, arr){
+		if(this._propertyItems){
+			this.propertyItems = this._propertyItems.filter(function(v){
 				if(!v.boi_type || v.boi_type!=='Relationship'){
 					return true;
 				}
@@ -18,7 +17,7 @@ angular.module('businessObjects')
 	
 	function showDetails(item){
 		if(item){
-			this._selectedItemDetails = item.properties;
+			this._propertyItems = item.properties;
 			this.showProperties.apply(this);//Initial content to show	
 		}
 	}
@@ -26,8 +25,8 @@ angular.module('businessObjects')
 	showDetails.apply(this, [this.selectedEntity]);
 	
 	this.showRelationships = function(){
-		if(this._selectedItemDetails){
-			this.selectedItemDetails = this._selectedItemDetails.filter(function(v, i, arr){
+		if(this._propertyItems){
+			this.propertyItems = this._propertyItems.filter(function(v){
 				if(v.boi_type && v.boi_type==='Relationship'){
 					return true;
 				}
@@ -40,7 +39,7 @@ angular.module('businessObjects')
 		var message = masterDataSvc.serviceErrorMessageFormatter(text, errorPayload);
 		$log.error(message);
 		Notifications.createMessageError(message);						
-	};
+	}
 	
 	this.startEdit = function() {
 	    $stateParams.entityForEdit = angular.copy(this.selectedEntity);		    
@@ -98,4 +97,4 @@ angular.module('businessObjects')
     	});
 	};
 	
-}])
+}]);
