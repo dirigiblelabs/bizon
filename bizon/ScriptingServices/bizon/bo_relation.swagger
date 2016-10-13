@@ -1,0 +1,204 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "0.0.0",
+        "title": "Bo_relation Entity Service",
+        "description":"This is a RESTful web service for listing, viewing and managing entities of the type 'Bo_relation'"
+    },
+    "basePath":"/services",
+    "tags":[
+      {
+         "name":"Bo_relation",
+         "description":"View and manage Bo_relation objects"
+      }
+    ],
+    "paths": {
+        "/js/bizon/bo_relation.js": {
+            "get": {
+            	"tags":[
+               		"Bo_relation"
+            	],
+                "description": "Gets 'Bo_relation' objects.\n",
+                "parameters": [
+                    {
+                        "name": "count",
+                        "in": "query",
+                        "description": "Count of all the records",
+                        "required": false,
+                        "type": "boolean"
+                    },
+                    {
+                        "name": "bor_id",
+                        "in": "query",
+                        "description": "Identifier of the 'Bo_relation' object",
+                        "required": false,
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "name": "metadata",
+                        "in": "query",
+                        "description": "Metadata of the 'Bo_relation' object",
+                        "required": false,
+                        "type": "boolean"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Limit of the objects list",
+                        "required": false,
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "name": "offset",
+                        "in": "query",
+                        "description": "Offset of the objects list",
+                        "required": false,
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort parameter",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "desc",
+                        "in": "query",
+                        "description": "Descending order",
+                        "required": false,
+                        "type": "boolean"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema":{
+		                     "$ref":"#/definitions/Bo_relation"
+                        }
+                    }
+                }
+            },
+            "post": {
+            	"tags":[
+               		"Bo_relation"
+            	],
+                "description": "Creates a new 'Bo_relation' object.\n",
+                "consumes":[
+	               "application/json"
+	            ],
+	            "produces":[
+	               "plain/text"
+	            ],
+	            "parameters":[
+	               {
+	                  "in":"body",
+	                  "name":"body",
+	                  "description":"Bo_relation object that needs to be added",
+	                  "required":true,
+	                  "schema":{
+	                     "$ref":"#/definitions/Bo_relation"
+	                  }
+	               }
+	            ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema":{
+		                     "$ref":"#/definitions/Bo_relation"
+                        }
+                    }
+                }
+            },
+            "put": {
+            	"tags":[
+               		"Bo_relation"
+            	],
+                "description": "Updates an existing 'Bo_relation' object.\n",
+                "consumes":[
+	               "application/json"
+	            ],
+	            "produces":[
+	               "plain/text"
+	            ],
+	            "parameters":[
+	               {
+	                  "in":"body",
+	                  "name":"body",
+	                  "description":"Bo_relation object that needs to be added",
+	                  "required":true,
+	                  "schema":{
+	                     "$ref":"#/definitions/Bo_relation"
+	                  }
+	               }
+	            ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema":{
+		                     "$ref":"#/definitions/Bo_relation"
+                        }
+                    }
+                }
+            },
+            "delete": {
+            	"tags":[
+               		"Bo_relation"
+            	],
+                "description": "Deletes 'Bo_relation' objects.\n",
+                "parameters": [
+                    {
+                        "name": "bor_id",
+                        "in": "query",
+                        "description": "Identifier of the 'Bo_relation' object",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema":{
+		                     "$ref":"#/definitions/Bo_relation"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions":{
+        "Bo_relation": {
+	        "type":"object",
+	        "properties": {
+        		"bor_id": {
+	            	"type": 
+        "string"
+	    		}
+				,
+        		"bor_src_boh_id": {
+	            	"type": 
+        "string"
+	    		}
+				,
+        		"bor_src_type": {
+	            	"type": 
+        "integer"
+	    		}
+				,
+        		"bot_target_id": {
+	            	"type": 
+        "string"
+	    		}
+				,
+        		"bot_target_type": {
+	            	"type": 
+        "integer"
+	    		}
+	        }
+        }
+	}
+}

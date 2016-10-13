@@ -88,7 +88,7 @@
 					  <a class="list-group-item selected-{{entry._selected_}}" ng-repeat="entry in detailsEditorVm.propertyItems|filter:searchText|orderBy:'boi_name'">
 						<div style="display:inline-block">
 							<div class="list-group-item-heading">
-								<span ng-class="{emphasized: !entry.boi_null}">{{entry.boi_name}}</span><i class="fa fa-asterisk required" aria-hidden="true" ng-if="!entry.boi_null"></i>
+								<span ng-class="{emphasized: !entry.boi_null}">{{entry.boi_name||entry.name}}</span><i class="fa fa-asterisk required" aria-hidden="true" ng-if="!entry.boi_null"></i>
 								<i class="fa fa-key" aria-hidden="true" ng-if="entry.boi_pk"></i>
 								<span class="optional" ng-if="entry.boi_null">(optional)</span>
 							</div>

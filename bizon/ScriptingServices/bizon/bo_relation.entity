@@ -1,0 +1,15 @@
+{
+  "entityName":"Bo_relation",
+  "tableName":"BO_RELATION",
+  "tableType":"TABLE",
+  "serviceName":"bo_relation.js",
+  "libraryName":"bo_relation_lib.js",
+  "specification":"bo_relation.swagger",
+  "getEnabled":"true",
+  "postEnabled":"true",
+  "putEnabled":"true",
+  "deleteEnabled":"true",
+  "countEnabled":"true",
+  "offsetAndLimitEnabled":"true",
+  "metadataEnabled":"true"
+}

@@ -1,7 +1,7 @@
 /* globals $ */
 /* eslint-env node, dirigible */
 
-var entityBo_items = require('bo_modeller/bo_item_lib');
+var entityBo_items = require('bizon/bo_item_lib');
 var request = require("net/http/request");
 var response = require("net/http/response");
 var xss = require("utils/xss");

@@ -28,7 +28,7 @@
 	.service('Entity', ['$resource', 'ResourceSvcConfiguration', function($resource, ResourceSvcConfiguration) {
 		var cfg = angular.copy(ResourceSvcConfiguration.cfg);
 		cfg.count = {method:'GET', params:{count:true}, isArray:false};
-	  	var res = $resource('../../js/bo_modeller/bo_header.js/:boId', { boId:'@id' }, cfg);
+	  	var res = $resource('../../js/bizon/bo_header.js/:boId', { boId:'@id' }, cfg);
 		
 		res.newObjectTemplate = {
 				"boh_name":"Business Object Name",
@@ -40,7 +40,7 @@
 	}])
 	.service('Item', ['$resource', 'ResourceSvcConfiguration', function($resource, ResourceSvcConfiguration) {
 	
-	  	var res = $resource('../../js/bo_modeller/bo_item.js/:boId', { boId:'@id' }, ResourceSvcConfiguration.cfg);
+	  	var res = $resource('../../js/bizon/bo_item.js/:boId', { boId:'@id' }, ResourceSvcConfiguration.cfg);
 		
 		
 		res.newObjectTemplate = {
@@ -52,13 +52,16 @@
 		return res;
 	}])	
 	.service('BuildService', ['$resource', function($resource) {
-	  	return $resource('../../js/bo_modeller/bo_build_svc.js', {}, {
+	  	return $resource('../../js/bizon/bo_build_svc.js', {}, {
 	  		build: {
 	  			method: 'POST',
 	  			isArray: false
   			}
 	  	});
 	}])	
+	.service('RelationsService', ['$resource', 'ResourceSvcConfiguration', function($resource, ResourceSvcConfiguration) {
+	  	return $resource('../../js/bizon/bo_relation.js', ResourceSvcConfiguration.cfg);
+	}])		
 	.service('masterDataSvc', ['Entity', 'Item',  '$q', function(Entity, Item, $q) {
 	
 		function createMasterDataTemplateObject(){
@@ -146,12 +149,22 @@
 					if(response.status===404){
 						return;
 					} else {
-						throw repsonse.data.err;
+						throw response.data.err;
 					}
 				});
 			}
 			return;
 		};
+		
+		/* 
+			Looks up an object with the given id in the currently loaded data, and if instructed by the reloadDataOnDemand parameter, 
+			will lookup remotely the data service and reload the list to feature this item too.
+			Note: With progessive loading and pagination patterns it is possible that an item exists but has not been loaded from remote service yet.
+				  The second parameter addresses precisely these situations.	
+		*/
+		this.findByName = function(name){
+			return Entity.query({name:name}).$promise;
+		};		
 
 		this._itemsCount;
 

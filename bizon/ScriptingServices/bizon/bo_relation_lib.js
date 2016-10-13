@@ -1,8 +1,9 @@
 /* globals $ */
 /* eslint-env node, dirigible */
 
+
 var database = require("db/database");
-var boItemLib = require("bizon/bo_item_lib");
+var boHeaderLib = require("bizon/bo_relation_lib");
 
 /* required for the exports.http module only */
 var request = require("net/http/request");
@@ -10,21 +11,19 @@ var response = require("net/http/response");
 
 var datasource = database.getDatasource();
 
-var itemsEntitySetName = "properties";
-
 // Parse JSON entity into SQL and insert in db. Returns the new record id.
 exports.insert = function(entity, cascaded) {
 
-	console.log('Inserting BO_HEADER entity cascaded['+cascaded+'] :' + entity);
+	console.log('Inserting BO_RELATION entity cascaded['+cascaded+'] :' + entity);
 
 	if(entity === undefined || entity === null){
 		throw new Error('Illegal argument: entity is ' + entity);
 	}
 
-	if(entity.boh_name === undefined || entity.boh_name === null){
+/*	if(entity.boh_name === undefined || entity.boh_name === null){
 		throw new Error('Illegal boh_name attribute: ' + entity.boh_name);
 	}
-
+*/
 	if(cascaded === undefined || cascaded === null){
 		cascaded = false;
 	}
@@ -33,14 +32,16 @@ exports.insert = function(entity, cascaded) {
 
     var connection = datasource.getConnection();
     try {
-        var sql = "INSERT INTO BO_HEADER (";
-        sql += "BOH_ID";
+        var sql = "INSERT INTO BO_RELATION (";
+        sql += "BOR_ID";
         sql += ",";
-        sql += "BOH_NAME";
+        sql += "BOR_SRC_BOH_ID";
         sql += ",";
-        sql += "BOH_TABLE";
+        sql += "BOR_SRC_TYPE";
         sql += ",";
-        sql += "BOH_DESCRIPTION";
+        sql += "BOT_TARGET_ID";
+        sql += ",";
+        sql += "BOT_TARGET_TYPE";
         sql += ") VALUES ("; 
         sql += "?";
         sql += ",";
@@ -49,21 +50,24 @@ exports.insert = function(entity, cascaded) {
         sql += "?";
         sql += ",";
         sql += "?";
+        sql += ",";
+        sql += "?";
         sql += ")";
-
+        
         var statement = connection.prepareStatement(sql);
         
         var i = 0;
-        entity.boh_id = datasource.getSequence('BO_HEADER_BOH_ID').next();
+        entity.boh_id = datasource.getSequence('BO_RELATION_BOR_ID').next();
          
-        statement.setInt(++i,  entity.boh_id);
-        statement.setString(++i, entity.boh_name);
-        statement.setString(++i, entity.boh_table);
-        statement.setString(++i, entity.boh_description);
+        statement.setInt(++i, entity.bor_id);
+        statement.setString(++i, entity.bor_src_boh_id);
+        statement.setShort(++i, entity.bor_src_type);
+        statement.setString(++i, entity.bor_target_id);
+        statement.setShort(++i, entity.bor_target_type);
         
         statement.executeUpdate();
 
-		if(cascaded){
+/*		if(cascaded){
 			if(entity[itemsEntitySetName] && entity[itemsEntitySetName].length > 0){
 	        	for(var j=0; j<entity[itemsEntitySetName].length; j++){
 	        		var item = entity[itemsEntitySetName][j];
@@ -72,8 +76,8 @@ exports.insert = function(entity, cascaded) {
 	    		}
 	    	}
 		}
-
-        console.log('BO_HEADER entity inserted with boh_id[' +  entity.boh_id + ']');
+*/
+        console.log('BO_RELATON entity inserted with bor_id[' +  entity.bor_id + ']');
 
         return entity.boh_id;
 
@@ -88,12 +92,12 @@ exports.insert = function(entity, cascaded) {
 // Reads a single entity by id, parsed into JSON object 
 exports.find = function(id) {
 
-	console.log('Finding BO_HEADER entity with id ' + id);
+	console.log('Finding BO_RELATION entity with id ' + id);
 
     var connection = datasource.getConnection();
     try {
         var entity;
-        var sql = "SELECT * FROM BO_HEADER WHERE " + exports.pkToSQL();
+        var sql = "SELECT * FROM BO_RELATION WHERE " + exports.pkToSQL();
         var statement = connection.prepareStatement(sql);
         statement.setInt(1, id);
         
@@ -101,7 +105,7 @@ exports.find = function(id) {
         if (resultSet.next()) {
             entity = createEntity(resultSet);
 			if(entity)
-            	console.log('BO_HEADER entity with id[' + id + '] found');
+            	console.log('BO_RELATION entity with id[' + id + '] found');
         } 
         return entity;
     } catch(e) {
@@ -113,9 +117,9 @@ exports.find = function(id) {
 };
 
 // Read all entities, parse and return them as an array of JSON objets
-exports.list = function(limit, offset, sort, order, expanded, entityName) {
+exports.list = function(limit, offset, sort, order, expanded) {
 
-	console.log('Listing BO_HEADER entity collection expanded['+expanded+'] with list operators: limit['+limit+'], offset['+offset+'], sort['+sort+'], order['+order+'], entityName['+entityName+']');
+	console.log('Listing BO_RELATION entity collection expanded['+expanded+'] with list operators: limit['+limit+'], offset['+offset+'], sort['+sort+'], order['+order+']');
 
     var connection = datasource.getConnection();
     try {
@@ -124,10 +128,7 @@ exports.list = function(limit, offset, sort, order, expanded, entityName) {
         if (limit !== null && offset !== null) {
             sql += " " + datasource.getPaging().genTopAndStart(limit, offset);
         }
-        sql += " * FROM BO_HEADER";
-        if (entityName !== null) {
-        	sql += " WHERE BOH_NAME LIKE '" + entityName + "%%'";
-    	}
+        sql += " * FROM BO_RELATION";
         if (sort !== null) {
             sql += " ORDER BY " + sort;
         }
@@ -137,21 +138,20 @@ exports.list = function(limit, offset, sort, order, expanded, entityName) {
         if (limit !== null && offset !== null) {
             sql += " " + datasource.getPaging().genLimitAndOffset(limit, offset);
         }
-
         var statement = connection.prepareStatement(sql);
         var resultSet = statement.executeQuery();
         while (resultSet.next()) {
         	var entity = createEntity(resultSet);
-        	if(expanded !== null && expanded!==undefined){
+/*        	if(expanded !== null && expanded!==undefined){
 			   var dependentEntities = boItemLib.list(entity.boh_id, null, null, null, null);
 			   if(dependentEntities) {
 			   	 entity[itemsEntitySetName] = dependentEntities;
 		   	   }
 			}
-            entities.push(entity);
+*/            entities.push(entity);
         }
         
-        console.log('' + entities.length +' BO_HEADER entities found');
+        console.log('' + entities.length +' BO_RELATION entities found');
         
         return entities;
     }  catch(e) {
@@ -165,12 +165,11 @@ exports.list = function(limit, offset, sort, order, expanded, entityName) {
 //create entity as JSON object from ResultSet current Row
 function createEntity(resultSet) {
     var entity = {};
-	entity.boh_id = resultSet.getInt("BOH_ID");
-    entity.boh_name = resultSet.getString("BOH_NAME");
-    entity.boh_table = resultSet.getString("BOH_TABLE");	
-	entity.boh_description = resultSet.getString("BOH_DESCRIPTION");
-	if(entity.boh_description === null)
-		delete entity.boh_description;
+	entity.bor_id = resultSet.getInt("BOR_ID");
+    entity.bor_src_id = resultSet.getString("BOR_SRC_ID");
+    entity.bor_src_type = resultSet.getShort("BOR_SRC_TYPE");    
+    entity.bor_target_id = resultSet.getString("BOR_TARGET_ID");
+    entity.bor_target_type = resultSet.getShort("BOR_TARGET_TYPE"); 
     console.log("Transformation from DB JSON object finished: " + entity);    
     return entity;
 }
@@ -196,40 +195,43 @@ function convertToDateString(date) {
 // update entity from a JSON object. Returns the id of the updated entity.
 exports.update = function(entity) {
 
-	console.log('Updating BO_HEADER entity ' + entity);
+	console.log('Updating BO_RELATION entity ' + entity);
 
 	if(entity === undefined || entity === null){
 		throw new Error('Illegal argument: entity is ' + entity);
 	}
 	
-	if(entity.boh_id === undefined || entity.boh_id === null){
-		throw new Error('Illegal boh_id attribute: ' + entity.boh_id);
+	if(entity.bor_id === undefined || entity.bor_id === null){
+		throw new Error('Illegal bor_id attribute: ' + entity.boh_id);
 	}
 
-	if(entity.boh_name === undefined || entity.boh_name === null){
+/*	if(entity.boh_name === undefined || entity.boh_name === null){
 		throw new Error('Illegal boh_name attribute: ' + entity.boh_name);
 	}
-
+*/
     var connection = datasource.getConnection();
     try {
     
-        var sql = "UPDATE BO_HEADER SET ";
-        sql += "BOH_NAME = ?";
+        var sql = "UPDATE BO_RELATION SET ";
+        sql += "BOR_SRC_BOH_ID = ?";
         sql += ",";
-        sql += "BOH_TABLE = ?";
+        sql += "BOR_SRC_TYPE = ?";
         sql += ",";
-        sql += "BOH_DESCRIPTION = ?";
-        sql += " WHERE BOH_ID = ?";
+        sql += "BOR_TARGET_ID = ?";
+        sql += ",";
+        sql += "BOR_TARGET_TYPE = ?";
+        sql += " WHERE BOR_ID = ?";
         var statement = connection.prepareStatement(sql);
         var i = 0;
-        statement.setString(++i, entity.boh_name);
-        statement.setString(++i, entity.boh_table);
-        statement.setString(++i, entity.boh_description);
-        var id = entity.boh_id;
+        statement.setString(++i, entity.bor_src_boh_id);
+        statement.setShort(++i, entity.bor_src_type);
+        statement.setString(++i, entity.bor_target_id);
+        statement.setShort(++i, entity.bor_target_type);
+        var id = entity.bor_id;
         statement.setInt(++i, id);
         statement.executeUpdate();
             
-        console.log('BO_HEADER entity with boh_id[' + id + '] updated');
+        console.log('BO_RELATION entity with bor_id[' + id + '] updated');
         
         return this;
         
@@ -244,23 +246,23 @@ exports.update = function(entity) {
 // delete entity by id. Returns the id of the deleted entity.
 exports.remove = function(id, cascaded) {
 
-	console.log('Deleting BO_HEADER entity with id[' + id + '], cascaded['+cascaded+']');
+	console.log('Deleting BO_RELATION entity with id[' + id + '], cascaded['+cascaded+']');
 
     var connection = datasource.getConnection();
     try {
-    	var sql = "DELETE FROM BO_HEADER WHERE " + exports.pkToSQL();
+    	var sql = "DELETE FROM BO_RELATION WHERE " + exports.pkToSQL();
         var statement = connection.prepareStatement(sql);
         statement.setString(1, id);
         statement.executeUpdate();
         
-		if(cascaded && id){
-			var persistedItems = boItemLib.list(id);
+/*		if(cascaded && id){
+			var persistedItems = boHeaderLib.list(id);
 			for(var i = 0; i < persistedItems.length; i++) {
-        		boItemLib.remove(persistedItems[i].boi_id);
+        		boHeaderLib.remove(persistedItems[i].boi_id);
 			}
-		}        
+		}        */
         
-        console.log('BO_HEADER entity with boh_id[' + id + '] deleted');                
+        console.log('BO_RELATION entity with bor_id[' + id + '] deleted');                
         
         return this;
 
@@ -274,12 +276,12 @@ exports.remove = function(id, cascaded) {
 
 exports.count = function() {
 
-	console.log('Counting BO_HEADER entities');
+	console.log('Counting BO_RELATION entities');
 
     var count = 0;
     var connection = datasource.getConnection();
     try {
-    	var sql = 'SELECT COUNT(*) FROM BO_HEADER';
+    	var sql = 'SELECT COUNT(*) FROM BO_RELATION';
         var statement = connection.prepareStatement(sql);
         var rs = statement.executeQuery();
         if (rs.next()) {
@@ -292,54 +294,57 @@ exports.count = function() {
         connection.close();
     }
     
-    console.log('' + count + ' BO_HEADER entities counted');
+    console.log('' + count + ' BO_RELATION entities counted');
 
     return count;
 };
 
 exports.metadata = function() {
-
-	console.log('Exporting metadata for BO_HEADER type');
-
 	var entityMetadata = {
-		name: 'bo_header',
+		name: 'bo_relation',
 		type: 'object',
 		properties: []
 	};
 	
-	var propertyboh_id = {
-		name: 'boh_id',
-		type: 'integer',
+	var propertybor_id = {
+		name: 'bor_id',
+    	type: 'string',
 		key: 'true',
 		required: 'true'
 	};
-    entityMetadata.properties.push(propertyboh_id);
+    entityMetadata.properties.push(propertybor_id);
 
-	var propertyboh_name = {
-		name: 'boh_name',
+	var propertybor_src_boh_id = {
+		name: 'bor_src_boh_id',
 		type: 'string'
 	};
-    entityMetadata.properties.push(propertyboh_name);
+    entityMetadata.properties.push(propertybor_src_boh_id);
 
-	var propertyboh_table = {
-		name: 'boh_table',
+	var propertybor_src_type = {
+		name: 'bor_src_type',
+		type: 'smallint'
+	};
+    entityMetadata.properties.push(propertybor_src_type);
+
+	var propertybot_target_id = {
+		name: 'bor_target_id',
 		type: 'string'
 	};
-    entityMetadata.properties.push(propertyboh_table);
+    entityMetadata.properties.push(propertybot_target_id);
 
-	var propertyboh_description = {
-		name: 'boh_description',
-		type: 'string'
+	var propertybot_target_type = {
+		name: 'bor_target_type',
+		type: 'smallint'
 	};
-    entityMetadata.properties.push(propertyboh_description);
+    entityMetadata.properties.push(propertybot_target_type);
 
-	return JSON.stringify(entityMetadata);
+	response.println(JSON.stringify(entityMetadata));
 };
 
 exports.getPrimaryKeys = function() {
     var result = [];
     var i = 0;
-    result[i++] = 'BOH_ID';
+    result[i++] = 'BOR_ID';
     if (result === 0) {
         throw new Error("There is no primary key");
     } else if(result.length > 1) {
@@ -357,11 +362,10 @@ exports.pkToSQL = function() {
     return pks[0] + " = ?";
 };
 
-
 exports.http = {
 
-	idPropertyName: 'boh_id',
-	validSortPropertyNames: ['boh_id','boh_name','boh_table','boh_description'],
+	idPropertyName: 'bor_id',
+	validSortPropertyNames: [],
 
 	dispatch: function(urlParameters){
 		var method = request.getMethod().toUpperCase();
@@ -382,7 +386,7 @@ exports.http = {
 				} else if(urlParameters.count){
 					this.count();
 				} else if(urlParameters.list){
-					this.query(urlParameters.list.limit, urlParameters.list.offset, urlParameters.list.sort, urlParameters.list.order, urlParameters.expanded, urlParameters.queryByName);
+					this.query(urlParameters.list.limit, urlParameters.list.offset, urlParameters.list.sort, urlParameters.list.order, urlParameters.expanded);
 				}
 			} else {
 				this.query();
@@ -451,7 +455,7 @@ exports.http = {
 		}		
 	},
 	
-	query: function(limit, offset, sort, order, expanded, entityName){
+	query: function(limit, offset, sort, order, expanded){
 		if (offset === undefined || offset === null) {
 			offset = 0;
 		} else if(isNaN(parseInt(offset)) || offset<0) {
@@ -483,7 +487,7 @@ exports.http = {
 			}
 		}
 	    try{
-			var items = exports.list(limit, offset, sort, order, expanded, entityName);
+			var items = exports.list(limit, offset, sort, order, expanded);
 	        var jsonResponse = JSON.stringify(items, null, 2);
 	    	response.println(jsonResponse);      	
 		} catch(e) {

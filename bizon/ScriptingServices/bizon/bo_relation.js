@@ -1,7 +1,7 @@
 /* globals $ */
 /* eslint-env node, dirigible */
 
-var entityBo_header = require('bizon/bo_header_lib');
+var entityBo_relation = require('bizon/bo_relation_lib');
 var request = require("net/http/request");
 var response = require("net/http/response");
 var xss = require("utils/xss");
@@ -14,7 +14,7 @@ function handleRequest() {
 	response.setCharacterEncoding("UTF-8");
 	
 	//get primary keys (one primary key is supported!)
-	var idParameter = entityBo_header.getPrimaryKey();
+	var idParameter = entityBo_relation.getPrimaryKey();
 	
 	// retrieve the id as parameter if exist 
 	var id = xss.escapeSql(request.getParameter(idParameter)) || request.getAttribute("path");
@@ -22,7 +22,6 @@ function handleRequest() {
 	var metadata = xss.escapeSql(request.getParameter('metadata'));
 	var expanded = xss.escapeSql(request.getParameter('expanded'));
 	var cascaded = xss.escapeSql(request.getParameter('cascaded'));	
-	var queryByName = xss.escapeSql(request.getParameter('name'));
 
 	if(checkConflictingParameters(id, count, metadata)){
 		var limit = xss.escapeSql(request.getParameter('limit'));
@@ -48,11 +47,10 @@ function handleRequest() {
 				"order": order			
 			},
 			"expanded": (expanded!==null),
-			"cascaded": (cascaded!==null),
-			"queryByName": queryByName
+			"cascaded": (cascaded!==null)
 		};
 		
-		entityBo_header.http.dispatch(urlParameters);	
+		entityBo_relation.http.dispatch(urlParameters);	
 	}
 	
 	// flush and close the response
@@ -62,11 +60,11 @@ function handleRequest() {
 
 function checkConflictingParameters(id, count, metadata) {
     if(id !== null && count !== null ){
-    	entityBo_header.http.printError(response.EXPECTATION_FAILED, 1, "Expectation failed: conflicting parameters - id, count");
+    	entityBo_relation.http.printError(response.EXPECTATION_FAILED, 1, "Expectation failed: conflicting parameters - id, count");
         return false;
     }
     if(id !== null && metadata !== null){
-    	entityBo_header.http.printError(response.EXPECTATION_FAILED, 2, "Expectation failed: conflicting parameters - id, metadata");
+    	entityBo_relation.http.printError(response.EXPECTATION_FAILED, 2, "Expectation failed: conflicting parameters - id, metadata");
         return false;
     }
     return true;

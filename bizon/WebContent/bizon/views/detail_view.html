@@ -58,7 +58,7 @@
 					<div class="list-group">
 					  <a class="list-group-item" ng-repeat="entry in detailsVm.propertyItems|filter:searchText|orderBy:'boi_name'">
 						<div class="list-group-item-title">
-							<span ng-class="{emphasized: !entry.boi_null}">{{entry.boi_name}}</span><i class="fa fa-asterisk required" aria-hidden="true" ng-if="!entry.boi_null"></i>
+							<span ng-class="{emphasized: !entry.boi_null}">{{entry.boi_name||entry.name}}</span><i class="fa fa-asterisk required" aria-hidden="true" ng-if="!entry.boi_null"></i>
 							<i class="fa fa-key" aria-hidden="true" ng-if="entry.boi_pk"></i>
 							<span class="optional" ng-if="entry.boi_null">(optional)</span>
 						</div>
