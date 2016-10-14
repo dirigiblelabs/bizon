@@ -47,20 +47,24 @@
 				<thead>
 					<tr>
 						<th>BOR_ID</th>
-						<th>BOR_SRC_BOH_ID</th>
+						<th>BOR_SRC_ID</th>
 						<th>BOR_SRC_TYPE</th>
-						<th>BOT_TARGET_ID</th>
-						<th>BOT_TARGET_TYPE</th>
+						<th>BOR_TARGET_ID</th>
+						<th>BOR_TARGET_TYPE</th>
+						<th>BOR_NAME</th>
+						<th>BOR_TYPE</th>						
 					</tr>
 				</thead>
 				<tbody>
 					<tr class="selected-{{entry._selected_}}" ng-repeat="entry in data"
 						ng-click="showInfoForEntry(entry)">
 						<td>{{entry.bor_id}}</td>
-						<td>{{entry.bor_src_boh_id}}</td>
+						<td>{{entry.bor_src_id}}</td>
 						<td>{{entry.bor_src_type}}</td>
-						<td>{{entry.bot_target_id}}</td>
-						<td>{{entry.bot_target_type}}</td>
+						<td>{{entry.bor_target_id}}</td>
+						<td>{{entry.bor_target_type}}</td>
+						<td>{{entry.bor_name}}</td>						
+						<td>{{entry.bor_type}}</td>												
 					</tr>
 				</tbody>
 			</table>
@@ -91,9 +95,9 @@
 					<input type="text" class="form-control" 
 						ng-model="selectedEntry.bor_id" readonly> <br>
 					<br>
-					<label>BOR_SRC_BOH_ID</label>
+					<label>BOR_SRC_ID</label>
 					<input type="text" class="form-control" 
-						ng-model="selectedEntry.bor_src_boh_id"
+						ng-model="selectedEntry.bor_src_id"
 						ng-readonly="operation == 'show'" required="required">
 					<br>
 					<label>BOR_SRC_TYPE</label>
@@ -101,16 +105,27 @@
 						ng-model="selectedEntry.bor_src_type"
 						ng-readonly="operation == 'show'" required="required">
 					<br>
-					<label>BOT_TARGET_ID</label>
+					<label>BOR_TARGET_ID</label>
 					<input type="text" class="form-control" 
-						ng-model="selectedEntry.bot_target_id"
+						ng-model="selectedEntry.bor_target_id"
 						ng-readonly="operation == 'show'" required="required">
 					<br>
-					<label>BOT_TARGET_TYPE</label>
+					<label>BOR_TARGET_TYPE</label>
 					<input type="text" class="form-control" 
-						ng-model="selectedEntry.bot_target_type"
+						ng-model="selectedEntry.bor_target_type"
 						ng-readonly="operation == 'show'" required="required">
 					<br>
+					<label>BOR_NAME</label>
+					<input type="text" class="form-control" 
+						ng-model="selectedEntry.bor_name"
+						ng-readonly="operation == 'show'" required="required">
+					<br>
+					<label>BOR_TYPE</label>
+					<input type="text" class="form-control" 
+						ng-model="selectedEntry.bor_type"
+						ng-readonly="operation == 'show'" required="required">
+						
+					<br>					
 				</div>
 				
 				<!-- save and cancel buttons -->

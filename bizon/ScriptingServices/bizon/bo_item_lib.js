@@ -347,6 +347,10 @@ exports.update = function(item) {
 exports.remove = function(id) {
 
 	console.log('Deleting BO_ITEM entity with id[' + id + ']');
+	
+	if(id === undefined || id === null){
+		throw new Error('Illegal argument: id[' + id + ']');
+	}	
 
     var connection = datasource.getConnection();
     try {

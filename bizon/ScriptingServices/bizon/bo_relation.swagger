@@ -176,12 +176,12 @@
 	        "properties": {
         		"bor_id": {
 	            	"type": 
-        "string"
+        "integer"
 	    		}
 				,
-        		"bor_src_boh_id": {
+        		"bor_src_id": {
 	            	"type": 
-        "string"
+        "integer"
 	    		}
 				,
         		"bor_src_type": {
@@ -189,15 +189,25 @@
         "integer"
 	    		}
 				,
-        		"bot_target_id": {
-	            	"type": 
-        "string"
-	    		}
-				,
-        		"bot_target_type": {
+        		"bor_target_id": {
 	            	"type": 
         "integer"
 	    		}
+				,
+        		"bor_target_type": {
+	            	"type": 
+        "integer"
+	    		}
+				,
+        		"bor_name": {
+	            	"type": 
+        "string"
+	    		}	    		
+,
+        		"bor_type": {
+	            	"type": 
+        "integer"
+	    		}	    			    		
 	        }
         }
 	}

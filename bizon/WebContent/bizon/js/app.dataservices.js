@@ -59,10 +59,10 @@
   			}
 	  	});
 	}])	
-	.service('RelationsService', ['$resource', 'ResourceSvcConfiguration', function($resource, ResourceSvcConfiguration) {
-	  	return $resource('../../js/bizon/bo_relation.js', ResourceSvcConfiguration.cfg);
+	.service('Relation', ['$resource', 'ResourceSvcConfiguration', function($resource, ResourceSvcConfiguration) {
+	  	return $resource('../../js/bizon/bo_relation.js/:boId', { boId:'@id' }, ResourceSvcConfiguration.cfg);
 	}])		
-	.service('masterDataSvc', ['Entity', 'Item',  '$q', function(Entity, Item, $q) {
+	.service('masterDataSvc', ['Entity', 'Item', 'Relation', '$q', function(Entity, Item, Relation, $q) {
 	
 		function createMasterDataTemplateObject(){
 			var obj = angular.copy(Entity.newObjectTemplate);
@@ -98,6 +98,17 @@
 			var deferred = $q.defer();
 			Entity.query(settings).$promise
 			.then(jQuery.proxy(function(data){
+				if(data)
+					data = data.map(function(entity){
+						if(entity.properties){
+							entity.properties = entity.properties.map(function(item){
+								if(!item.boi_type)
+									item.boi_type = 'Relationship';
+								return item;
+							});
+						}
+						return entity;
+					});
 				if(self.querySettings.limit){
 					if(!self.querySettings.offset)
 						self.batchLoadedMasterData = data;//invalidate cached data
@@ -230,9 +241,15 @@
 					var action = item.action;
 					delete item.action;
 					if(action === 'remove') {
-			        	return Item.remove({boId: item.boi_id}).$promise;
+						if(item.boi_type !== 'Relationship')
+			        		return Item.remove({boId: item.boi_id}).$promise;
+			        	else
+			        		return Relation.remove({boId: item.bor_id}).$promise;			        	
 		        	} else {
-		        		return Item[action]({boId: item.boi_id}, item).$promise;
+		        		if(item.boi_type !== 'Relationship')
+		        			return Item[action]({boId: item.boi_id}, item).$promise;
+		        		else
+		        			return Relation[action]({boId: item.boi_id}, item).$promise;		        		
 	        		}
 		    	});
 			}

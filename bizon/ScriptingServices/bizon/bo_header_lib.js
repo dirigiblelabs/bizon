@@ -3,6 +3,7 @@
 
 var database = require("db/database");
 var boItemLib = require("bizon/bo_item_lib");
+var boRelationLib = require("bizon/bo_relation_lib");
 
 /* required for the exports.http module only */
 var request = require("net/http/request");
@@ -11,6 +12,10 @@ var response = require("net/http/response");
 var datasource = database.getDatasource();
 
 var itemsEntitySetName = "properties";
+var persistentProperties = {
+	mandatory: ["boh_id", "boh_name"],
+	optional: ["boh_description"]
+};
 
 // Parse JSON entity into SQL and insert in db. Returns the new record id.
 exports.insert = function(entity, cascaded) {
@@ -20,9 +25,15 @@ exports.insert = function(entity, cascaded) {
 	if(entity === undefined || entity === null){
 		throw new Error('Illegal argument: entity is ' + entity);
 	}
-
-	if(entity.boh_name === undefined || entity.boh_name === null){
-		throw new Error('Illegal boh_name attribute: ' + entity.boh_name);
+	
+	for(var i = 0; i< persistentProperties.mandatory.length; i++){
+		var propName = persistentProperties.mandatory[i];
+		if(propName==='boh_id')
+			continue;//Skip validaiton check for id. It's epxected to be null on insert.
+		var propValue = entity[propName];
+		if(propValue === undefined || propValue === null){
+			throw new Error('Illegal ' + propName + ' attribute value in BO_HEADER entity for insert: ' + propValue);
+		}
 	}
 
 	if(cascaded === undefined || cascaded === null){
@@ -67,8 +78,13 @@ exports.insert = function(entity, cascaded) {
 			if(entity[itemsEntitySetName] && entity[itemsEntitySetName].length > 0){
 	        	for(var j=0; j<entity[itemsEntitySetName].length; j++){
 	        		var item = entity[itemsEntitySetName][j];
-	        		item.boi_boh_id = entity.boh_id;
-					boItemLib.insert(item);
+	        		if(item.boh_type !== 'Relationship'){
+		        		item.boi_boh_id = entity.boh_id;
+						boItemLib.insert(item);        				
+        			} else {
+		        		item.bor_src_id = entity.boh_id;
+						boRelationLib.insert(item);
+    				}
 	    		}
 	    	}
 		}
@@ -89,6 +105,10 @@ exports.insert = function(entity, cascaded) {
 exports.find = function(id) {
 
 	console.log('Finding BO_HEADER entity with id ' + id);
+
+	if(id === undefined || id === null){
+		throw new Error('Illegal argument for id parameter:' + id);
+	}
 
     var connection = datasource.getConnection();
     try {
@@ -143,10 +163,16 @@ exports.list = function(limit, offset, sort, order, expanded, entityName) {
         while (resultSet.next()) {
         	var entity = createEntity(resultSet);
         	if(expanded !== null && expanded!==undefined){
-			   var dependentEntities = boItemLib.list(entity.boh_id, null, null, null, null);
-			   if(dependentEntities) {
-			   	 entity[itemsEntitySetName] = dependentEntities;
+			   var dependentItemEntities = boItemLib.list(entity.boh_id, null, null, null, null);
+			   if(dependentItemEntities) {
+			   	 entity[itemsEntitySetName] = dependentItemEntities;
 		   	   }
+			   var dependentRelationEntities = boRelationLib.list(null, null, null, null, entity.boh_id, null);
+			   if(dependentRelationEntities) {
+			   	if(!entity[itemsEntitySetName])
+			   		entity[itemsEntitySetName] = [];
+			   	 entity[itemsEntitySetName] = entity[itemsEntitySetName].concat(dependentRelationEntities);
+		   	   }		   	   
 			}
             entities.push(entity);
         }
@@ -186,13 +212,6 @@ function createSQLEntity(entity) {
 	return entity;
 }
 
-function convertToDateString(date) {
-    var fullYear = date.getFullYear();
-    var month = date.getMonth() < 10 ? "0" + date.getMonth() : date.getMonth();
-    var dateOfMonth = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
-    return fullYear + "/" + month + "/" + dateOfMonth;
-}
-
 // update entity from a JSON object. Returns the id of the updated entity.
 exports.update = function(entity) {
 
@@ -200,16 +219,16 @@ exports.update = function(entity) {
 
 	if(entity === undefined || entity === null){
 		throw new Error('Illegal argument: entity is ' + entity);
+	}	
+	
+	for(var i = 0; i< persistentProperties.mandatory.length; i++){
+		var propName = persistentProperties.mandatory[i];
+		var propValue = entity[propName];
+		if(propValue === undefined || propValue === null){
+			throw new Error('Illegal ' + propName + ' attribute value in BO_HEADER entity for insert: ' + propValue);
+		}
 	}
 	
-	if(entity.boh_id === undefined || entity.boh_id === null){
-		throw new Error('Illegal boh_id attribute: ' + entity.boh_id);
-	}
-
-	if(entity.boh_name === undefined || entity.boh_name === null){
-		throw new Error('Illegal boh_name attribute: ' + entity.boh_name);
-	}
-
     var connection = datasource.getConnection();
     try {
     
@@ -246,6 +265,10 @@ exports.remove = function(id, cascaded) {
 
 	console.log('Deleting BO_HEADER entity with id[' + id + '], cascaded['+cascaded+']');
 
+	if(id === undefined || id === null){
+		throw new Error('Illegal argument: id[' + id + ']');
+	}
+
     var connection = datasource.getConnection();
     try {
     	var sql = "DELETE FROM BO_HEADER WHERE " + exports.pkToSQL();
@@ -254,9 +277,13 @@ exports.remove = function(id, cascaded) {
         statement.executeUpdate();
         
 		if(cascaded && id){
-			var persistedItems = boItemLib.list(id);
-			for(var i = 0; i < persistedItems.length; i++) {
-        		boItemLib.remove(persistedItems[i].boi_id);
+			var dependentItems = boItemLib.list(id);
+			for(var i = 0; i < dependentItems.length; i++) {
+        		boItemLib.remove(dependentItems[i].boi_id);
+			}
+			var dependentRelationEntities = boRelationLib.list(null, null, null, null, id, id);
+			for(var i = 0; i < dependentRelationEntities.length; i++) {
+        		boRelationLib.remove(dependentRelationEntities[i].bor_id);
 			}
 		}        
         

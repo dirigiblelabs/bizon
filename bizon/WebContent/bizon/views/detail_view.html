@@ -58,11 +58,12 @@
 					<div class="list-group">
 					  <a class="list-group-item" ng-repeat="entry in detailsVm.propertyItems|filter:searchText|orderBy:'boi_name'">
 						<div class="list-group-item-title">
-							<span ng-class="{emphasized: !entry.boi_null}">{{entry.boi_name||entry.name}}</span><i class="fa fa-asterisk required" aria-hidden="true" ng-if="!entry.boi_null"></i>
+							<span ng-class="{emphasized: !entry.boi_null}">{{entry.boi_name||entry.bor_name}}</span><i class="fa fa-asterisk required" aria-hidden="true" ng-if="!entry.boi_null"></i>
 							<i class="fa fa-key" aria-hidden="true" ng-if="entry.boi_pk"></i>
 							<span class="optional" ng-if="entry.boi_null">(optional)</span>
 						</div>
-						<div class="list-group-item-text">Data Type: <span style="color: gray; font-style: italic">{{entry.boi_type}}<span></div>
+						<div class="list-group-item-text" ng-if="entry.boi_type!=='Relationship'">Data Type: <span style="color: gray; font-style: italic">{{entry.boi_type}}<span></div>
+						<div class="list-group-item-text" ng-if="entry.bor_type">Relation Type: <span style="color: gray; font-style: italic">{{entry.bor_type==1?'Association':'Composition'}}<span></div>						
 					  </a>
 					</div>
 				</div>	

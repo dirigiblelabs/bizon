@@ -3,7 +3,6 @@
 
 
 var database = require("db/database");
-var boHeaderLib = require("bizon/bo_relation_lib");
 
 /* required for the exports.http module only */
 var request = require("net/http/request");
@@ -11,22 +10,29 @@ var response = require("net/http/response");
 
 var datasource = database.getDatasource();
 
-// Parse JSON entity into SQL and insert in db. Returns the new record id.
-exports.insert = function(entity, cascaded) {
+var persistentProperties = {
+	mandatory: ["bor_id", "bor_src_id", "bor_src_type","bor_target_id","bor_target_type","bor_name","bor_type"],
+	optional: []
+};
 
-	console.log('Inserting BO_RELATION entity cascaded['+cascaded+'] :' + entity);
+// Parse JSON entity into SQL and insert in db. Returns the new record id.
+exports.insert = function(entity) {
+
+	console.log('Inserting BO_RELATION entity[' + entity+"]");
 
 	if(entity === undefined || entity === null){
 		throw new Error('Illegal argument: entity is ' + entity);
 	}
-
-/*	if(entity.boh_name === undefined || entity.boh_name === null){
-		throw new Error('Illegal boh_name attribute: ' + entity.boh_name);
-	}
-*/
-	if(cascaded === undefined || cascaded === null){
-		cascaded = false;
-	}
+	
+	for(var i = 0; i< persistentProperties.mandatory.length; i++){
+		var propName = persistentProperties.mandatory[i];
+		if(propName==='bor_id')
+			continue;//Skip validaiton check for id. It's epxected to be null on insert.
+		var propValue = entity[propName];
+		if(propValue === undefined || propValue === null){
+			throw new Error('Illegal ' + propName + ' attribute value in BO_RELATON entity for insert: ' + propValue);
+		}
+	}	
 
     entity = createSQLEntity(entity);
 
@@ -35,13 +41,17 @@ exports.insert = function(entity, cascaded) {
         var sql = "INSERT INTO BO_RELATION (";
         sql += "BOR_ID";
         sql += ",";
-        sql += "BOR_SRC_BOH_ID";
+        sql += "BOR_SRC_ID";
         sql += ",";
         sql += "BOR_SRC_TYPE";
         sql += ",";
-        sql += "BOT_TARGET_ID";
+        sql += "BOR_TARGET_ID";
         sql += ",";
-        sql += "BOT_TARGET_TYPE";
+        sql += "BOR_TARGET_TYPE";
+        sql += ",";
+        sql += "BOR_NAME";        
+        sql += ",";
+        sql += "BOR_TYPE";                
         sql += ") VALUES ("; 
         sql += "?";
         sql += ",";
@@ -52,34 +62,30 @@ exports.insert = function(entity, cascaded) {
         sql += "?";
         sql += ",";
         sql += "?";
+        sql += ",";        
+        sql += "?";        
+        sql += ",";        
+        sql += "?";         
         sql += ")";
         
         var statement = connection.prepareStatement(sql);
         
         var i = 0;
-        entity.boh_id = datasource.getSequence('BO_RELATION_BOR_ID').next();
+        entity.bor_id = datasource.getSequence('BO_RELATION_BOR_ID').next();
          
         statement.setInt(++i, entity.bor_id);
-        statement.setString(++i, entity.bor_src_boh_id);
+        statement.setInt(++i, entity.bor_src_id);
         statement.setShort(++i, entity.bor_src_type);
-        statement.setString(++i, entity.bor_target_id);
+        statement.setInt(++i, entity.bor_target_id);
         statement.setShort(++i, entity.bor_target_type);
+        statement.setString(++i, entity.bor_name);
+        statement.setShort(++i, entity.bor_type);
         
         statement.executeUpdate();
 
-/*		if(cascaded){
-			if(entity[itemsEntitySetName] && entity[itemsEntitySetName].length > 0){
-	        	for(var j=0; j<entity[itemsEntitySetName].length; j++){
-	        		var item = entity[itemsEntitySetName][j];
-	        		item.boi_boh_id = entity.boh_id;
-					boItemLib.insert(item);
-	    		}
-	    	}
-		}
-*/
         console.log('BO_RELATON entity inserted with bor_id[' +  entity.bor_id + ']');
 
-        return entity.boh_id;
+        return entity.bor_id;
 
     } catch(e) {
 		e.errContext = sql;
@@ -92,7 +98,11 @@ exports.insert = function(entity, cascaded) {
 // Reads a single entity by id, parsed into JSON object 
 exports.find = function(id) {
 
-	console.log('Finding BO_RELATION entity with id ' + id);
+	console.log('Finding BO_RELATION entity with id[' + id + "]");
+
+	if(id === undefined || id === null){
+		throw new Error('Illegal argument for id parameter:' + id);
+	}
 
     var connection = datasource.getConnection();
     try {
@@ -117,9 +127,9 @@ exports.find = function(id) {
 };
 
 // Read all entities, parse and return them as an array of JSON objets
-exports.list = function(limit, offset, sort, order, expanded) {
+exports.list = function(limit, offset, sort, order, srcId, targetId) {
 
-	console.log('Listing BO_RELATION entity collection expanded['+expanded+'] with list operators: limit['+limit+'], offset['+offset+'], sort['+sort+'], order['+order+']');
+	console.log('Listing BO_RELATION entity collection with list operators: limit['+limit+'], offset['+offset+'], sort['+sort+'], order['+order+'], srcId['+srcId+'], targetId['+targetId+']');
 
     var connection = datasource.getConnection();
     try {
@@ -129,6 +139,15 @@ exports.list = function(limit, offset, sort, order, expanded) {
             sql += " " + datasource.getPaging().genTopAndStart(limit, offset);
         }
         sql += " * FROM BO_RELATION";
+        if (srcId !== null || targetId !== null) {
+        	sql += " WHERE";
+        	if(srcId !== null)
+        		sql += " BOR_SRC_ID = ?";
+        	if(srcId !== null && targetId !== null)
+        		sql += " OR ";
+			if(targetId !== null)
+        		sql += "BOR_TARGET_ID = ?";
+    	}
         if (sort !== null) {
             sql += " ORDER BY " + sort;
         }
@@ -139,16 +158,16 @@ exports.list = function(limit, offset, sort, order, expanded) {
             sql += " " + datasource.getPaging().genLimitAndOffset(limit, offset);
         }
         var statement = connection.prepareStatement(sql);
+        var i=0;
+        if(srcId!==null)
+        	statement.setInt(++i, srcId);
+        if(targetId!==null)        	
+        	statement.setInt(++i, targetId);
+        
         var resultSet = statement.executeQuery();
         while (resultSet.next()) {
         	var entity = createEntity(resultSet);
-/*        	if(expanded !== null && expanded!==undefined){
-			   var dependentEntities = boItemLib.list(entity.boh_id, null, null, null, null);
-			   if(dependentEntities) {
-			   	 entity[itemsEntitySetName] = dependentEntities;
-		   	   }
-			}
-*/            entities.push(entity);
+            entities.push(entity);
         }
         
         console.log('' + entities.length +' BO_RELATION entities found');
@@ -166,10 +185,12 @@ exports.list = function(limit, offset, sort, order, expanded) {
 function createEntity(resultSet) {
     var entity = {};
 	entity.bor_id = resultSet.getInt("BOR_ID");
-    entity.bor_src_id = resultSet.getString("BOR_SRC_ID");
+    entity.bor_src_id = resultSet.getInt("BOR_SRC_ID");
     entity.bor_src_type = resultSet.getShort("BOR_SRC_TYPE");    
-    entity.bor_target_id = resultSet.getString("BOR_TARGET_ID");
+    entity.bor_target_id = resultSet.getInt("BOR_TARGET_ID");
     entity.bor_target_type = resultSet.getShort("BOR_TARGET_TYPE"); 
+    entity.bor_name = resultSet.getString("BOR_NAME");     
+    entity.bor_type = resultSet.getShort("BOR_TYPE");         
     console.log("Transformation from DB JSON object finished: " + entity);    
     return entity;
 }
@@ -185,13 +206,6 @@ function createSQLEntity(entity) {
 	return entity;
 }
 
-function convertToDateString(date) {
-    var fullYear = date.getFullYear();
-    var month = date.getMonth() < 10 ? "0" + date.getMonth() : date.getMonth();
-    var dateOfMonth = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
-    return fullYear + "/" + month + "/" + dateOfMonth;
-}
-
 // update entity from a JSON object. Returns the id of the updated entity.
 exports.update = function(entity) {
 
@@ -199,34 +213,40 @@ exports.update = function(entity) {
 
 	if(entity === undefined || entity === null){
 		throw new Error('Illegal argument: entity is ' + entity);
-	}
+	}	
 	
-	if(entity.bor_id === undefined || entity.bor_id === null){
-		throw new Error('Illegal bor_id attribute: ' + entity.boh_id);
-	}
+	for(var i = 0; i< persistentProperties.mandatory.length; i++){
+		var propName = persistentProperties.mandatory[i];
+		var propValue = entity[propName];
+		if(propValue === undefined || propValue === null){
+			throw new Error('Illegal ' + propName + ' attribute value in BO_RELATON entity for insert: ' + propValue);
+		}
+	}	
 
-/*	if(entity.boh_name === undefined || entity.boh_name === null){
-		throw new Error('Illegal boh_name attribute: ' + entity.boh_name);
-	}
-*/
     var connection = datasource.getConnection();
     try {
     
         var sql = "UPDATE BO_RELATION SET ";
-        sql += "BOR_SRC_BOH_ID = ?";
+        sql += "BOR_SRC_ID = ?";
         sql += ",";
         sql += "BOR_SRC_TYPE = ?";
         sql += ",";
         sql += "BOR_TARGET_ID = ?";
         sql += ",";
         sql += "BOR_TARGET_TYPE = ?";
+        sql += ",";
+        sql += "BOR_NAME = ?";        
+        sql += ",";
+        sql += "BOR_TYPE = ?";        
         sql += " WHERE BOR_ID = ?";
         var statement = connection.prepareStatement(sql);
         var i = 0;
-        statement.setString(++i, entity.bor_src_boh_id);
+        statement.setInt(++i, entity.bor_src_id);
         statement.setShort(++i, entity.bor_src_type);
-        statement.setString(++i, entity.bor_target_id);
+        statement.setInt(++i, entity.bor_target_id);
         statement.setShort(++i, entity.bor_target_type);
+        statement.setString(++i, entity.bor_name);        
+        statement.setShort(++i, entity.bor_type);        
         var id = entity.bor_id;
         statement.setInt(++i, id);
         statement.executeUpdate();
@@ -244,23 +264,20 @@ exports.update = function(entity) {
 };
 
 // delete entity by id. Returns the id of the deleted entity.
-exports.remove = function(id, cascaded) {
+exports.remove = function(id) {
 
-	console.log('Deleting BO_RELATION entity with id[' + id + '], cascaded['+cascaded+']');
+	console.log('Deleting BO_RELATION entity with id[' + id + ']');
+	
+	if(id === undefined || id === null){
+		throw new Error('Illegal argument: id[' + id + ']');
+	}
 
     var connection = datasource.getConnection();
     try {
     	var sql = "DELETE FROM BO_RELATION WHERE " + exports.pkToSQL();
         var statement = connection.prepareStatement(sql);
-        statement.setString(1, id);
+        statement.setInt(1, id);
         statement.executeUpdate();
-        
-/*		if(cascaded && id){
-			var persistedItems = boHeaderLib.list(id);
-			for(var i = 0; i < persistedItems.length; i++) {
-        		boHeaderLib.remove(persistedItems[i].boi_id);
-			}
-		}        */
         
         console.log('BO_RELATION entity with bor_id[' + id + '] deleted');                
         
@@ -308,17 +325,17 @@ exports.metadata = function() {
 	
 	var propertybor_id = {
 		name: 'bor_id',
-    	type: 'string',
+    	type: 'integer',
 		key: 'true',
 		required: 'true'
 	};
     entityMetadata.properties.push(propertybor_id);
 
-	var propertybor_src_boh_id = {
-		name: 'bor_src_boh_id',
-		type: 'string'
+	var propertybor_src_id = {
+		name: 'bor_src_id',
+		type: 'integer'
 	};
-    entityMetadata.properties.push(propertybor_src_boh_id);
+    entityMetadata.properties.push(propertybor_src_id);
 
 	var propertybor_src_type = {
 		name: 'bor_src_type',
@@ -326,17 +343,29 @@ exports.metadata = function() {
 	};
     entityMetadata.properties.push(propertybor_src_type);
 
-	var propertybot_target_id = {
+	var propertybor_target_id = {
 		name: 'bor_target_id',
-		type: 'string'
+		type: 'integer'
 	};
-    entityMetadata.properties.push(propertybot_target_id);
+    entityMetadata.properties.push(propertybor_target_id);
 
-	var propertybot_target_type = {
+	var propertybor_target_type = {
 		name: 'bor_target_type',
 		type: 'smallint'
 	};
-    entityMetadata.properties.push(propertybot_target_type);
+    entityMetadata.properties.push(propertybor_target_type);
+    
+	var propertybor_name = {
+		name: 'bor_name',
+		type: 'varchar'
+	};
+    entityMetadata.properties.push(propertybor_name);    
+
+	var propertybor_type = {
+		name: 'bor_type',
+		type: 'smallint'
+	};
+    entityMetadata.properties.push(propertybor_type);        
 
 	response.println(JSON.stringify(entityMetadata));
 };
@@ -372,11 +401,11 @@ exports.http = {
 		console.log('Dispatching operation request for HTTP Verb['+ method +'] and URL parameters: ' + urlParameters);
 
 		if('POST' === method){
-			this.create(urlParameters.cascaded);
+			this.create();
 		} else if('PUT' === method){
-			this.update(urlParameters.cascaded);
+			this.update();
 		} else if('DELETE' === method){
-			this.remove(urlParameters.id, urlParameters.cascaded);
+			this.remove(urlParameters.id);
 		} else if('GET' === method){
 			if(urlParameters){
 				if(urlParameters.id){
@@ -386,7 +415,7 @@ exports.http = {
 				} else if(urlParameters.count){
 					this.count();
 				} else if(urlParameters.list){
-					this.query(urlParameters.list.limit, urlParameters.list.offset, urlParameters.list.sort, urlParameters.list.order, urlParameters.expanded);
+					this.query(urlParameters.list.limit, urlParameters.list.offset, urlParameters.list.sort, urlParameters.list.order);
 				}
 			} else {
 				this.query();
@@ -396,11 +425,11 @@ exports.http = {
 		}
 	}, 
 
-	create: function(cascaded){
+	create: function(){
 		var input = request.readInputText();
 	    var item = JSON.parse(input);
 	    try{
-			item[this.idPropertyName] = exports.insert(item, cascaded);
+			item[this.idPropertyName] = exports.insert(item);
 			response.setStatus(response.OK);
 			response.setHeader('Location', $.getRequest().getRequestURL().toString() + '/' + item[this.idPropertyName]);
 		} catch(e) {
@@ -410,11 +439,11 @@ exports.http = {
 		}
 	},
 	
-	update: function(cascaded) {
+	update: function() {
 		var input = request.readInputText();
 	    var item = JSON.parse(input);
 	    try{
-			item[this.idPropertyName] = exports.update(item, cascaded);
+			item[this.idPropertyName] = exports.update(item);
 			response.setStatus(response.NO_CONTENT);
 		} catch(e) {
     	    var errorCode = response.INTERNAL_SERVER_ERROR ;
@@ -423,9 +452,9 @@ exports.http = {
 		}
 	},
 	
-	remove: function(id, cascaded) {
+	remove: function(id) {
 	    try{
-			exports.remove(id, cascaded);
+			exports.remove(id);
 			response.setStatus(response.NO_CONTENT);
 		} catch(e) {
     	    var errorCode = response.INTERNAL_SERVER_ERROR;
@@ -434,14 +463,14 @@ exports.http = {
 		}
 	},
 	
-	get: function(id, expanded){
+	get: function(id){
 		//id is mandatory parameter and an integer
 		if(id === undefined || isNaN(parseInt(id))) {
 			this.printError(response.BAD_REQUEST, 1, "Invallid id parameter: " + id);
 		}
 
 	    try{
-			var item = exports.find(id, expanded);
+			var item = exports.find(id);
 			if(!item){
         		this.printError(response.NOT_FOUND, 1, "Record with id: " + id + " does not exist.");
         		return;
@@ -455,7 +484,7 @@ exports.http = {
 		}		
 	},
 	
-	query: function(limit, offset, sort, order, expanded){
+	query: function(limit, offset, sort, order, sourceId, targetId){
 		if (offset === undefined || offset === null) {
 			offset = 0;
 		} else if(isNaN(parseInt(offset)) || offset<0) {
@@ -486,8 +515,12 @@ exports.http = {
 				return;
 			}
 		}
+		if(sourceId === undefined)
+			sourceId = null;
+		if(targetId === undefined)
+			targetId = null;
 	    try{
-			var items = exports.list(limit, offset, sort, order, expanded);
+			var items = exports.list(limit, offset, sort, order, sourceId, targetId);
 	        var jsonResponse = JSON.stringify(items, null, 2);
 	    	response.println(jsonResponse);      	
 		} catch(e) {

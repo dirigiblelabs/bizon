@@ -4,17 +4,17 @@
     [
       {
         "name":"bor_id",
-        "type":"VARCHAR",
-        "length":"100",
+        "type":"INTEGER",
+        "length":"0",
         "notNull":"true",
         "primaryKey":"true",
         "defaultValue":""
       }
       ,
       {
-        "name":"bor_src_boh_id",
-        "type":"VARCHAR",
-        "length":"100",
+        "name":"bor_src_id",
+        "type":"INTEGER",
+        "length":"0",
         "notNull":"true",
         "primaryKey":"false",
         "defaultValue":""
@@ -31,8 +31,8 @@
       ,
       {
         "name":"bor_target_id",
-        "type":"VARCHAR",
-        "length":"100",
+        "type":"INTEGER",
+        "length":"0",
         "notNull":"true",
         "primaryKey":"false",
         "defaultValue":""
@@ -46,5 +46,23 @@
         "primaryKey":"false",
         "defaultValue":""
       }
+      ,
+      {
+        "name":"bor_name",
+        "type":"VARCHAR",
+        "length":"255",
+        "notNull":"true",
+        "primaryKey":"false",
+        "defaultValue":""
+      }
+      ,
+      {
+        "name":"bor_type",
+        "type":"SMALLINT",
+        "length":"1",
+        "notNull":"true",
+        "primaryKey":"false",
+        "defaultValue":""
+      }      
     ]
 }

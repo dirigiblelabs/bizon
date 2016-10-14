@@ -21,7 +21,6 @@ function handleRequest() {
 	var count = xss.escapeSql(request.getParameter('count'));
 	var metadata = xss.escapeSql(request.getParameter('metadata'));
 	var expanded = xss.escapeSql(request.getParameter('expanded'));
-	var cascaded = xss.escapeSql(request.getParameter('cascaded'));	
 
 	if(checkConflictingParameters(id, count, metadata)){
 		var limit = xss.escapeSql(request.getParameter('limit'));
@@ -46,8 +45,7 @@ function handleRequest() {
 				"sort": sort,	
 				"order": order			
 			},
-			"expanded": (expanded!==null),
-			"cascaded": (cascaded!==null)
+			"expanded": (expanded!==null)
 		};
 		
 		entityBo_relation.http.dispatch(urlParameters);	

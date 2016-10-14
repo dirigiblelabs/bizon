@@ -124,7 +124,7 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		.state("list.entity.edit.relations", {
 			url: "relation",
 		    params: {
-				selectedEntity: undefined,
+				entityForEdit: undefined,				
 				item: undefined,
 				message: {value: undefined}
 		    },

@@ -5,8 +5,8 @@ angular.module('businessObjects')
 	var self = this;
 	
 	this.showProperties = function(){
-		if(this._propertyItems){
-			this.propertyItems = this._propertyItems.filter(function(v){
+		if(this.selectedEntity.properties){
+			this.propertyItems = this.selectedEntity.properties.filter(function(v){
 				if(!v.boi_type || v.boi_type!=='Relationship'){
 					return true;
 				}
@@ -17,7 +17,6 @@ angular.module('businessObjects')
 	
 	function showDetails(item){
 		if(item){
-			this._propertyItems = item.properties;
 			this.showProperties.apply(this);//Initial content to show	
 		}
 	}
@@ -25,8 +24,8 @@ angular.module('businessObjects')
 	showDetails.apply(this, [this.selectedEntity]);
 	
 	this.showRelationships = function(){
-		if(this._propertyItems){
-			this.propertyItems = this._propertyItems.filter(function(v){
+		if(this.selectedEntity.properties){
+			this.propertyItems = this.selectedEntity.properties.filter(function(v){
 				if(v.boi_type && v.boi_type==='Relationship'){
 					return true;
 				}
