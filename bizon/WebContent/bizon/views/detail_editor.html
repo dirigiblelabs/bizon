@@ -46,17 +46,7 @@
 				<p class="title" editable-text="detailsEditorVm.entityForEdit.boh_name">{{detailsEditorVm.entityForEdit.boh_name}}</p>
 	    		<p class="subtitle" editable-text="detailsEditorVm.entityForEdit.boh_description">{{detailsEditorVm.entityForEdit.boh_description}}</p>											
 			</div>
-		</section>
-		<!--<section class="object-attributes">
-      		<div>
-      			<label><i class="fa fa-key"></i></label>
-      			<span editable-select="detailsEditorVm.selectedEntity.boh_key" e-ng-options="s.value as s.text for s in [{text:'Id', value:'Id'}, {text:'Property 1', value:'Property 1'}, {text:'Property 2', value:'Property 2'}]">{{detailsEditorVm.entityForEdit.boh_key}}</span>
-      		</div>
-			<div>
-				<label><i class="fa fa-table"></i></label>
-      			<span editable-select="detailsEditorVm.selectedEntity.boh_table" e-ng-options="s.value as s.text for s in [{text:'TBL_A', value:'TBL_A'}, {text:'TBL_B', value:'TBL_B'}, {text:'TBL_C', value:'TBL_C'}]">{{detailsEditorVm.selectedEntity.boh_table}}</span>
-      		</div>				      		
-		</section>-->					    		
+		</section>				    		
 	</section>	
 		
 	<div class="list-content">	
@@ -90,7 +80,6 @@
 						<div style="display:inline-block">
 							<div class="list-group-item-heading">
 								<span ng-class="{emphasized: !entry.boi_null}">{{entry.boi_name||entry.bor_name}}</span><i class="fa fa-asterisk required" aria-hidden="true" ng-if="!entry.boi_null"></i>
-								<i class="fa fa-key" aria-hidden="true" ng-if="entry.boi_pk"></i>
 								<span class="optional" ng-if="entry.boi_null">(optional)</span>
 							</div>
 							<div class="list-group-item-text" ng-if="entry.boi_type!=='Relationship'">Data Type: <span style="color: gray; font-style: italic">{{entry.boi_type}}<span></div>

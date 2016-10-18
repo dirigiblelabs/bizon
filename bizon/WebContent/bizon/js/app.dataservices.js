@@ -74,9 +74,6 @@
 				item.boi_column += i;
 				obj.properties.push(item);
 			}
-			obj.properties[0].boi_name = "BO_ID";
-			obj.properties[0].boi_column = "BO_ID";			
-			obj.properties[0].boi_pk = true;
 			obj.properties[0].boi_null = false;			
 			return obj;
 		}

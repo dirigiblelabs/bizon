@@ -9,7 +9,7 @@ var datasource = database.getDatasource();
 
 var persistentProperties = {
 	mandatory: ["boi_id", "boi_boh_id", "boi_name","boi_column","boi_type"],
-	optional: ["boi_length", "boi_null", "boi_pk", "boi_default"]
+	optional: ["boi_length", "boi_null", "boi_default"]
 };
 
 // Parse JSON entity into SQL and insert in db. Returns the new record id.
@@ -48,12 +48,8 @@ exports.insert = function(item) {
         sql += ",";
         sql += "BOI_NULL";
         sql += ",";
-        sql += "BOI_PK";
-        sql += ",";
         sql += "BOI_DEFAULT";
         sql += ") VALUES ("; 
-        sql += "?";
-        sql += ",";
         sql += "?";
         sql += ",";
         sql += "?";
@@ -84,7 +80,6 @@ exports.insert = function(item) {
         statement.setInt(++j, item.boi_type);
         statement.setInt(++j, item.boi_length);
         statement.setShort(++j, item.boi_null);
-        statement.setShort(++j, item.boi_pk);
         statement.setString(++j, item.boi_default);
         statement.executeUpdate();
         
@@ -191,12 +186,6 @@ function createEntity(resultSet) {
 	} else {
 		entity.boi_null = true;
 	}
-    entity.boi_pk = resultSet.getShort("BOI_PK");
-    if(entity.boi_pk === 0){
-    	entity.boi_pk = false;
-	} else {
-		entity.boi_pk = true;
-	}
     entity.boi_default = resultSet.getString("BOI_DEFAULT");
     if(entity.boi_default === null)
     	delete entity.boi_default;	    
@@ -223,11 +212,6 @@ function createSQLEntity(item) {
 	} else {
    	   	persistentItem.boi_null = 0;
     }
-	if(persistentItem.boi_pk === null || persistentItem.boi_pk === false){
-		persistentItem.boi_pk = 0;
-	} else {
-	   	persistentItem.boi_pk = 1;	
-	}
 	if(persistentItem.boi_length === null){
 		persistentItem.boi_length = 0;
 	}
@@ -310,8 +294,6 @@ exports.update = function(item) {
         sql += ",";
         sql += "BOI_NULL = ?";
         sql += ",";
-        sql += "BOI_PK = ?";
-        sql += ",";
         sql += "BOI_DEFAULT = ?";
         sql += " WHERE BOI_ID = ?";
         
@@ -325,7 +307,6 @@ exports.update = function(item) {
         statement.setInt(++i, item.boi_type);
         statement.setInt(++i, item.boi_length);
         statement.setShort(++i, item.boi_null);
-        statement.setShort(++i, item.boi_pk);
         statement.setString(++i, item.boi_default);
         var id = item.boi_id;
         statement.setInt(++i, id);
@@ -450,12 +431,6 @@ exports.metadata = function() {
 		type: 'smallint'
 	};
     entityMetadata.properties.push(propertyboi_null);
-
-	var propertyboi_pk = {
-		name: 'boi_pk',
-		type: 'smallint'
-	};
-    entityMetadata.properties.push(propertyboi_pk);
 
 	var propertyboi_default = {
 		name: 'boi_default',

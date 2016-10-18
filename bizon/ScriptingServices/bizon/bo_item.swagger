@@ -175,23 +175,35 @@
 	        "type":"object",
 	        "properties": {
         		"boi_id": {
-	            	"type": 
-        "integer"
+	            	"type": "integer"
 	    		}
 				,
         		"boi_boh_id": {
-	            	"type": 
-        "integer"
+	            	"type":  "integer"
 	    		}
 				,
         		"boi_name": {
-	            	"type": 
-        "string"
+	            	"type":  "string"
 	    		}
+	    		,
+        		"boi_null": {
+	            	"type": "boolean"
+	    		}
+	    		,
+        		"boi_length": {
+	            	"type":   "integer"
+	    		}
+	    		,
+        		"boi_default": {
+	            	"type": "string"
+	    		}
+                ,
+        		"boi_type": {
+	            	"type":   "string"
+	    		}	    		
 				,
         		"boi_description": {
-	            	"type": 
-        "string"
+	            	"type":   "string"
 	    		}
 	        }
         }

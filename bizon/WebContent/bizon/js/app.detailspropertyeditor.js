@@ -49,9 +49,8 @@ angular.module('businessObjects')
       	$stateParams.entityForEdit = $stateParams.selectedEntity = selectedEntity;
       } else {
       	this.item.action = 'update';
-    	selectedEntity = $stateParams.entityForEdit = $stateParams.selectedEntity; 
       }
-      $scope.$close(selectedEntity);
+      $scope.$close($stateParams.entityForEdit);
     };
     
     init.apply(this);

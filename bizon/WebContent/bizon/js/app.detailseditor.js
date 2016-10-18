@@ -99,7 +99,7 @@ angular.module('businessObjects')
 	    masterDataSvc.update($stateParams.entityForEdit)
 	    .then(function(){
 			$log.debug('Buisness Object updated successfully');
-			Notifications.createMessageSuccess('Buisness Object updated successfully.');					    
+			Notifications.createMessageSuccess('Buisness Object updated successfully.');
 			$stateParams.boId = self.entityForEdit.boh_id;
 			$stateParams.selectedEntity = self.entityForEdit;
 			$state.go('^', $stateParams, {reload: 'list', location:false, inherit: false});
