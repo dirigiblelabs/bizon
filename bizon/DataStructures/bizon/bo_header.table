@@ -23,11 +23,56 @@
       {
         "name":"BOH_TABLE",
         "type":"VARCHAR",
-        "length":"255",
-        "notNull":"true",
+        "length":"128",
+        "notNull":"false",
         "primaryKey":"false",
         "defaultValue":""
       }
+      ,
+      {
+        "name":"BOH_DS_GEN_ENABLED",
+        "type":"SMALLINT",
+        "length":"0",
+        "notNull":"false",
+        "primaryKey":"false",
+        "defaultValue":"1"
+      }
+      ,
+      {
+        "name":"BOH_ID_NAME",
+        "type":"VARCHAR",
+        "length":"255",
+        "notNull":"false",
+        "primaryKey":"false",
+        "defaultValue":""
+      }
+      ,
+      {
+        "name":"BOH_ID_DATATYPE_CODE",
+        "type":"SMALLINT",
+        "length":"1",
+        "notNull":"false",
+        "primaryKey":"false",
+        "defaultValue":"1"
+      }     
+      ,
+      {
+        "name":"BOH_SVC_NAME",
+        "type":"VARCHAR",
+        "length":"255",
+        "notNull":"false",
+        "primaryKey":"false",
+        "defaultValue":""
+      }     
+      ,
+      {
+        "name":"BOH_SVC_GEN_ENABLED",
+        "type":"SMALLINT",
+        "length":"0",
+        "notNull":"false",
+        "primaryKey":"false",
+        "defaultValue":"1"
+      }            
       ,
       {
         "name":"BOH_DESCRIPTION",

@@ -82,7 +82,7 @@ angular.module('businessObjects')
 		var modalOptions = {
             closeButtonText: 'Cancel',
             actionButtonText: 'OK',
-            headerText: 'Changes will be lost. Cancel editing "' + self.selectedEntity.boh_name + '"?',
+            headerText: 'Changes will be lost. Cancel editing "' + self.entityForEdit.boh_name + '"?',
             bodyText: 'Are you sure you want to cancel your changes?'
         };
 

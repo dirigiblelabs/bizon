@@ -33,7 +33,8 @@
 		res.newObjectTemplate = {
 				"boh_name":"Business Object Name",
 				"boh_description":"Description for business object",
-				"boh_table":"BO_Tbl"
+				"boh_ds_gen_enabled": true,
+				"boh_svc_gen_enabled": true
 			};
 			
 		return res;

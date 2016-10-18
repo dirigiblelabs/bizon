@@ -1,3 +1,11 @@
+<style>
+legend {
+    width:inherit; /* Or auto */
+    padding:0 10px; /* To give a bit of padding on the left and right */
+    border-bottom:none;
+}
+</style>
+
 <div class="detail col-xs-8 col-md-10">
 	<header class="header">
       <div class="btn-group">
@@ -22,8 +30,8 @@
 				<p class="title">{{detailsVm.selectedEntity.boh_name}}</p>
 	    		<p class="subtitle">{{detailsVm.selectedEntity.boh_description}}</p>						
 			</div>
-		</section>
-		<section class="object-attributes">
+		</section> 
+		<!--<section class="object-attributes">
       		<div>
       			<label><i class="fa fa-key"></i></label>
       			<span ng-bind="(detailsVm.selectedEntity.properties | filter: {boi_pk:'true'})[0].boi_name"></span>
@@ -32,14 +40,15 @@
 				<label><i class="fa fa-table"></i></label>
       			<span>{{detailsVm.selectedEntity.boh_table}}</span>
       		</div>				      							    		
-		</section>
+		</section>-->
 	</section>
 								
 	<div class="list-content">	
 
 		<ul class="nav nav-tabs">
-		  <li role="presentation" class="active"><a href ng-click="detailsVm.showProperties()" role="tab" data-toggle="tab">Properties</a></li>
-		  <li role="presentation"><a href ng-click="detailsVm.showRelationships()" role="tab" data-toggle="tab">Relationships <i class="glyphicon glyphicon-link pull-right"></i></a></li>
+		  <li role="presentation" class="active"><a href ng-click="detailsVm.showProperties()" data-target="#properties" aria-controls="properties" role="tab" data-toggle="tab">Properties</a></li>
+		  <li role="presentation"><a href ng-click="detailsVm.showRelationships()" data-target="#properties" aria-controls="relationships" role="tab" data-toggle="tab">Relationships <i class="fa fa-chain pull-right"></i></a></li>
+		  <li role="presentation"><a href ng-click="detailsVm.showConfig()" data-target="#config" aria-controls="relationships" role="tab" data-toggle="tab">Configuration <i class="fa fa-cog pull-right"></i></a></li>		  
 		</ul>
 	
 		<div class="toolbar btn-group pull-right">
@@ -51,7 +60,7 @@
 
 		<div class="tab-content">
 		
-			<div class="tab-pane fade in active">
+			<div class="tab-pane fade in active" role="tabpanel" id="properties">
 	
 				<div class="items-list">
 					<div ng-hide="detailsVm.propertyItems.length" class="nodata-text">No Items</div>
@@ -67,7 +76,55 @@
 					  </a>
 					</div>
 				</div>	
-			</div>	
+			</div>
+			
+			<div class="tab-pane fade" role="tabpanel" id="config">
+				<div class="container">			
+					<form class="form-horizontal">
+						<div class="row panel panel-default">
+						  <div class="panel-heading">
+						    <h3 class="panel-title" style="display: inline-block">Data Structure</h3>
+						    <span>[Generation {{detailsVm.selectedEntity.boh_ds_gen_enabled?'Enabled':'Disabled'}}]</span>
+						  </div>
+						  <div class="panel-body">
+							<div class="form-group">
+							    <label for="table" class="col-sm-3 control-label" required="true">Table Name</label>
+							    <div class="col-sm-5">
+							    	<p name="table" id="table" class="form-control-static" ng-bind="detailsVm.selectedEntity.boh_table"></p>
+							    </div>
+							  </div>
+							  <div class="form-group">
+							    <label for="primaryKey" class="col-sm-3 control-label" required="true">Entity Identifier Name</label>
+							    <div class="col-sm-5">
+							    	<p name="primaryKey" id="primaryKey" class="form-control-static" ng-bind="detailsVm.selectedEntity.boh_id_name"></p>				    
+							    </div>
+							  </div>
+							  <div class="form-group">
+							    <label for="primaryKeyType" class="col-sm-3 control-label" required="true">Entity Identifier Data Type</label>
+							    <div class="col-sm-5">
+							    	<p name="primaryKeyType" id="primaryKeyType" class="form-control-static" ng-bind="detailsVm.selectedEntity.boh_id_datatype_code"></p>				    
+							    </div>
+							  </div>						  
+						  </div>
+						</div>
+						<div class="row panel panel-default">
+						  <div class="panel-heading">
+						    <h3 class="panel-title" style="display: inline-block">Service</h3>
+							<span>[Generation {{detailsVm.selectedEntity.boh_svc_gen_enabled?'Enabled':'Disabled'}}]</span>
+						  </div>
+						  <div class="panel-body">
+							<div class="form-group">
+							  <label for="service" class="col-sm-3 control-label" required="true">Service Name</label>
+							  <div class="col-sm-5">
+							  	<p name="service" id="service" class="form-control-static" ng-bind="detailsVm.selectedEntity.boh_svc_name"></p>
+							  </div>
+							</div>						  
+						  </div>
+						</div>
+					</form>	
+				</div>
+			</div>
+			
 		</div>
 
 	</div>
