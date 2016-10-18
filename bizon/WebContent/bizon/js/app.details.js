@@ -57,6 +57,12 @@ angular.module('businessObjects')
         .then(function () {
 			var duplicateItem = angular.copy(self.selectedEntity, {});
 			delete duplicateItem.boh_id;
+			duplicateItem.properties = duplicateItem.properties.map(function(item){
+				delete item.boi_id;
+				delete item.bor_id;
+				delete item.boi_boh_id;
+				return item;
+			});
 			masterDataSvc.create(undefined, duplicateItem)
 				.then(function(newItem){
 					$stateParams.boId = newItem.boh_id;

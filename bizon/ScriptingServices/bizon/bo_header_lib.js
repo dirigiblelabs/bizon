@@ -69,7 +69,7 @@ exports.insert = function(entity, cascaded) {
 			if(entity[itemsEntitySetName] && entity[itemsEntitySetName].length > 0){
 	        	for(var j=0; j<entity[itemsEntitySetName].length; j++){
 	        		var item = entity[itemsEntitySetName][j];
-	        		if(item.boh_type !== 'Relationship'){
+	        		if(item.boi_type !== 'Relationship'){
 		        		item.boi_boh_id = entity.boh_id;
 						boItemLib.insert(item);        				
         			} else {
