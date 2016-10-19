@@ -106,12 +106,12 @@
 						  <div class="panel-heading clearfix">
 						    <h3 class="panel-title pull-left">Data Structure</h3>
 					    	<div class="pull-right">
-								<input name="ds_enabled" id="ds_enabled" type="checkbox" class="checkbox" data-on-text="Enable" data-off-text="Disable" ng-model="detailsEditorVm.entityForEdit.boh_ds_gen_enabled" bootstrap-switch/>						    
+								<input type="checkbox" class="checkbox" data-on-text="Enable" data-off-text="Disable" ng-model="detailsEditorVm.entityForEdit.boh_ds_gen_enabled" bootstrap-switch/>						    
 							</div>
 						  </div>
 						  <div class="panel-body">
 							  <div class="form-group">
-							    <label for="table" class="col-sm-3 control-label" required="true">Table Name</label>
+							    <label for="table" class="col-sm-3 control-label" required="true">Database Table Name</label>
 							    <div class="col-sm-8">
 							      <input name="table" id="table" class="form-control" placeholder="Type Table Name" ng-model="detailsEditorVm.entityForEdit.boh_table" ng-disabled="!detailsEditorVm.entityForEdit.boh_ds_gen_enabled" minlength="1" required="true">
 							    </div>
@@ -132,11 +132,11 @@
 						</div>
 						<div class="row panel panel-default">
 						  <div class="panel-heading clearfix">
-						    <h3 class="panel-title">Service</h3>
-							<div class="pull-right">						    
-						    	<input name="svc_enabled" id="svc_enabled" type="checkbox" class="checkbox" data-on-text="Enable" data-off-text="Disable" ng-model="detailsEditorVm.entityForEdit.boh_svc_gen_enabled" bootstrap-switch/>
-						   	</div>
-						  </div>
+						    <h3 class="panel-title pull-left">Service</h3>
+					    	<div class="pull-right">
+								<input type="checkbox" class="checkbox" data-on-text="Enable" data-off-text="Disable" ng-model="detailsEditorVm.entityForEdit.boh_svc_gen_enabled" bootstrap-switch/>						    
+							</div>
+						  </div>						
 						  <div class="panel-body">
 							<div class="form-group">
 							  <label for="service" class="col-sm-3 control-label" required="true">Service Name</label>
@@ -146,6 +146,22 @@
 							</div>
 						  </div>
 						</div>
+						<div class="row panel panel-default">
+						  <div class="panel-heading clearfix">
+						    <h3 class="panel-title pull-left">UI</h3>
+					    	<div class="pull-right">
+								<input type="checkbox" class="checkbox" data-on-text="Enable" data-off-text="Disable" ng-model="detailsEditorVm.entityForEdit.boh_ui_gen_enabled" bootstrap-switch/>						    
+							</div>
+						  </div>												
+						  <div class="panel-body">
+							<div class="form-group">
+							  <label for="ui-title" class="col-sm-3 control-label" required="true">Page Title</label>
+							  <div class="col-sm-8">
+						     	<input name="ui-title" id="ui-title" class="form-control" placeholder="Type Page Title" ng-model="detailsEditorVm.entityForEdit.boh_ui_title" ng-disabled="!detailsEditorVm.entityForEdit.boh_ui_gen_enabled" minlength="1" required="true">
+							  </div>
+							</div>
+						  </div>
+						</div>						
 					</div>
 				</form>		
 			</div>			

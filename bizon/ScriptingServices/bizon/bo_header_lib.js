@@ -14,13 +14,13 @@ var datasource = database.getDatasource();
 var itemsEntitySetName = "properties";
 var persistentProperties = {
 	mandatory: ["boh_id", "boh_name"],
-	optional: ["boh_description", "boh_table", "boh_id_name", "boh_id_datatype_code", "boh_svc_name"]
+	optional: ["boh_description", "boh_table", "boh_id_name", "boh_id_datatype_code", "boh_svc_name", "boh_svc_gen_enabled", "boh_ds_gen_enabled", "boh_ui_gen_enabled", "boh_ui_title"]
 };
 
 // Parse JSON entity into SQL and insert in db. Returns the new record id.
 exports.insert = function(entity, cascaded) {
 
-	console.debug('Inserting BO_HEADER entity cascaded['+cascaded+'] :' + entity);
+	console.info('Inserting BO_HEADER entity cascaded['+cascaded+'] :' + entity);
 
 	if(entity === undefined || entity === null){
 		throw new Error('Illegal argument: entity is ' + entity);
@@ -45,8 +45,8 @@ exports.insert = function(entity, cascaded) {
     var connection = datasource.getConnection();
     try {
         var sql = "INSERT INTO BO_HEADER (";
-        sql += "BOH_ID, BOH_NAME, BOH_TABLE, BOH_DS_GEN_ENABLED, BOH_ID_NAME, BOH_ID_DATATYPE_CODE, BOH_SVC_NAME, BOH_SVC_GEN_ENABLED, BOH_DESCRIPTION) "; 
-        sql += "VALUES (?,?,?,?,?,?,?,?,?)";
+        sql += "BOH_ID, BOH_NAME, BOH_TABLE, BOH_DS_GEN_ENABLED, BOH_ID_NAME, BOH_ID_DATATYPE_CODE, BOH_SVC_NAME, BOH_SVC_GEN_ENABLED, BOH_UI_GEN_ENABLED, BOH_UI_TITLE, BOH_DESCRIPTION) "; 
+        sql += "VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 
         var statement = connection.prepareStatement(sql);
         
@@ -61,6 +61,8 @@ exports.insert = function(entity, cascaded) {
         statement.setShort(++i, entity.boh_id_datatype_code);        
         statement.setString(++i, entity.boh_svc_name);   
         statement.setShort(++i, entity.boh_svc_gen_enabled);
+        statement.setShort(++i, entity.boh_ui_gen_enabled);
+        statement.setString(++i, entity.boh_ui_title);        
         statement.setString(++i, entity.boh_description);
         
         statement.executeUpdate();
@@ -80,7 +82,7 @@ exports.insert = function(entity, cascaded) {
 	    	}
 		}
 
-        console.debug('BO_HEADER entity inserted with boh_id[' +  entity.boh_id + ']');
+        console.info('BO_HEADER entity inserted with boh_id[' +  entity.boh_id + ']');
 
         return entity.boh_id;
 
@@ -95,7 +97,7 @@ exports.insert = function(entity, cascaded) {
 // Reads a single entity by id, parsed into JSON object 
 exports.find = function(id) {
 
-	console.debug('Finding BO_HEADER entity with id ' + id);
+	console.info('Finding BO_HEADER entity with id ' + id);
 
 	if(id === undefined || id === null){
 		throw new Error('Illegal argument for id parameter:' + id);
@@ -112,7 +114,7 @@ exports.find = function(id) {
         if (resultSet.next()) {
             entity = createEntity(resultSet);
 			if(entity)
-            	console.debug('BO_HEADER entity with id[' + id + '] found');
+            	console.info('BO_HEADER entity with id[' + id + '] found');
         } 
         return entity;
     } catch(e) {
@@ -126,8 +128,8 @@ exports.find = function(id) {
 // Read all entities, parse and return them as an array of JSON objets
 exports.list = function(limit, offset, sort, order, expanded, entityName) {
 
-	console.debug('Listing BO_HEADER entity collection expanded['+expanded+'] with list operators: limit['+limit+'], offset['+offset+'], sort['+sort+'], order['+order+'], entityName['+entityName+']');
-
+	console.info('Listing BO_HEADER entity collection expanded['+expanded+'] with list operators: limit['+limit+'], offset['+offset+'], sort['+sort+'], order['+order+'], entityName['+entityName+']');
+	
     var connection = datasource.getConnection();
     try {
         var entities = [];
@@ -168,7 +170,7 @@ exports.list = function(limit, offset, sort, order, expanded, entityName) {
             entities.push(entity);
         }
         
-        console.debug('' + entities.length +' BO_HEADER entities found');
+        console.info('' + entities.length +' BO_HEADER entities found');
         
         return entities;
     }  catch(e) {
@@ -190,6 +192,8 @@ function createEntity(resultSet) {
     entity.boh_id_datatype_code = resultSet.getShort("BOH_ID_DATATYPE_CODE");
     entity.boh_svc_name = resultSet.getString("BOH_SVC_NAME");
     entity.boh_svc_gen_enabled = resultSet.getShort("BOH_SVC_GEN_ENABLED");        
+    entity.boh_ui_gen_enabled = resultSet.getShort("BOH_UI_GEN_ENABLED");      
+    entity.boh_ui_title = resultSet.getString("BOH_UI_TITLE");      
 	entity.boh_description = resultSet.getString("BOH_DESCRIPTION");
 	if(entity.boh_ds_gen_enabled!==null){
 	    if(entity.boh_ds_gen_enabled > 0)
@@ -203,6 +207,12 @@ function createEntity(resultSet) {
 	    else if(entity.boh_svc_gen_enabled < 1)
 	       	entity.boh_svc_gen_enabled = false;    	
 	}
+	if(entity.boh_ui_gen_enabled!==null){
+	    if(entity.boh_ui_gen_enabled > 0)
+	    	entity.boh_ui_gen_enabled = true;
+	    else if(entity.boh_ui_gen_enabled < 1)
+	       	entity.boh_ui_gen_enabled = false;    	
+	}	
 	for(var key in Object.keys(entity)){
 		if(entity[key] === null)
 			entity[key] = undefined;
@@ -235,7 +245,7 @@ function createSQLEntity(entity) {
 				tblName = tblName.substring(0, 124);
 			tblName += createRadnomAlphanumeric(4);
 			entity.boh_table = tblName;
-			console.debug('Generated boh_table['+entity.boh_table+']');
+			console.info('Generated boh_table['+entity.boh_table+']');
 		}
 		if(entity.boh_id_name !== undefined){
 			var isIdNameValid = /^[a-zA-Z_][a-zA-Z0-9_]{0,255}$/.test(entity.boh_id_name);//TODO: validation needs to come from database dialect provider
@@ -243,7 +253,7 @@ function createSQLEntity(entity) {
 				throw new Error("Illegal arugment: boh_id_name["+entity.boh_id_name+"] does not comply with validation rules");
 		} else {
 			entity.boh_id_name = "id";
-			console.debug('Generated boh_id_name['+entity.boh_id_name+']');
+			console.info('Generated boh_id_name['+entity.boh_id_name+']');
 		}
 		if(entity.boh_id_datatype_code !== undefined){
 			var isIdDataTypeValid = !isNaN(entity.boh_id_datatype_code) && [0,1,2,3,4,5,6,7,8,9].indexOf(entity.boh_id_datatype_code);//TODO: extenralize valid codes
@@ -272,12 +282,25 @@ function createSQLEntity(entity) {
 				svcName = svcName.substring(0, 251);			
 			svcName += createRadnomAlphanumeric(4);
 			entity.boh_svc_name = svcName;
-			console.debug('Generated boh_svc_name['+entity.boh_svc_name+']');
+			console.info('Generated boh_svc_name['+entity.boh_svc_name+']');
 		}
 	} else {
 		entity.boh_svc_gen_enabled = 0;	
 	}
-	console.debug("Transformation to DB JSON object finished: " + entity);
+	if(entity.boh_ui_gen_enabled === true){
+		entity.boh_ui_gen_enabled = 1;
+		if(entity.boh_ui_title !== undefined){
+			if(entity.boh_ui_title.length>255)
+				throw new Error("Illegal arugment: bo_ui_title["+entity.boh_ui_title+"] does not comply with validation rules. Longer than 255 characters.");
+		} else {
+			entity.boh_ui_title = entity.boh_name;
+			console.error('>>>>>>>>>>>'+entity.boh_ui_title)
+			console.info('Autoassigned boh_ui_title['+entity.boh_ui_title+']');			
+		}
+	} else {
+		entity.boh_ui_gen_enabled = 0;	
+	}		
+	console.info("Transformation to DB JSON object finished: " + entity);
 	return entity;
 }
 
@@ -292,7 +315,7 @@ function createRadnomAlphanumeric(length){
 // update entity from a JSON object. Returns the id of the updated entity.
 exports.update = function(entity) {
 
-	console.debug('Updating BO_HEADER entity ' + entity);
+	console.info('Updating BO_HEADER entity ' + entity);
 
 	if(entity === undefined || entity === null){
 		throw new Error('Illegal argument: entity is ' + entity);
@@ -312,7 +335,7 @@ exports.update = function(entity) {
     try {
     
         var sql = "UPDATE BO_HEADER";
-        sql += " SET BOH_NAME=?, BOH_TABLE=?, BOH_DS_GEN_ENABLED=?, BOH_ID_NAME=?, BOH_ID_DATATYPE_CODE=?, BOH_SVC_NAME=?, BOH_SVC_GEN_ENABLED=?, BOH_DESCRIPTION = ?"; 
+        sql += " SET BOH_NAME=?, BOH_TABLE=?, BOH_DS_GEN_ENABLED=?, BOH_ID_NAME=?, BOH_ID_DATATYPE_CODE=?, BOH_SVC_NAME=?, BOH_SVC_GEN_ENABLED=?, BOH_UI_GEN_ENABLED=?, BOH_UI_TITLE=?, BOH_DESCRIPTION = ?"; 
         sql += " WHERE BOH_ID = ?";
         var statement = connection.prepareStatement(sql);
         var i = 0;
@@ -323,12 +346,14 @@ exports.update = function(entity) {
         statement.setShort(++i, entity.boh_id_datatype_code);        
         statement.setString(++i, entity.boh_svc_name);   
         statement.setShort(++i, entity.boh_svc_gen_enabled);
-        statement.setString(++i, entity.boh_description);
+        statement.setShort(++i, entity.boh_ui_gen_enabled);
+        statement.setString(++i, entity.boh_ui_title);      
+        statement.setString(++i, entity.boh_description);        
         var id = entity.boh_id;
         statement.setInt(++i, id);
         statement.executeUpdate();
             
-        console.debug('BO_HEADER entity with boh_id[' + id + '] updated');
+        console.info('BO_HEADER entity with boh_id[' + id + '] updated');
         
         return this;
         
@@ -343,7 +368,7 @@ exports.update = function(entity) {
 // delete entity by id. Returns the id of the deleted entity.
 exports.remove = function(id, cascaded) {
 
-	console.debug('Deleting BO_HEADER entity with id[' + id + '], cascaded['+cascaded+']');
+	console.info('Deleting BO_HEADER entity with id[' + id + '], cascaded['+cascaded+']');
 
 	if(id === undefined || id === null){
 		throw new Error('Illegal argument: id[' + id + ']');
@@ -367,7 +392,7 @@ exports.remove = function(id, cascaded) {
 			}
 		}        
         
-        console.debug('BO_HEADER entity with boh_id[' + id + '] deleted');                
+        console.info('BO_HEADER entity with boh_id[' + id + '] deleted');                
         
         return this;
 
@@ -381,7 +406,7 @@ exports.remove = function(id, cascaded) {
 
 exports.count = function() {
 
-	console.debug('Counting BO_HEADER entities');
+	console.info('Counting BO_HEADER entities');
 
     var count = 0;
     var connection = datasource.getConnection();
@@ -399,14 +424,14 @@ exports.count = function() {
         connection.close();
     }
     
-    console.debug('' + count + ' BO_HEADER entities counted');
+    console.info('' + count + ' BO_HEADER entities counted');
 
     return count;
 };
 
 exports.metadata = function() {
 
-	console.debug('Exporting metadata for BO_HEADER type');
+	console.info('Exporting metadata for BO_HEADER type');
 
 	var entityMetadata = {
 		name: 'bo_header',
@@ -434,6 +459,48 @@ exports.metadata = function() {
 	};
     entityMetadata.properties.push(propertyboh_table);
 
+	var propertyboh_ds_gen_enabled = {
+		name: 'boh_ds_gen_enabled',
+		type: 'booblean'
+	};
+    entityMetadata.properties.push(propertyboh_ds_gen_enabled);
+
+	var propertyboh_id_name = {
+		name: 'boh_id_name',
+		type: 'string'
+	};
+    entityMetadata.properties.push(propertyboh_id_name);
+
+	var propertyboh_id_datatype_code = {
+		name: 'boh_id_datatype_code',
+		type: 'string'
+	};
+    entityMetadata.properties.push(propertyboh_id_datatype_code);
+
+	var propertyboh_svc_gen_enabled = {
+		name: 'boh_svc_gen_enabled',
+		type: 'booblean'
+	};
+    entityMetadata.properties.push(propertyboh_svc_gen_enabled);
+
+	var propertyboh_svc_name = {
+		name: 'boh_svc_name',
+		type: 'string'
+	};
+    entityMetadata.properties.push(propertyboh_svc_name);
+
+	var propertyboh_ui_gen_enabled = {
+		name: 'boh_ui_gen_enabled',
+		type: 'booblean'
+	};
+    entityMetadata.properties.push(propertyboh_ui_gen_enabled);
+
+	var propertyboh_ui_title = {
+		name: 'boh_ui_title',
+		type: 'string'
+	};
+    entityMetadata.properties.push(propertyboh_ui_title);   
+    
 	var propertyboh_description = {
 		name: 'boh_description',
 		type: 'string'
@@ -468,11 +535,11 @@ exports.pkToSQL = function() {
 exports.http = {
 
 	idPropertyName: 'boh_id',
-	validSortPropertyNames: ['boh_id','boh_name','boh_table','boh_description'],
+	validSortPropertyNames: ['boh_id','boh_name'],
 
 	dispatch: function(urlParameters){
 		var method = request.getMethod().toUpperCase();
-		console.debug('Dispatching operation request for HTTP Verb['+ method +'] and URL parameters: ' + urlParameters);
+		console.info('Dispatching operation request for HTTP Verb['+ method +'] and URL parameters: ' + urlParameters);
 
 		if('POST' === method){
 			this.create(urlParameters.cascaded);

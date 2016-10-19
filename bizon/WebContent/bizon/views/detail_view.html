@@ -77,7 +77,7 @@ legend {
 						  </div>
 						  <div class="panel-body">
 							<div class="form-group">
-							    <label for="table" class="col-sm-3 control-label" required="true">Table Name</label>
+							    <label for="table" class="col-sm-3 control-label" required="true">Database Table Name</label>
 							    <div class="col-sm-5">
 							    	<p name="table" id="table" class="form-control-static" ng-bind="detailsVm.selectedEntity.boh_table"></p>
 							    </div>
@@ -110,6 +110,20 @@ legend {
 							</div>						  
 						  </div>
 						</div>
+						<div class="row panel panel-default">
+						  <div class="panel-heading">
+						    <h3 class="panel-title clearifx" style="display: inline-block">UI</h3>
+							<div class="pull-right">[Generation {{detailsVm.selectedEntity.boh_ui_gen_enabled?'Enabled':'Disabled'}}]</div>
+						  </div>
+						  <div class="panel-body">
+							<div class="form-group">
+							  <label for="ui-title" class="col-sm-3 control-label" required="true">Page Title</label>
+							  <div class="col-sm-5">
+							  	<p name="ui-title" id="ui-title" class="form-control-static" ng-bind="detailsVm.selectedEntity.boh_ui_title"></p>
+							  </div>
+							</div>						  
+						  </div>
+						</div>						
 					</form>	
 				</div>
 			</div>
