@@ -55,7 +55,7 @@ legend {
 				<div class="items-list">
 					<div ng-hide="detailsVm.propertyItems.length" class="nodata-text">No Items</div>
 					<div class="list-group">
-					  <a class="list-group-item" ng-repeat="entry in detailsVm.propertyItems|filter:searchText|orderBy:'boi_name'">
+					  <a class="list-group-item" ng-repeat="entry in detailsVm.propertyItems|filter:searchText|orderBy:['boi_name', 'bor_name']">
 						<div class="list-group-item-title">
 							<span ng-class="{emphasized: !entry.boi_null}">{{entry.boi_name||entry.bor_name}}</span><i class="fa fa-asterisk required" aria-hidden="true" ng-if="!entry.boi_null"></i>
 							<span class="optional" ng-if="entry.boi_null">(optional)</span>
@@ -76,19 +76,19 @@ legend {
 						    <div class="pull-right">[Generation {{detailsVm.selectedEntity.boh_ds_gen_enabled?'Enabled':'Disabled'}}]</div>
 						  </div>
 						  <div class="panel-body">
-							<div class="form-group">
+							<div class="form-group" ng-if="detailsVm.filterConfigurationEntries(searchText, 'Database Table Name')">
 							    <label for="table" class="col-sm-3 control-label" required="true">Database Table Name</label>
 							    <div class="col-sm-5">
 							    	<p name="table" id="table" class="form-control-static" ng-bind="detailsVm.selectedEntity.boh_table"></p>
 							    </div>
 							  </div>
-							  <div class="form-group">
+							  <div class="form-group" ng-if="detailsVm.filterConfigurationEntries(searchText, 'Entity Identifier Name')">
 							    <label for="primaryKey" class="col-sm-3 control-label" required="true">Entity Identifier Name</label>
 							    <div class="col-sm-5">
 							    	<p name="primaryKey" id="primaryKey" class="form-control-static" ng-bind="detailsVm.selectedEntity.boh_id_name"></p>				    
 							    </div>
 							  </div>
-							  <div class="form-group">
+							  <div class="form-group" ng-if="detailsVm.filterConfigurationEntries(searchText, 'Entity Identifier Data Type')">
 							    <label for="primaryKeyType" class="col-sm-3 control-label" required="true">Entity Identifier Data Type</label>
 							    <div class="col-sm-5">
 							    	<p name="primaryKeyType" id="primaryKeyType" class="form-control-static" ng-bind="detailsVm.selectedEntity.boh_id_datatype_code"></p>				    
@@ -102,7 +102,7 @@ legend {
 							<div class="pull-right">[Generation {{detailsVm.selectedEntity.boh_svc_gen_enabled?'Enabled':'Disabled'}}]</div>
 						  </div>
 						  <div class="panel-body">
-							<div class="form-group">
+							<div class="form-group"  ng-if="detailsVm.filterConfigurationEntries(searchText, 'Service Name')">
 							  <label for="service" class="col-sm-3 control-label" required="true">Service Name</label>
 							  <div class="col-sm-5">
 							  	<p name="service" id="service" class="form-control-static" ng-bind="detailsVm.selectedEntity.boh_svc_name"></p>
@@ -116,7 +116,7 @@ legend {
 							<div class="pull-right">[Generation {{detailsVm.selectedEntity.boh_ui_gen_enabled?'Enabled':'Disabled'}}]</div>
 						  </div>
 						  <div class="panel-body">
-							<div class="form-group">
+							<div class="form-group" ng-if="detailsVm.filterConfigurationEntries(searchText, 'Page Title')">
 							  <label for="ui-title" class="col-sm-3 control-label" required="true">Page Title</label>
 							  <div class="col-sm-5">
 							  	<p name="ui-title" id="ui-title" class="form-control-static" ng-bind="detailsVm.selectedEntity.boh_ui_title"></p>

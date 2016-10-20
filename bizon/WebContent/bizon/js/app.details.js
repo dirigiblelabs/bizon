@@ -1,5 +1,5 @@
 angular.module('businessObjects')
-.controller('DetailsCtrl', ['masterDataSvc', 'modalService', 'Notifications', 'selectedEntity', '$log', '$state', '$stateParams' , function (masterDataSvc, modalService, Notifications, selectedEntity, $log, $state, $stateParams) {
+.controller('DetailsCtrl', ['masterDataSvc', 'modalService', 'Notifications', 'selectedEntity', '$log', '$state', '$stateParams', '$scope', function (masterDataSvc, modalService, Notifications, selectedEntity, $log, $state, $stateParams, $scope) {
 	
 	this.selectedEntity = selectedEntity;
 	var self = this;
@@ -16,6 +16,7 @@ angular.module('businessObjects')
 	};
 	
 	function showDetails(item){
+		$scope.searchText = undefined;
 		if(item){
 			this.showProperties.apply(this);//Initial content to show	
 		}
@@ -24,6 +25,7 @@ angular.module('businessObjects')
 	showDetails.apply(this, [this.selectedEntity]);
 	
 	this.showRelationships = function(){
+		$scope.searchText = undefined;
 		if(this.selectedEntity.properties){
 			this.propertyItems = this.selectedEntity.properties.filter(function(v){
 				if(v.boi_type && v.boi_type==='Relationship'){
@@ -32,6 +34,10 @@ angular.module('businessObjects')
 				return false;
 			}, this);
 		}
+	};
+	
+	this.showConfig = function(){
+		$scope.searchText = undefined;
 	};
 	
 	function handleServiceError(text, errorPayload){
@@ -101,5 +107,10 @@ angular.module('businessObjects')
     	
     	});
 	};
+	
+	this.filterConfigurationEntries = function(expression, cfgEntry){
+		return !expression || cfgEntry.indexOf(expression)>-1;
+	};
+
 	
 }]);
