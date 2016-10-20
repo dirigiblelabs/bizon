@@ -52,9 +52,9 @@
 	<div class="list-content">	
 	
 		<ul class="nav nav-tabs">
-		  <li role="presentation" class="active"><a href ng-click="detailsEditorVm.showProperties()" data-target="#properties" role="tab" data-toggle="tab">Properties</a></li>
-		  <li role="presentation"><a href ng-click="detailsEditorVm.showRelationships()" role="tab" data-target="#properties" data-toggle="tab">Relationships <i class="fa fa-chain pull-right"></i></a></li>
-		  <li role="presentation"><a href ng-click="detailsEditorVm.showConfig()" data-target="#config" role="tab" data-toggle="tab">Configuration <i class="fa fa-cog pull-right"></i></a></li>		  
+		  <li role="presentation" class="active"><a href ng-click="detailsEditorVm.showProperties()" data-target="#properties" aria-controls="properties" role="tab" data-toggle="tab">Properties</a></li>
+		  <li role="presentation"><a href ng-click="detailsEditorVm.showRelationships()" data-target="#properties" aria-controls="relationships" role="tab" data-toggle="tab">Relationships <i class="fa fa-chain pull-right"></i></a></li>
+		  <li role="presentation"><a href ng-click="detailsEditorVm.showConfig()" data-target="#config" aria-controls="configuration" role="tab" data-toggle="tab">Configuration <i class="fa fa-cog pull-right"></i></a></li>		  
 		</ul>
 
 		<div class="toolbar btn-group pull-left">
@@ -71,7 +71,7 @@
 
 		<div class="tab-content">
 		
-			<div class="tab-pane fade in active">
+			<div class="tab-pane fade in active" role="tabpanel" id="properties">
 				
 				<div class="items-list">
 					<div ng-hide="detailsEditorVm.entityForEdit.properties.length" class="nodata-text">No Items</div>
