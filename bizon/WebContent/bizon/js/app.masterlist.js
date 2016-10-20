@@ -13,6 +13,21 @@ angular.module('businessObjects')
 		order: 'ASC'
 	};
 	
+	this.filterPopover = {
+	    templateUrl: 'filter-popover-view.html'
+	};
+	  
+	//TODO: move to directive
+	angular.element('.filter-popover').popover({
+	    html: true,
+	    title: function () {
+	        return angular.element('.filter-popover-markup').find('.head').html();
+	    },
+	    content: function () {
+	        return angular.element('.filter-popover-markup').find('.content').html();
+	    }
+	});
+	
 	var loadMoreBreakNumber = this.querySettings.limit*2;
 	var self = this;
 	
