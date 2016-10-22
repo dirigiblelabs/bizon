@@ -3,9 +3,10 @@ angular.module('businessObjects')
 
 	this.entityForEdit = $stateParams.entityForEdit;
 	var self = this;
-	var TABS = Object.freeze({PROP_TAB:0, REL_TAB:1});
+	var TABS = Object.freeze({PROP_TAB:0, REL_TAB:1, CONF_TAB:2});
 	
 	this.showProperties = function(){
+		this.searchText = undefined;	
 		this.tab = TABS.PROP_TAB;
 		if(this.entityForEdit.properties){
 			this.propertyItems = this.entityForEdit.properties.filter(function(v){
@@ -26,6 +27,7 @@ angular.module('businessObjects')
 	showDetails.apply(this, [this.entityForEdit]);
 	
 	this.showRelationships = function(){
+		this.searchText = undefined;
 		this.tab = TABS.REL_TAB;	
 		if(this.entityForEdit.properties){
 			this.propertyItems = this.entityForEdit.properties.filter(function(v){
@@ -35,6 +37,11 @@ angular.module('businessObjects')
 				return false;
 			}, this);
 		}
+	};
+	
+	this.showConfig = function(){
+		this.tab = TABS.CONF_TAB;
+		this.searchText = undefined;
 	};
 	
 	this.openPropertyEditor = function(item){
@@ -102,7 +109,7 @@ angular.module('businessObjects')
 			Notifications.createMessageSuccess('Buisness Object updated successfully.');
 			$stateParams.boId = self.entityForEdit.boh_id;
 			$stateParams.selectedEntity = self.entityForEdit;
-			$state.go('^', $stateParams, {reload: 'list', location:false, inherit: false});
+			$state.go('^', $stateParams, {reload: true, location:false, inherit: false});
     	})
     	.catch(function(reason){
     		var message = masterDataSvc.serviceErrorMessageFormatter('Updating Buisness Object failed', reason);
@@ -110,6 +117,10 @@ angular.module('businessObjects')
 			Notifications.createMessageError(message);    		
 			$state.go($state.current, $stateParams, {reload: false});
 		});	  
+	};
+
+	this.filterConfigurationEntries = function(expression, cfgEntry){
+		return !expression || cfgEntry.indexOf(expression)>-1;
 	};
 			
 }]);

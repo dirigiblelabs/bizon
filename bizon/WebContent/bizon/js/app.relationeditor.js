@@ -99,7 +99,7 @@ angular.module('businessObjects')
       	selectedEntity.properties.push(this.relation);
       	$stateParams.entityForEdit = $stateParams.selectedEntity = selectedEntity;
       } else {
-      	this.item.action = 'update';
+      	this.relation.action = 'update';
     	selectedEntity = $stateParams.entityForEdit = $stateParams.selectedEntity; 
       }
       $scope.$close(selectedEntity);
