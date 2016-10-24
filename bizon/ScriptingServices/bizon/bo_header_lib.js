@@ -342,7 +342,7 @@ exports.update = function(entity) {
         statement.setString(++i, entity.boh_table);
         statement.setShort(++i, entity.boh_ds_gen_enabled);
         statement.setString(++i, entity.boh_id_name);
-        statement.setShort(++i, entity.boh_id_datatype_code);        
+        statement.setString(++i, entity.boh_id_datatype_code);        
         statement.setString(++i, entity.boh_svc_name);   
         statement.setShort(++i, entity.boh_svc_gen_enabled);
         statement.setShort(++i, entity.boh_ui_gen_enabled);
