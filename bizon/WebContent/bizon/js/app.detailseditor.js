@@ -5,6 +5,8 @@ angular.module('businessObjects')
 	var self = this;
 	var TABS = Object.freeze({PROP_TAB:0, REL_TAB:1, CONF_TAB:2});
 	
+	this.typeOptions = [{id:0, val:'INTEGER'},{id:1, val:'VARCHAR'},{id:2, val:'BIGINT'}];
+	
 	this.showProperties = function(){
 		this.searchText = undefined;	
 		this.tab = TABS.PROP_TAB;

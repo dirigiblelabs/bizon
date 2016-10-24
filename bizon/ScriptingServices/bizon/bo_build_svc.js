@@ -122,14 +122,14 @@ function defaultValueBySQLType(type){
 }
 
 function createEntityIDColumnDef(entity){
-	var id_type = 'INTEGER';//TODO: Fix this
+	var dataType = entity.boh_id_datatype_code || 'INTEGER';
 	return {
 		name: entity.boh_id_name || 'id',	
-		type: id_type || 'INTEGER',
+		type: dataType,
 		primaryKey: true,	
-		length: entity.boi_length || lengthBySQLType(id_type),
+		length: entity.boi_length || lengthBySQLType(dataType),
 		notNull: true,
-		defaultValue: defaultValueBySQLType(id_type),
+		defaultValue: defaultValueBySQLType(dataType),
 	};
 }
 
@@ -155,7 +155,7 @@ function generateUIForEntity(entity, template, worker){
 	template.pageTitle = entity.boh_ui_title || entity.boh_name;
 	template.tableName = template.fileName;
 	template.serviceEndpoint = '/'+template.packageName+'/'+template.fileName;	
-	template.fileName = template.fileName.replace('.js','') + '.html';
+	template.fileName = template.fileName.replace('.js','.html');
 	template.columns = template.columns.map(function(column){
 		column.label = column.boi_label || column.name;
 		column.widgetType = column.boi_widgetType || 'text';
@@ -175,9 +175,12 @@ function createSQLEntity(item) {
 		defaultValue: item.boi_default || ''
 	};
 	persistentItem.name = item.boi_name.replace(/\s+/g, '_');
-	persistentItem.type = stringToCodeItemTypeMapping(item.boi_type);
-	if(persistentItem.length === 0 && persistentItem.type === 'VARCHAR'){
-		persistentItem.length = 255;
+	persistentItem.type = item.boi_type;//stringToCodeItemTypeMapping(item.boi_type);
+	if(!persistentItem.length){
+		if(item.boi_type=== 'VARCHAR'){
+			persistentItem.length = 255;
+		}
+		//TODO: add default legnths for all relevant sql types
 	}
 	if(persistentItem.defaultValue === undefined){
 		persistentItem.defaultValue = '';

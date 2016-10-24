@@ -8,7 +8,7 @@ var database = require("db/database");
 var datasource = database.getDatasource();
 
 var persistentProperties = {
-	mandatory: ["boi_id", "boi_boh_id", "boi_name","boi_column","boi_type"],
+	mandatory: ["boi_id", "boi_boh_id", "boi_name", "boi_column", "boi_type", "boi_type_name"],
 	optional: ["boi_length", "boi_null", "boi_default"]
 };
 
@@ -33,39 +33,8 @@ exports.insert = function(item) {
 	
     var connection = datasource.getConnection();
     try {
-        var sql = "INSERT INTO BO_ITEM (";
-        sql += "BOI_ID";
-        sql += ",";
-        sql += "BOI_BOH_ID";
-        sql += ",";
-        sql += "BOI_NAME";
-        sql += ",";
-        sql += "BOI_COLUMN";
-        sql += ",";
-        sql += "BOI_TYPE";
-        sql += ",";
-        sql += "BOI_LENGTH";
-        sql += ",";
-        sql += "BOI_NULL";
-        sql += ",";
-        sql += "BOI_DEFAULT";
-        sql += ") VALUES ("; 
-        sql += "?";
-        sql += ",";
-        sql += "?";
-        sql += ",";
-        sql += "?";
-        sql += ",";
-        sql += "?";
-        sql += ",";
-        sql += "?";
-        sql += ",";
-        sql += "?";
-        sql += ",";
-        sql += "?";
-        sql += ",";
-        sql += "?";
-        sql += ")";
+        var sql = "INSERT INTO BO_ITEM (BOI_ID, BOI_BOH_ID, BOI_NAME, BOI_COLUMN, BOI_TYPE_NAME, BOI_TYPE, BOI_LENGTH, BOI_NULL, BOI_DEFAULT)";
+        sql += " VALUES (?,?,?,?,?,?,?,?,?)";
 
         var statement = connection.prepareStatement(sql);
         item = createSQLEntity(item);
@@ -77,7 +46,8 @@ exports.insert = function(item) {
         statement.setInt(++j, item.boi_boh_id);
         statement.setString(++j, item.boi_name);
         statement.setString(++j, item.boi_column);
-        statement.setInt(++j, item.boi_type);
+        statement.setString(++j, item.boi_type_name);        
+        statement.setString(++j, item.boi_type);
         statement.setInt(++j, item.boi_length);
         statement.setShort(++j, item.boi_null);
         statement.setString(++j, item.boi_default);
@@ -175,8 +145,9 @@ function createEntity(resultSet) {
 	entity.boi_boh_id = resultSet.getInt("BOI_BOH_ID");
     entity.boi_name = resultSet.getString("BOI_NAME");
     entity.boi_column = resultSet.getString("BOI_COLUMN");
-	entity.boi_type = resultSet.getInt("BOI_TYPE");
-	entity.boi_type = codeToStringItemTypeMapping(entity.boi_type);
+	entity.boi_type_name = resultSet.getString("BOI_TYPE_NAME");    
+	entity.boi_type = resultSet.getString("BOI_TYPE");
+//	entity.boi_type = codeToStringItemTypeMapping(entity.boi_type);
 	entity.boi_length = resultSet.getInt("BOI_LENGTH");
     if(entity.boi_length === null)
     	delete entity.boi_length;	
@@ -206,7 +177,7 @@ function createSQLEntity(item) {
 			persistentItem[persistentProperties.optional[i]] = null;
 		}
 	}
-	persistentItem.boi_type = stringToCodeItemTypeMapping(persistentItem.boi_type);
+//	persistentItem.boi_type = stringToCodeItemTypeMapping(persistentItem.boi_type);
 	if(persistentItem.boi_null === null || persistentItem.boi_null === true){
 		persistentItem.boi_null = 1;
 	} else {
@@ -263,38 +234,17 @@ exports.update = function(item) {
 		throw new Error('Illegal argument: item is ' + item);
 	}
 	
-	if(item.boi_id === undefined || item.boi_id === null){
-		throw new Error('Illegal boi_id attribute: ' + item.boi_id);
-	}	
-	
-	if(item.boi_boh_id === undefined || item.boi_boh_id === null){
-		throw new Error('Illegal boi_boh_id attribute: ' + item.boi_boh_id);
-	}	
-	
-	if(item.boi_name === undefined || item.boi_name === null){
-		throw new Error('Illegal boi_name attribute: ' + item.boi_name);
-	}
-
-	if(item.boi_type === undefined || item.boi_type === null){
-		throw new Error('Illegal boi_type attribute: ' + item.boi_type);
+	for(var i = 0; i< persistentProperties.mandatory.length; i++){
+		var propName = persistentProperties.mandatory[i];
+		var propValue = item[propName];
+		if(propValue === undefined || propValue === null){
+			throw new Error('Illegal value for property ' + propName + '[' + propValue +'] in BO_ITEM for update ' + item);
+		}
 	}
 
     var connection = datasource.getConnection();
     try {
-        var sql = "UPDATE BO_ITEM SET ";
-        sql += "BOI_BOH_ID = ?";
-        sql += ",";
-        sql += "BOI_NAME = ?";
-        sql += ",";
-        sql += "BOI_COLUMN = ?";
-        sql += ",";
-        sql += "BOI_TYPE = ?";
-        sql += ",";
-        sql += "BOI_LENGTH = ?";
-        sql += ",";
-        sql += "BOI_NULL = ?";
-        sql += ",";
-        sql += "BOI_DEFAULT = ?";
+        var sql = "UPDATE BO_ITEM SET BOI_BOH_ID = ?, BOI_NAME = ?, BOI_COLUMN = ?, BOI_TYPE_NAME = ?, BOI_TYPE = ?, BOI_LENGTH = ?, BOI_NULL = ?, BOI_DEFAULT = ?";
         sql += " WHERE BOI_ID = ?";
         
         var statement = connection.prepareStatement(sql);
@@ -304,7 +254,8 @@ exports.update = function(item) {
         statement.setInt(++i, item.boi_boh_id);
         statement.setString(++i, item.boi_name);
         statement.setString(++i, item.boi_column);
-        statement.setInt(++i, item.boi_type);
+        statement.setString(++i, item.boi_type_name);        
+        statement.setString(++i, item.boi_type);
         statement.setInt(++i, item.boi_length);
         statement.setShort(++i, item.boi_null);
         statement.setString(++i, item.boi_default);
@@ -414,6 +365,12 @@ exports.metadata = function() {
 	};
     entityMetadata.properties.push(propertyboi_column);
 
+	var propertyboi_type_name = {
+		name: 'boi_type_name',
+		type: 'string'
+	};
+    entityMetadata.properties.push(propertyboi_type_name);
+    
 	var propertyboi_type = {
 		name: 'boi_type',
 		type: 'integer'
@@ -466,7 +423,7 @@ exports.pkToSQL = function() {
 exports.http = {
 
 	idPropertyName: 'boi_id',
-	validSortPropertyNames: ['boi_id','boi_name','boi_boh_id','boi_column','boi_type','boi_length','boi_null','boi_default'],
+	validSortPropertyNames: ['boi_id','boi_name','boi_boh_id','boi_column','boi_type_name','boi_type','boi_length','boi_null','boi_default'],
 
 	dispatch: function(urlParameters){
 		var method = request.getMethod().toUpperCase();

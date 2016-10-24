@@ -49,11 +49,11 @@
       ,
       {
         "name":"BOH_ID_DATATYPE_CODE",
-        "type":"SMALLINT",
-        "length":"1",
+        "type":"VARCHAR",
+        "length":"255",
         "notNull":"false",
         "primaryKey":"false",
-        "defaultValue":"1"
+        "defaultValue":""
       }     
       ,
       {

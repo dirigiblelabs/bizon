@@ -39,9 +39,18 @@
       }
       ,
       {
+        "name":"BOI_TYPE_NAME",
+        "type":"VARCHAR",
+        "length":"255",
+        "notNull":"true",
+        "primaryKey":"false",
+        "defaultValue":""
+      }      
+      ,
+      {
         "name":"BOI_TYPE",
-        "type":"INTEGER",
-        "length":"0",
+        "type":"VARCHAR",
+        "length":"255",
         "notNull":"true",
         "primaryKey":"false",
         "defaultValue":""

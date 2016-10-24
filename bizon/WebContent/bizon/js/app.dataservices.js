@@ -48,7 +48,9 @@
 		res.newObjectTemplate = {
 					"boi_name":"Item",
 					"boi_column":"Item",
-					"boi_type": "String",
+					"boi_type_name": "Text",					
+					"boi_type": "VARCHAR",
+					"length": "100",					
 					"boi_null": true,
 				};
 		return res;

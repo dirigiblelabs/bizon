@@ -60,7 +60,7 @@ legend {
 							<span ng-class="{emphasized: !entry.boi_null}">{{entry.boi_name||entry.bor_name}}</span><i class="fa fa-asterisk required" aria-hidden="true" ng-if="!entry.boi_null"></i>
 							<span class="optional" ng-if="entry.boi_null">(optional)</span>
 						</div>
-						<div class="list-group-item-text" ng-if="entry.boi_type!=='Relationship'">Data Type: <span style="color: gray; font-style: italic">{{entry.boi_type}}<span></div>
+						<div class="list-group-item-text" ng-if="entry.boi_type!=='Relationship'">Data Type: <span style="color: gray; font-style: italic">{{entry.boi_type_name}}<span></div>
 						<div class="list-group-item-text" ng-if="entry.bor_type">Relation Type: <span style="color: gray; font-style: italic">{{entry.bor_type==1?'Association':'Composition'}}<span></div>						
 					  </a>
 					</div>

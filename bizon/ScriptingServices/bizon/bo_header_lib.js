@@ -58,7 +58,7 @@ exports.insert = function(entity, cascaded) {
         statement.setString(++i, entity.boh_table);
         statement.setShort(++i, entity.boh_ds_gen_enabled);
         statement.setString(++i, entity.boh_id_name);
-        statement.setShort(++i, entity.boh_id_datatype_code);        
+        statement.setString(++i, entity.boh_id_datatype_code);        
         statement.setString(++i, entity.boh_svc_name);   
         statement.setShort(++i, entity.boh_svc_gen_enabled);
         statement.setShort(++i, entity.boh_ui_gen_enabled);
@@ -189,7 +189,7 @@ function createEntity(resultSet) {
     entity.boh_table = resultSet.getString("BOH_TABLE");
     entity.boh_ds_gen_enabled = resultSet.getShort("BOH_DS_GEN_ENABLED");    	
     entity.boh_id_name = resultSet.getString("BOH_ID_NAME");
-    entity.boh_id_datatype_code = resultSet.getShort("BOH_ID_DATATYPE_CODE");
+    entity.boh_id_datatype_code = resultSet.getString("BOH_ID_DATATYPE_CODE");
     entity.boh_svc_name = resultSet.getString("BOH_SVC_NAME");
     entity.boh_svc_gen_enabled = resultSet.getShort("BOH_SVC_GEN_ENABLED");        
     entity.boh_ui_gen_enabled = resultSet.getShort("BOH_UI_GEN_ENABLED");      
@@ -256,11 +256,11 @@ function createSQLEntity(entity) {
 			console.info('Generated boh_id_name['+entity.boh_id_name+']');
 		}
 		if(entity.boh_id_datatype_code !== undefined){
-			var isIdDataTypeValid = !isNaN(entity.boh_id_datatype_code) && [0,1,2,3,4,5,6,7,8,9].indexOf(entity.boh_id_datatype_code);//TODO: extenralize valid codes
+			/*var isIdDataTypeValid = !isNaN(entity.boh_id_datatype_code) && [0,1,2,3,4,5,6,7,8,9].indexOf(entity.boh_id_datatype_code);//TODO: extenralize valid codes
 			if(!isIdDataTypeValid)
-				throw new Error("Illegal arugment: boh_id_datatype_code["+entity.boh_id_datatype_code+"] does not comply with validation rules");
+				throw new Error("Illegal arugment: boh_id_datatype_code["+entity.boh_id_datatype_code+"] does not comply with validation rules");*/
 		} else {
-			entity.boh_id_datatype_code = 1;
+			entity.boh_id_datatype_code = "INTEGER";
 		}
 	} else {
 		entity.boh_ds_gen_enabled = 0;	
@@ -294,7 +294,6 @@ function createSQLEntity(entity) {
 				throw new Error("Illegal arugment: bo_ui_title["+entity.boh_ui_title+"] does not comply with validation rules. Longer than 255 characters.");
 		} else {
 			entity.boh_ui_title = entity.boh_name;
-			console.error('>>>>>>>>>>>'+entity.boh_ui_title)
 			console.info('Autoassigned boh_ui_title['+entity.boh_ui_title+']');			
 		}
 	} else {
