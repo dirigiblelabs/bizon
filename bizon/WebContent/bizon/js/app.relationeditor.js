@@ -1,5 +1,5 @@
 angular.module('businessObjects')
-.controller('RelationEditorCtrl', ['$scope', 'masterDataSvc', '$log', '$stateParams', 'selectedEntity', function($scope, masterDataSvc, $log, $stateParams, selectedEntity) {
+.controller('RelationEditorCtrl', ['$scope', 'masterDataSvc', '$log', '$stateParams', 'selectedEntity','$timeout', function($scope, masterDataSvc, $log, $stateParams, selectedEntity, $timeout) {
 	
 	this.loading = false;
 	this.noResults;
@@ -32,8 +32,38 @@ angular.module('businessObjects')
 	
 	var MULTIPLICITY_OPTS = Object.freeze({ONE:1, MANY:2});
 	var isNewProperty;
+	
 	var self = this;
-		
+	
+	//TODO:move to directive	
+	this.registerForValidation = function () {
+		//$timeout without delay will wait for the view tempalte to load
+		$timeout(function(){
+			self.form = angular.element('.modal-dialog form');		
+			self.formValidationOptions = {
+				errorClass: 'has-error',
+		     	validClass : 'has-success',
+		     	ignore: 'input[style*="position: absolute"]',
+		 		highlight: function (element, errorClass, validClass) {
+					            angular.element(element).closest('.form-group').removeClass('has-success').addClass('has-error');
+					            if($validator.numberOfInvalids()>0)
+					            	angular.element('.modal-footer .btn.btn-success').addClass('disabled');
+					        },
+				unhighlight: function(element, errorClass, validClass) {
+					        	$(element).closest('.form-group').removeClass('has-error').addClass('has-success');
+					        	if($validator.numberOfInvalids()<1)
+						        	angular.element('.modal-footer .btn.btn-success').removeClass('disabled');
+					        },
+				success: "has-success"	    
+			};			
+			var $validator = angular.element(self.form).validate(self.formValidationOptions);
+//			validator.form();//This doesn't work as expected
+			$('.modal-dialog form .form-control[required]').each(function(i){
+        		$validator.element(this);
+        	})
+		});
+	};
+			
 	function init(){
 		isNewProperty = $stateParams.item === undefined ? true : false;
 		if(isNewProperty) {
@@ -45,7 +75,18 @@ angular.module('businessObjects')
 			this.relation.bor_name = selectedEntity.boh_name +'- ';
 		} else {
 			this.relation = $stateParams.item;
+			if(this.relation.bor_target_id){
+				masterDataSvc.get(this.relation.bor_target_id, true)
+				.then(function(target){
+					self.relation.target = target;
+				});			
+			}
+			relationToSlider.apply(this, [this.relation, this.slider]);
 		}
+		$scope.$$postDigest(function () {
+			    $scope.$broadcast('rzSliderForceRender');
+		});	
+		this.registerForValidation();
 	}
 	
 	this.matchTargets = function(name){
@@ -67,43 +108,62 @@ angular.module('businessObjects')
 	};
 	
 	this.changeTarget = function(){
-		var nameSegments = self.relation.bor_name.split('-');
+/*		var nameSegments = self.relation.bor_name.split('-');
 		if(self.relation.target){
 			nameSegments[1] = self.relation.target.boh_name;	
 		} else {
 			nameSegments[1] = "[No target selected yet]";
 		}
-		self.relation.bor_name = nameSegments.join('-');
+		self.relation.bor_name = nameSegments.join('-');*/
+		//TODO: implement in case we need some special formatting
 		return (self.relation.target && self.relation.target.boh_name) || '';
 	};
     
-   this.cancel = function() {
-      $scope.$dismiss($stateParams.selectedEntity);
+    this.cancel = function() {
+   		$scope.$dismiss($stateParams.selectedEntity);
     };
 
-    this.ok = function() {    
-		if(self.slider.value === MULTIPLICITY_TYPES.ONE_TO_ONE){
-      		this.relation.bor_src_type = MULTIPLICITY_OPTS.ONE;
-      		this.relation.bor_target_type = MULTIPLICITY_OPTS.ONE;
-  		} else if(self.slider.value === MULTIPLICITY_TYPES.ONE_TO_MANY){
-  			this.relation.bor_src_type = MULTIPLICITY_OPTS.MANY;
-      		this.relation.bor_target_type = MULTIPLICITY_OPTS.ONE;
-  		} else if(self.slider.value === MULTIPLICITY_TYPES.MANY_TO_MANY){
-  			this.relation.bor_src_type = MULTIPLICITY_OPTS.MANY;
-      		this.relation.bor_target_type = MULTIPLICITY_OPTS.MANY;
-  		}
-  		this.relation.bor_target_id = this.relation.target.boh_id;
-  		this.relation.bor_type = this.relTypeSlider.value;
-      if(isNewProperty){      	
-      	this.relation.action = 'save';
-      	selectedEntity.properties.push(this.relation);
-      	$stateParams.entityForEdit = $stateParams.selectedEntity = selectedEntity;
-      } else {
-      	this.relation.action = 'update';
-    	selectedEntity = $stateParams.entityForEdit = $stateParams.selectedEntity; 
-      }
-      $scope.$close(selectedEntity);
+    this.ok = function($event) {
+    	if(angular.element($event.target).hasClass('disabled')){
+    		$event.stopPropagation();
+    		return;
+    	}
+		sliderValueToRelation.apply(self, [self.slider.value, self.relation]);
+		if(this.relation.target)
+  			this.relation.bor_target_id = this.relation.target.boh_id;
+		if(isNewProperty){      	
+		  this.relation.action = 'save';
+		  selectedEntity.properties.push(this.relation);
+		  $stateParams.entityForEdit = $stateParams.selectedEntity = selectedEntity;
+		} else {
+			this.relation.action = 'update';
+			selectedEntity = $stateParams.selectedEntity = $stateParams.entityForEdit; 
+		}
+		$scope.$close(selectedEntity);
     };
+    
+    function sliderValueToRelation(sliderValue, relation){
+    	if(sliderValue === MULTIPLICITY_TYPES.ONE_TO_ONE){
+      		relation.bor_src_type = MULTIPLICITY_OPTS.ONE;
+      		relation.bor_target_type = MULTIPLICITY_OPTS.ONE;
+  		} else if(sliderValue === MULTIPLICITY_TYPES.ONE_TO_MANY){
+  			relation.bor_src_type = MULTIPLICITY_OPTS.MANY;
+      		relation.bor_target_type = MULTIPLICITY_OPTS.ONE;
+  		} else if(sliderValue === MULTIPLICITY_TYPES.MANY_TO_MANY){
+  			relation.bor_src_type = MULTIPLICITY_OPTS.MANY;
+      		relation.bor_target_type = MULTIPLICITY_OPTS.MANY;
+  		}
+    }
+    
+    function relationToSlider(relation, slider){
+		if(relation.bor_src_type === MULTIPLICITY_OPTS.ONE && relation.bor_target_type === MULTIPLICITY_OPTS.ONE){
+      		slider.value = MULTIPLICITY_TYPES.ONE_TO_ONE;
+  		} else if(relation.bor_src_type === MULTIPLICITY_OPTS.MANY && relation.bor_target_type === MULTIPLICITY_OPTS.ONE){
+  		 	slider.value = MULTIPLICITY_TYPES.ONE_TO_MANY;
+  		} else if(relation.bor_src_type === MULTIPLICITY_OPTS.MANY && relation.bor_target_type === MULTIPLICITY_OPTS.MANY){
+  			slider.value = MULTIPLICITY_TYPES.MANY_TO_MANY;
+  		}			
+    }    
     
     init.apply(this);
     

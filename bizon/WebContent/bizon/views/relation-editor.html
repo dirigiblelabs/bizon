@@ -7,6 +7,20 @@
 		min-width: 85px !important;
     	font-size: 1.3rem;	
 	}
+	.rzslider .rz-pointer {
+	  background-color: #428bca;
+	  outline: 0px;
+	}
+	.rzslider .rz-pointer.rz-active:after {
+	  background-color: #fff;
+	  border:none;
+	}	
+	.rzslider .rz-bar {
+	  background: #c5c6c7;
+	}
+	.rzslider .rz-ticks .rz-tick {
+	  background: #c5c6c7;
+	}	
 </style>
 
 
@@ -22,13 +36,13 @@
 		  <div class="form-group">
 		    <label for="name" class="col-sm-4 control-label" required="true" readonly>Name</label>
 		    <div class="col-sm-7">
-		      <input name="name" id="name" class="form-control" placeholder="Type Relationship Name" ng-model="relEditorVm.relation.bor_name" minlength="1">
+		      <input name="name" id="name" class="form-control" placeholder="Type Relationship Name" ng-model="relEditorVm.relation.bor_name" minlength="1" required="true">
 		    </div>
 		  </div>
 		  <div class="form-group">
-		    <label for="item_target_name1" class="col-sm-4 control-label" required="true">Target Object</label>
+		    <label for="item_target_name" class="col-sm-4 control-label" required="true">Target Object</label>
 		    <div class="col-sm-7">
-				<input id="item_target_name1" type="text" placeholder="Type to select target object" class="form-control"
+				<input id="item_target_name" type="text" placeholder="Type to select target object" class="form-control" required="true"
 					 ng-model="relEditorVm.relation.target" 
 					 ng-model-options="{ debounce: 500, blur: 250 }"
 					 typeahead-loading="relEditorVm.loading" 
@@ -51,14 +65,14 @@
 		  <div class="form-group">
 	  		<label for="boi_null" class="col-sm-4 control-label">Relation Type</label>
 		    <div class="col-sm-7">
-		    	<rzslider rz-slider-model="relEditorVm.relTypeSlider.value" rz-slider-options="relEditorVm.relTypeSlider.options"></rzslider>
+		    	<rzslider rz-slider-model="relEditorVm.relation.bor_type" rz-slider-options="relEditorVm.relTypeSlider.options"></rzslider>
 		    </div>
 		  </div>		  
 		</form>
 	</div>
 	
 	<div class="modal-footer">
-	  <button class="btn btn-success" ng-click="relEditorVm.ok()">OK</button>
+	  <button class="btn btn-success" ng-click="relEditorVm.ok($event)" ng-disabled="$this.hasClass('disabled')">OK</button>
 	  <button class="btn" ng-click="relEditorVm.cancel()">Cancel</button>
 	</div>
 	

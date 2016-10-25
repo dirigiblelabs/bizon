@@ -146,24 +146,7 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		            controllerAs: 'relEditorVm'
 		        });
 		        modalInstance.rendered.then(function(){
-		        	var $validator = $('.modal-body form').validate({
-		        		errorClass: 'has-error',
-		        		validClass : 'has-success',
- 		        		highlight: function (element, errorClass, validClass) {
-				            $(element).closest('.form-group').removeClass('has-success').addClass('has-error');
-				            if($validator.numberOfInvalids()>0)
-				            	$('.modal-footer .btn.btn-success').addClass('disabled');
-				        },
-				        unhighlight: function(element, errorClass, validClass) {
-				        	$(element).closest('.form-group').removeClass('has-error').addClass('has-success');
-				        	if($validator.numberOfInvalids()<1)
-					        	$('.modal-footer .btn.btn-success').removeClass('disabled');	
-				        },
-		 		        success: "has-success"
-		        	});
-		        	$('.form-control[required]').each(function(i){
-		        		$validator.element(this);
-		        	});
+		        	//moved to controller
 		        });
 		        modalInstance.result.then(goBack, goBack);
 		    }]
