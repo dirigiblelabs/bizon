@@ -21,6 +21,8 @@ function handleRequest() {
 	var count = xss.escapeSql(request.getParameter('count'));
 	var metadata = xss.escapeSql(request.getParameter('metadata'));
 	var expanded = xss.escapeSql(request.getParameter('expanded'));
+	var srcId = xss.escapeSql(request.getParameter('srcId'));
+	var targetId = xss.escapeSql(request.getParameter('targetId'));	
 
 	if(checkConflictingParameters(id, count, metadata)){
 		var limit = xss.escapeSql(request.getParameter('limit'));
@@ -45,7 +47,9 @@ function handleRequest() {
 				"sort": sort,	
 				"order": order			
 			},
-			"expanded": (expanded!==null)
+			"expanded": (expanded!==null),
+			"srcId": srcId,
+			"targetId": targetId			
 		};
 		
 		entityBo_relation.http.dispatch(urlParameters);	

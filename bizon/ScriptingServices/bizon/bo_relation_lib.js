@@ -134,7 +134,7 @@ exports.list = function(limit, offset, sort, order, srcId, targetId) {
     var connection = datasource.getConnection();
     try {
         var entities = [];
-        var sql = "SELECT ";
+        var sql = "SELECT";
         if (limit !== null && offset !== null) {
             sql += " " + datasource.getPaging().genTopAndStart(limit, offset);
         }
@@ -146,7 +146,7 @@ exports.list = function(limit, offset, sort, order, srcId, targetId) {
         	if(srcId !== null && targetId !== null)
         		sql += " OR ";
 			if(targetId !== null)
-        		sql += "BOR_TARGET_ID = ?";
+        		sql += " BOR_TARGET_ID = ?";
     	}
         if (sort !== null) {
             sql += " ORDER BY " + sort;
@@ -157,6 +157,7 @@ exports.list = function(limit, offset, sort, order, srcId, targetId) {
         if (limit !== null && offset !== null) {
             sql += " " + datasource.getPaging().genLimitAndOffset(limit, offset);
         }
+
         var statement = connection.prepareStatement(sql);
         var i=0;
         if(srcId!==null)
@@ -170,7 +171,7 @@ exports.list = function(limit, offset, sort, order, srcId, targetId) {
             entities.push(entity);
         }
         
-        console.log('' + entities.length +' BO_RELATION entities found');
+        console.info('' + entities.length +' BO_RELATION entities found');
         
         return entities;
     }  catch(e) {
@@ -415,7 +416,7 @@ exports.http = {
 				} else if(urlParameters.count){
 					this.count();
 				} else if(urlParameters.list){
-					this.query(urlParameters.list.limit, urlParameters.list.offset, urlParameters.list.sort, urlParameters.list.order);
+					this.query(urlParameters.list.limit, urlParameters.list.offset, urlParameters.list.sort, urlParameters.list.order, urlParameters.srcId, urlParameters.targetId);
 				}
 			} else {
 				this.query();

@@ -4,6 +4,9 @@ legend {
     padding:0 10px; /* To give a bit of padding on the left and right */
     border-bottom:none;
 }
+button.list-group-item:active, button.list-group-item:focus {
+	background-color: transparent;
+}
 </style>
 
 <div class="detail col-xs-8 col-md-10">
@@ -37,10 +40,10 @@ legend {
 
 		<ul class="nav nav-tabs">
 		  <li role="presentation" class="active"><a href ng-click="detailsVm.showProperties()" data-target="#properties" aria-controls="properties" role="tab" data-toggle="tab">Properties</a></li>
-		  <li role="presentation"><a href ng-click="detailsVm.showRelationships()" data-target="#properties" aria-controls="relationships" role="tab" data-toggle="tab">Relations <i class="fa fa-chain pull-right"></i></a></li>
+		  <li role="presentation"><a href ng-click="detailsVm.showRelationships()" data-target="#relations" aria-controls="relations" role="tab" data-toggle="tab">Relations <i class="fa fa-chain pull-right"></i></a></li>
 		  <li role="presentation"><a href ng-click="detailsVm.showConfig()" data-target="#config" aria-controls="configuration" role="tab" data-toggle="tab">Configuration <i class="fa fa-cog pull-right"></i></a></li>		  
 		</ul>
-	
+
 		<div class="toolbar btn-group pull-right">
 			<div class="inner-addon left-addon">
 			    <i class="glyphicon glyphicon-search"></i>	
@@ -55,17 +58,52 @@ legend {
 				<div class="items-list">
 					<div ng-hide="detailsVm.propertyItems.length" class="nodata-text">No Items</div>
 					<div class="list-group">
-					  <a class="list-group-item" ng-repeat="entry in detailsVm.propertyItems|filter:detailsVm.searchText|orderBy:['boi_name', 'bor_name']">
+					  <a class="list-group-item" ng-repeat="entry in detailsVm.propertyItems|filter:detailsVm.searchText|orderBy:['boi_name']">
 						<div class="list-group-item-title">
-							<span ng-class="{emphasized: !entry.boi_null}">{{entry.boi_name||entry.bor_name}}</span><i class="fa fa-asterisk required" aria-hidden="true" ng-if="!entry.boi_null"></i>
+							<span ng-class="{emphasized: !entry.boi_null}">{{entry.boi_name}}</span><i class="fa fa-asterisk required" aria-hidden="true" ng-if="!entry.boi_null"></i>
 							<span class="optional" ng-if="entry.boi_null">(optional)</span>
 						</div>
 						<div class="list-group-item-text" ng-if="entry.boi_type!=='Relationship'">Data Type: <span style="color: gray; font-style: italic">{{entry.boi_type_name}}<span></div>
-						<div class="list-group-item-text" ng-if="entry.bor_type">Relation Type: <span style="color: gray; font-style: italic">{{entry.bor_type==1?'Association':'Composition'}}<span></div>						
 					  </a>
 					</div>
 				</div>	
 			</div>
+			
+			<div class="tab-pane fade" role="tabpanel" id="relations">
+	
+				<div class="items-list">
+					<div class="list-group">
+					  <div class="list-group-item" ng-click="$event.stopPropagation();" style="outline: none; cursor: auto; background-color: #f5f5f5">
+						Outbound relations from <span style="font-style:italic">{{detailsVm.selectedEntity.boh_name}}</span> to other entities <i class="fa fa-arrow-right"></i>
+					  </div>					
+					  <button type="button" class="list-group-item" ng-repeat="entry in detailsVm.outboundRelations|filter:detailsVm.searchText|orderBy:['bor_name']" ng-click="$event.stopPropagation();" style="outline: none; cursor: auto;">
+						<div class="list-group-item-title">
+							<span class="emphasized">{{entry.bor_name}}</span>
+						</div>
+						<div class="list-group-item-text">
+							Relation Type: <span style="color: gray; font-style: italic">{{entry.bor_type===1?'Association':'Composition'}}</span> of <a ng-href="#/{{entry.bor_target_id}}">{{entry.target.boh_name}}</a>
+						</div>						
+					  </button>
+					</div>
+					<div ng-hide="detailsVm.outboundRelations.length>0" class="nodata-text">No Items</div>					
+				</div>
+				<div class="items-list">									
+					<div class="list-group">
+					  <div class="list-group-item" ng-click="$event.stopPropagation();" style="outline: none; cursor: auto; background-color: #f5f5f5">
+						Inbound relations from other entities to <span style="font-style:italic">{{detailsVm.selectedEntity.boh_name}}</span> <i class="fa fa-arrow-left"></i>
+					  </div>										
+					  <button type="button" class="list-group-item" ng-repeat="entry in detailsVm.inboundRelations|filter:detailsVm.searchText|orderBy:['bor_name']" ng-click="$event.stopPropagation();" style="outline: none; cursor: auto;">
+						<div class="list-group-item-title">
+							<span class="emphasized">{{entry.bor_name}}</span>
+						</div>
+						<div class="list-group-item-text">
+							Relation Type: <span style="color: gray; font-style: italic">{{entry.bor_type==1?'Association':'Composition'}}</span> for <a ng-href="#/{{entry.bor_src_id}}">{{entry.source.boh_name}}</a>
+						</div>						
+					  </button>
+					</div>
+					<div ng-hide="detailsVm.inboundRelations.length>0" class="nodata-text">No Items</div>										
+				</div>	
+			</div>			
 			
 			<div class="tab-pane fade" role="tabpanel" id="config">
 				<form class="form-horizontal">			
