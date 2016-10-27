@@ -56,9 +56,14 @@
 		return res;
 	}])	
 	.service('BuildService', ['$resource', function($resource) {
-	  	return $resource('../../js/bizon/bo_build_svc.js', {}, {
+	  	return $resource('../../js/bizon/bo_build_svc.js/:path', {}, {
 	  		build: {
 	  			method: 'POST',
+	  			isArray: false
+  			},
+  			listTemplates: {
+	  			method: 'GET',
+	  			params: {path: 'templates'},
 	  			isArray: false
   			}
 	  	});

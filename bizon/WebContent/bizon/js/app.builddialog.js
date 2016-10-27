@@ -14,6 +14,31 @@ angular.module('businessObjects')
 	};
 	var self = this;
 	
+	BuildService.listTemplates().$promise
+		.then(function(templates){
+			self.templates = templates;
+			self.cfg.templates = {};
+			//set defualt templates
+			if(templates.ds){
+				self.cfg.templates.ds = templates.ds.find(function(tmpl){
+					return tmpl.name === 'ds_table';
+				});
+			}
+			if(templates.svc){
+				self.cfg.templates.svc = templates.svc.find(function(tmpl){
+					return tmpl.name === 'svc_js_crud';
+				});
+			}
+			if(templates.ds){
+				self.cfg.templates.ui = templates.ui.find(function(tmpl){
+					return tmpl.name === 'ui_list_and_manage';
+				});
+			}			
+		})
+		.catch(function(response){
+			$log.error(response);
+		});
+
 	this.build = function(){
 		var buildRequestPayload = angular.copy(self.cfg);
 		buildRequestPayload.entities = masterDataSvc.getLoadedData();

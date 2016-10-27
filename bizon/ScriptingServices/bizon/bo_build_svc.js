@@ -3,7 +3,33 @@
 
 var request = require('net/http/request');
 var response = require('net/http/response');
+var xss = require("utils/xss");
 var generator = require('platform/generator');
+
+
+var TEMPLATE_CATEGORY = Object.freeze({"DATSTRUCTURE":"ds", "SERVICE":"svc", "UI":"ui"});
+var templates = {
+	"ds": [{
+		"name": "ds_table", 
+		"label": "Relational Database Table", 
+		"description": "Relational database table template",
+		"templateAdapter": generateDataStructure
+	}],
+	"svc": [{
+		"name": "svc_js_crud", 
+		"label": "JavaScript Entity Service on Table",
+		"description": "JavaScript RESTful entity service on a relational database table", 
+		"templateAdapter": generateService,
+		"baseTemplate": "ds"
+	}],	
+	"ui": [{
+		"name": "ui_list_and_manage", 
+		"label": "List and Manage Entity",
+		"description": "List and manage entity page based on Bootstrap and AngularJS", 
+		"templateAdapter": generateUIForEntity,
+		"baseTemplate": "svc"
+	}]
+};
 
 handleRequest();
 
@@ -15,13 +41,36 @@ function handleRequest() {
 
 	var method = request.getMethod().toUpperCase();
 
-	if('POST' !== method){
-		response.setStatus(400);
-		response.println('Not suported method for this resource: ' + method);
-		response.flush();
-		response.close();
-		return;
-	} else {
+	if('GET' === method){
+		var path = request.getAttribute("path");
+		if(path === 'templates'){
+			var category = xss.escapeSql(request.getParameter('category'));
+			if(category){
+				var templateIds = Object.keys(TEMPLATE_CATEGORY).map(function(key){
+					return TEMPLATE_CATEGORY[key];
+				});			
+				if(templateIds.indexOf(category)<0){
+					response.setStatus(400);
+		    		console.error('Illegal value for query parameter category['+category+']. Must be one of ' + templateIds);
+		    		response.println('{"err":"Illegal value for query parameter category['+category+']. Must be one of ' + templateIds+'"}');
+					response.flush();
+					response.close();
+					return;    		
+				}
+			}
+			
+			var _templates = listTemplates(category);	
+			var jsonResponse = JSON.stringify(_templates, null, 2);
+	        response.println(jsonResponse);
+		} else {
+		    response.setStatus(400);
+    		console.error('No handler for this resource path['+path+']');
+    		response.println('{"err":"No handler for this resource path['+path+']"}');
+			response.flush();
+			response.close();
+			return;    		
+		}	
+	} else if('POST' === method){
 		//read, parse and validate input
 		var input = request.readInputText();
 	    var buildRequest = JSON.parse(input);
@@ -71,12 +120,18 @@ function handleRequest() {
 			return;    		
 		}
 		
+	} else{
+		response.setStatus(400);
+		response.println('Not suported HTTP method['+method+'] for this resource');
+		response.flush();
+		response.close();
+		return;
 	}
 
 	response.flush();
 	response.close();
 
-};
+}
 
 
 function getBaseTemplate(projectName, packageName, entity){
@@ -203,3 +258,23 @@ function stringToCodeItemTypeMapping(typeIndex) {
 		return 'OBJECT';
 }
 
+//TODO: provide for list of categories too
+function listTemplates(category){	
+	var _templates = {};
+	if(category && Object.keys(templates).indexOf(category)>-1){
+		_templates[category] = templates[category];
+	} else{
+		_templates = templates;
+	}
+	var _keys = Object.keys(_templates);
+	for(var i=0;i<_keys.length;i++){
+		_templates[_keys[i]] = _templates[_keys[i]].map(function(tmpl){
+			return {
+				"name": tmpl.name,
+				"label": tmpl.label,			
+				"description": tmpl.description,
+			};
+		});
+	}
+	return _templates;
+}
