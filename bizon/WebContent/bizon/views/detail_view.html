@@ -57,7 +57,7 @@ button.list-group-item:active, button.list-group-item:focus {
 	
 				<div class="items-list">
 					<div ng-hide="detailsVm.propertyItems.length" class="nodata-text">No Items</div>
-					<div class="list-group">
+					<div class="list-group" ng-if="detailsVm.propertyItems.length>0">
 					  <a class="list-group-item" ng-repeat="entry in detailsVm.propertyItems|filter:detailsVm.searchText|orderBy:['boi_name']">
 						<div class="list-group-item-title">
 							<span ng-class="{emphasized: !entry.boi_null}">{{entry.boi_name}}</span><i class="fa fa-asterisk required" aria-hidden="true" ng-if="!entry.boi_null"></i>

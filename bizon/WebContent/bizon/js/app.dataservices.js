@@ -88,7 +88,11 @@
 		
 		this.masterDataTemplateObject = createMasterDataTemplateObject();
 		this.batchLoadedMasterData = [];//data cache
-		this.querySettings;
+		this.querySettings = {
+			limit: 100,
+			sort: 'boh_name',
+			order: 'ASC'
+		};
 		this.selection = [];
 		
 		var self = this;
@@ -261,8 +265,10 @@
 			}
 
 			promises.unshift(Entity.update({boId: header.boh_id}, header).$promise);
-			promises.push(refresh.apply(self));
-	    	return $q.all(promises);
+			//promises.push(refresh.apply(self));
+	    	return $q.all(promises).then(function(){
+	    		refresh.apply(self);
+	    	});
 		};	
 		
 		this.remove = function(headerId, cascaded){

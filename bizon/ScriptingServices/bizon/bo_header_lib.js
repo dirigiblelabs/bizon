@@ -17,6 +17,12 @@ var persistentProperties = {
 	optional: ["boh_description", "boh_table", "boh_id_name", "boh_id_datatype_code", "boh_svc_name", "boh_svc_gen_enabled", "boh_ds_gen_enabled", "boh_ui_gen_enabled", "boh_ui_title"]
 };
 
+var parseIntStrict = function (value) {
+  if(/^(\-|\+)?([0-9]+|Infinity)$/.test(value))
+    return Number(value);
+  return NaN;
+}
+
 // Parse JSON entity into SQL and insert in db. Returns the new record id.
 exports.insert = function(entity, cascaded) {
 
@@ -605,8 +611,9 @@ exports.http = {
 	
 	get: function(id, expanded){
 		//id is mandatory parameter and an integer
-		if(id === undefined || isNaN(parseInt(id))) {
+		if(id === undefined || isNaN(parseIntStrict(id))) {
 			this.printError(response.BAD_REQUEST, 1, "Invallid id parameter: " + id);
+			return;
 		}
 
 	    try{
@@ -616,7 +623,7 @@ exports.http = {
         		return;
 			}
 			var jsonResponse = JSON.stringify(item, null, 2);
-	        response.println(jsonResponse);        	
+	        response.println(jsonResponse);
 		} catch(e) {
     	    var errorCode = response.INTERNAL_SERVER_ERROR ;
         	this.printError(errorCode, errorCode, e.message, e.errContext);
@@ -627,14 +634,14 @@ exports.http = {
 	query: function(limit, offset, sort, order, expanded, entityName){
 		if (offset === undefined || offset === null) {
 			offset = 0;
-		} else if(isNaN(parseInt(offset)) || offset<0) {
+		} else if(isNaN(parseIntStrict(offset)) || offset<0) {
 			this.printError(response.BAD_REQUEST, 1, "Invallid offset parameter: " + offset + ". Must be a positive integer.");
 			return;
 		}
 
 		if (limit === undefined || limit === null) {
 			limit = 0;
-		}  else if(isNaN(parseInt(limit)) || limit<0) {
+		}  else if(isNaN(parseIntStrict(limit)) || limit<0) {
 			this.printError(response.BAD_REQUEST, 1, "Invallid limit parameter: " + limit + ". Must be a positive integer.");
 			return;			
 		}

@@ -1,7 +1,7 @@
 angular.module('businessObjects')
 .controller('EditCtrl', ['masterDataSvc', 'modalService', 'Notifications', 'selectedEntity', '$log', '$state', '$stateParams', function (masterDataSvc, modalService, Notifications, selectedEntity, $log, $state, $stateParams) {
 
-	this.entityForEdit = $stateParams.entityForEdit;
+	this.entityForEdit = $stateParams.entityForEdit || JSON.parse(JSON.stringify(selectedEntity));
 	var self = this;
 	var TABS = Object.freeze({PROP_TAB:0, REL_TAB:1, CONF_TAB:2});
 	
@@ -55,7 +55,7 @@ angular.module('businessObjects')
 		} else if(this.tab === TABS.REL_TAB){
 			$state.go('list.entity.edit.relations', {
 				entityForEdit: this.entityForEdit,
-				item: item
+				relation: item
 			}, {location: false});
 		}
 	};
@@ -97,21 +97,17 @@ angular.module('businessObjects')
 
         modalService.showModal({}, modalOptions)
         .then(function () {
-			delete $stateParams.boIdedit;
-			delete $stateParams.entityForEdit;
-		    $state.go('^', $stateParams);
+			delete $stateParams.entityForEdit;			
+		    $state.go('list.entity', {boId:self.entityForEdit.boh_id});
         });
 	};
 	
 	this.saveItem = function() {
-
-	    masterDataSvc.update($stateParams.entityForEdit)
+	    masterDataSvc.update(self.entityForEdit)
 	    .then(function(){
 			$log.debug('Buisness Object updated successfully');
 			Notifications.createMessageSuccess('Buisness Object updated successfully.');
-			$stateParams.boId = self.entityForEdit.boh_id;
-			$stateParams.selectedEntity = self.entityForEdit;
-			$state.go('^', $stateParams, {reload: true, location:false, inherit: false});
+			$state.go('list.entity', {boId: self.entityForEdit.boh_id}, {reload:true});
     	})
     	.catch(function(reason){
     		var message = masterDataSvc.serviceErrorMessageFormatter('Updating Buisness Object failed', reason);

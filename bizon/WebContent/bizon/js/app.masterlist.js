@@ -31,7 +31,7 @@ angular.module('businessObjects')
 	var loadMoreBreakNumber = this.querySettings.limit*2;
 	var self = this;
 	
-	function initList(selectedEntity) {
+/*	function initList(selectedEntity) {
 		this.items = masterDataSvc.getLoadedData();
 		if(this.items.length > 0) {
 			var selectedEntityId;
@@ -89,7 +89,7 @@ angular.module('businessObjects')
 			boId: item.boh_id
 		});
 		$state.go('list.entity', $stateParams, {reload: false});
-	};
+	};*/
 	
 	this.createItem = function(){
 		masterDataSvc.create()
@@ -99,14 +99,15 @@ angular.module('businessObjects')
 			$log.debug('Business Object with id '+newItem.boh_id+' created successfully');
 			Notifications.createMessageSuccess('Business Object created successfully');
 			masterDataSvc.selection = [newItem];
-			initList.apply(self, [masterDataSvc.selection[0]]);
+			self.items = masterDataSvc.getLoadedData();
+//			initList.apply(self, [masterDataSvc.selection[0]]);
 			return;
 		})
 		.catch(function(reason){
 			handleServiceError('Creating new Buisness Object failed', reason);
 		})
 		.finally(function(){
-			$state.go("list.entity", $stateParams, {reload: false});
+			$state.go("list.entity", {boId:$stateParams.boId}, {reload: false});
 		});
 	};
 	
@@ -127,7 +128,7 @@ angular.module('businessObjects')
 				delete $stateParams.boId;
 				delete $state.params.boId;
 				delete $stateParams.selectedEntity;
-				delete $state.params.selectedEntity;					
+				delete $state.params.selectedEntity;			
 				$log.debug('Business object deleted');
 				Notifications.createMessageSuccess('Buisness Object successfully deleted.');
 
@@ -136,8 +137,8 @@ angular.module('businessObjects')
 				handleServiceError('Deleting Buisness Object failed', reason);
 			})
 			.finally(function(){
-				$state.go($state.current, $stateParams, {reload: true, inheirt: false});
-				initList.apply(self);
+				$state.go('list', {message: $stateParams.message}, {reload: true, inheirt: false});
+				//initList.apply(self);
 			});	        
         });
         
@@ -158,11 +159,43 @@ angular.module('businessObjects')
 				//..
 			})
 			.finally(function(){
-				initList.apply(self, [masterDataSvc.selection[0]]);
+				self.items = masterDataSvc.getLoadedData();
+				if(self.items.length > 0) {
+					if($state.current.name==='list.entity' && $state.params.boId!==undefined){
+						masterDataSvc.get($stateParams.entityId)
+						.then(function(entity){
+							if(entity){
+	              				postNext.apply(self);
+							}
+						});				
+					} else {
+						postNext.apply(self);
+						if(masterDataSvc.getLoadedData().length>0){
+		              		$state.go('list.entity', {boId: masterDataSvc.getLoadedData()[0].boh_id});
+		              	}
+		              	self.busy = false;
+					}
+					//initList.apply(self, [masterDataSvc.selection[0]]);		
+				} else {
+					$state.go('list.empty');
+				}
 			});			
 		}
 		self.busy = true;
 	};
+	
+	var postNext = function(){
+		if(self.items.length === loadMoreBreakNumber){
+			return masterDataSvc.hasMore()
+			.then(function(_hasMore){
+				self.showLoadMore = _hasMore;
+				loadMoreBreakNumber = loadMoreBreakNumber + self.querySettings*2;
+			});
+		} else {
+			self.showLoadMore = false;
+		}
+		self.count = masterDataSvc._itemsCount;
+	}
 	
 	this.build = function(){
 		$state.go('list.entity.build',$stateParams,{reload:true,location:true});

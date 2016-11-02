@@ -8,8 +8,7 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		.state('list', {
 			  url: "/",
 		      params: {
-		    	  message: undefined,
-		    	  selectedEntity: undefined
+		    	  message: undefined
 		      },
 		      views: {
 		          'master': {
@@ -37,14 +36,18 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		      }
 		   })			    
 		.state('list.entity', {
-			url: ":boId",
-		    params: {
+			url: "{boId}",
+/*		    params: {
 			  	selectedEntity: undefined
-		    }, 
+		    }, */
 			resolve: { 
-	            selectedEntity: ['$stateParams',
-	                function($stateParams) {
-	                	return $stateParams.selectedEntity;
+	            selectedEntity: ['$stateParams', 'masterDataSvc',
+	                function($stateParams, masterDataSvc) {
+	                	if($stateParams.boId){
+	                		return masterDataSvc.get($stateParams.boId, true);
+	                	} else {
+	                		return $stateParams.selectedEntity;	                	
+	                	}
                 }]
             },
             views: {
@@ -56,12 +59,8 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		     }
 		   })	
 		.state('list.entity.edit', {
-			  url: "edit",
 		      params: {
-		    	  items: undefined,
-		    	  selectedEntity: undefined,
-		    	  entityForEdit: undefined,
-		    	  message: {value: undefined}  
+		    	entityForEdit: undefined
 		      },
 		      views: {
 		          'master@': {
@@ -75,16 +74,21 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		      }
 		    })
 		.state("list.entity.edit.items", {
-			url: "property",
+			resolve: {
+				entityForEdit: ['$stateParams', function($stateParams){
+					return $stateParams.entityForEdit;
+				}],
+				item: ['$stateParams', function($stateParams){
+					return $stateParams.item;
+				}]
+			},
 		    params: {
-				selectedEntity: undefined,
-				item: undefined,
-				message: {value: undefined}
+				item: undefined
 		    },
-		    onEnter: ['$stateParams', '$state', '$uibModal', function($stateParams, $state, $modal) {
+		    onEnter: ['$state', '$uibModal', 'entityForEdit', 'item', function($state, $modal, entityForEdit, item) {
 		    	
 		    	function goBack(_selectedEntity) {
-		        	$state.go("list.entity.edit", {selectedEntity: _selectedEntity}, {location:false});
+		        	$state.go("list.entity.edit", {entityForEdit: _selectedEntity}, {reload:true});
 		        }
 		    	
 		        var modalInstance = $modal.open({
@@ -92,7 +96,10 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		            templateUrl: "views/propertyEditor.html",
 		            resolve: {
 		            	selectedEntity: function() { 
-		            		return $stateParams.selectedEntity; 
+		            		return entityForEdit; 
+		            	},
+		            	item: function(){
+		            		return item;
 		            	}
 		            },
 		            controller: 'PropertyEditorCtrl',
@@ -122,16 +129,22 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		    }]
 		  })
 		.state("list.entity.edit.relations", {
-			url: "relation",
 		    params: {
 				entityForEdit: undefined,				
-				item: undefined,
-				message: {value: undefined}
+				relation: undefined
 		    },
-		    onEnter: ['$stateParams', '$state', '$uibModal', function($stateParams, $state, $modal) {
+			resolve: {
+				entityForEdit: ['$stateParams', function($stateParams){
+					return $stateParams.entityForEdit;
+				}],
+				relation: ['$stateParams', function($stateParams){
+					return $stateParams.relation;
+				}]
+			},		    
+		    onEnter: ['$state', '$uibModal', 'entityForEdit', 'relation', function($state, $modal, entityForEdit, relation) {
 		    	
 		    	function goBack(_selectedEntity) {
-		        	$state.go("list.entity.edit", {selectedEntity: _selectedEntity}, {location:false});
+		        	$state.go("list.entity.edit", {entityForEdit: _selectedEntity}, {reload:true});
 		        }
 		    	
 		        var modalInstance = $modal.open({
@@ -139,7 +152,10 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		            templateUrl: "views/relation-editor.html",
 		            resolve: {
 		            	selectedEntity: function() { 
-		            		return $stateParams.selectedEntity; 
+		            		return entityForEdit; 
+		            	},
+		            	relation: function(){
+		            		return relation;
 		            	}
 		            },
 		            controller: 'RelationEditorCtrl',
@@ -152,7 +168,6 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		    }]
 		  })		  
 		  .state("list.entity.build", {
-		  	url: 'build',
 		    params: {
 				message: {value: undefined}
 		    },

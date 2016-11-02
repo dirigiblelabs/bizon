@@ -144,6 +144,8 @@ function getBaseTemplate(projectName, packageName, entity){
 	if(entity.properties){
 		for(var j=0; j< entity.properties.length; j++){
 			var prop = entity.properties[j];
+			if(!prop.boi_name)
+				continue;
 			prop = createSQLEntity(prop);
 			baseTemplate.columns.push(prop);
 		}
@@ -229,7 +231,7 @@ function createSQLEntity(item) {
 		primaryKey: false,
 		defaultValue: item.boi_default || ''
 	};
-	persistentItem.name = item.boi_name.replace(/\s+/g, '_');
+	persistentItem.name = item.boi_name.replace(/\s+/g, '_');	
 	persistentItem.type = item.boi_type;//stringToCodeItemTypeMapping(item.boi_type);
 	if(!persistentItem.length){
 		if(item.boi_type=== 'VARCHAR'){

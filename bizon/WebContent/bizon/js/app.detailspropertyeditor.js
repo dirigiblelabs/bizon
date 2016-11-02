@@ -1,7 +1,8 @@
 angular.module('businessObjects')
-.controller('PropertyEditorCtrl', ['$scope', 'Item', '$stateParams', 'selectedEntity', function($scope, Item, $stateParams, selectedEntity) {
+.controller('PropertyEditorCtrl', ['$scope', 'Item', 'selectedEntity', 'item', function($scope, Item, selectedEntity, item) {
 	
-	var isNewProperty;
+	this.item = item;
+	var isNewProperty = (item === undefined ? true : false);
 							
 	this.typeOptions = [{
 							id: '0',
@@ -24,7 +25,7 @@ angular.module('businessObjects')
 						},{
 							id: '3',
 							val: 'Alternative (Yes/No)',
-							typemap: "tinyint"
+							typemap: "SMALLINT"
 						},{
 							id: '4',
 							val: 'Temporal',
@@ -65,18 +66,15 @@ angular.module('businessObjects')
 			this.item.boi_type = this.selectedTypeOption.typemap;
 		}
 	};
-	
+
 	function init(){
 		$scope.$$postDigest(function () {
 			    $scope.$broadcast('rzSliderForceRender');
 		});
-		
-		isNewProperty = $stateParams.item === undefined ? true : false;
 		if(isNewProperty) {
 			this.item = angular.copy(Item.newObjectTemplate);
-			this.item.boi_boh_id = $stateParams.selectedEntity.boh_id;
+			this.item.boi_boh_id = selectedEntity.boh_id;
 		} else {
-			this.item = $stateParams.item;
 			this.selectedTypeOption = this.typeOptions.find(function(typeOption){
 						return typeOption.val === self.item.boi_type_name;
 					});
@@ -88,25 +86,26 @@ angular.module('businessObjects')
 				this.typeVariantsSlider.value = this.selectedTypeOption.variant.value;
 			}
 		}
-
-    	/*$timeout(function () {
-        	$scope.$broadcast('rzSliderForceRender');
-    	});*/
 	}
     
    this.cancel = function() {
-      $scope.$dismiss($stateParams.selectedEntity);
+      $scope.$dismiss(selectedEntity);
     };
 
     this.ok = function() {
       if(isNewProperty){
       	this.item.action = 'save';
       	selectedEntity.properties.push(this.item);
-      	$stateParams.entityForEdit = $stateParams.selectedEntity = selectedEntity;
       } else {
       	this.item.action = 'update';
+      	selectedEntity.properties = selectedEntity.properties.map(function(prop){
+      		if(prop.boi_id === self.item.boi_id){
+      			return self.item;
+      		}
+      		return prop;
+      	});
       }
-      $scope.$close($stateParams.entityForEdit);
+      $scope.$close(selectedEntity);
     };
     
     init.apply(this);

@@ -38,35 +38,8 @@ exports.insert = function(entity) {
 
     var connection = datasource.getConnection();
     try {
-        var sql = "INSERT INTO BO_RELATION (";
-        sql += "BOR_ID";
-        sql += ",";
-        sql += "BOR_SRC_ID";
-        sql += ",";
-        sql += "BOR_SRC_TYPE";
-        sql += ",";
-        sql += "BOR_TARGET_ID";
-        sql += ",";
-        sql += "BOR_TARGET_TYPE";
-        sql += ",";
-        sql += "BOR_NAME";        
-        sql += ",";
-        sql += "BOR_TYPE";                
-        sql += ") VALUES ("; 
-        sql += "?";
-        sql += ",";
-        sql += "?";
-        sql += ",";
-        sql += "?";
-        sql += ",";
-        sql += "?";
-        sql += ",";
-        sql += "?";
-        sql += ",";        
-        sql += "?";        
-        sql += ",";        
-        sql += "?";         
-        sql += ")";
+        var sql = "INSERT INTO BO_RELATION (BOR_ID,BOR_SRC_ID,BOR_SRC_TYPE,BOR_TARGET_ID,BOR_TARGET_TYPE,BOR_NAME,BOR_TYPE)"+
+        		  " VALUES (?,?,?,?,?,?,?)";
         
         var statement = connection.prepareStatement(sql);
         

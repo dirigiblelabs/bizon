@@ -1,5 +1,7 @@
 angular.module('businessObjects')
-.controller('RelationEditorCtrl', ['$scope', 'masterDataSvc', '$log', '$stateParams', 'selectedEntity','$timeout', function($scope, masterDataSvc, $log, $stateParams, selectedEntity, $timeout) {
+.controller('RelationEditorCtrl', ['$scope', 'masterDataSvc', '$log', '$stateParams', 'selectedEntity', 'relation', '$timeout', function($scope, masterDataSvc, $log, $stateParams, selectedEntity, relation, $timeout) {
+	
+	this.relation = relation;
 	
 	this.loading = false;
 	this.noResults;
@@ -31,7 +33,7 @@ angular.module('businessObjects')
 	};
 	
 	var MULTIPLICITY_OPTS = Object.freeze({ONE:1, MANY:2});
-	var isNewProperty;
+	var isNewProperty = (relation === undefined ? true : false);
 	
 	var self = this;
 	
@@ -65,16 +67,15 @@ angular.module('businessObjects')
 	};
 			
 	function init(){
-		isNewProperty = $stateParams.item === undefined ? true : false;
 		if(isNewProperty) {
 			this.relation = {
 				boi_type: 'Relationship'
 			};
-			this.relation.bor_src_id = $stateParams.selectedEntity.boh_id;
+			this.relation.bor_src_id = selectedEntity.boh_id;
 			this.relation.bor_src_type = MULTIPLICITY_OPTS.ONE;
 			this.relation.bor_name = selectedEntity.boh_name +'- ';
 		} else {
-			this.relation = $stateParams.item;
+//			this.relation = $stateParams.item;
 			if(this.relation.bor_target_id){
 				masterDataSvc.get(this.relation.bor_target_id, true)
 				.then(function(target){
@@ -134,10 +135,15 @@ angular.module('businessObjects')
 		if(isNewProperty){      	
 		  this.relation.action = 'save';
 		  selectedEntity.properties.push(this.relation);
-		  $stateParams.entityForEdit = $stateParams.selectedEntity = selectedEntity;
 		} else {
 			this.relation.action = 'update';
-			selectedEntity = $stateParams.selectedEntity = $stateParams.entityForEdit; 
+			selectedEntity.properties = selectedEntity.properties
+				.map(function(prop){
+					if(prop.bor_id === self.relation.bor_id){
+						return self.relation;
+					}
+					return prop;
+				});
 		}
 		$scope.$close(selectedEntity);
     };

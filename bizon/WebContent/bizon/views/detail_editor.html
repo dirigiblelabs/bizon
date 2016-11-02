@@ -53,7 +53,7 @@
 	
 		<ul class="nav nav-tabs">
 		  <li role="presentation" class="active"><a href ng-click="detailsEditorVm.showProperties()" data-target="#properties" aria-controls="properties" role="tab" data-toggle="tab">Properties</a></li>
-		  <li role="presentation"><a href ng-click="detailsEditorVm.showRelationships()" data-target="#properties" aria-controls="relationships" role="tab" data-toggle="tab">Relations <i class="fa fa-chain pull-right"></i></a></li>
+		  <li role="presentation"><a href ng-click="detailsEditorVm.showRelationships()" data-target="#relations" aria-controls="relations" role="tab" data-toggle="tab">Relations <i class="fa fa-chain pull-right"></i></a></li>
 		  <li role="presentation"><a href ng-click="detailsEditorVm.showConfig()" data-target="#config" aria-controls="configuration" role="tab" data-toggle="tab">Configuration <i class="fa fa-cog pull-right"></i></a></li>		  
 		</ul>
 
@@ -76,17 +76,16 @@
 				<div class="items-list">
 					<div ng-hide="detailsEditorVm.entityForEdit.properties.length" class="nodata-text">No Items</div>
 					<div class="list-group">
-					  <a class="list-group-item selected-{{entry._selected_}}" ng-repeat="entry in detailsEditorVm.propertyItems|filter:detailsEditorVm.searchText|orderBy:['boi_name', 'bor_name']">
+					  <a class="list-group-item selected-{{entry._selected_}}" ng-repeat="entry in detailsEditorVm.propertyItems|filter:detailsEditorVm.searchText|orderBy:['boi_name']">
 						<div style="display:inline-block">
 							<div class="list-group-item-heading">
-								<span ng-class="{emphasized: !entry.boi_null}">{{entry.boi_name||entry.bor_name}}</span><i class="fa fa-asterisk required" aria-hidden="true" ng-if="!entry.boi_null"></i>
+								<span ng-class="{emphasized: !entry.boi_null}">{{entry.boi_name}}</span><i class="fa fa-asterisk required" aria-hidden="true" ng-if="!entry.boi_null"></i>
 								<span class="optional" ng-if="entry.boi_null">(optional)</span>
 							</div>
 							<div class="list-group-item-text" ng-if="entry.boi_type!=='Relationship'">Data Type: <span style="color: gray; font-style: italic">{{entry.boi_type_name}}<span></div>
-							<div class="list-group-item-text" ng-if="entry.bor_type">Relation Type: <span style="color: gray; font-style: italic">{{entry.bor_type==1?'Association':'Composition'}}<span></div>
 						</div>
 						<div class="btn-group pull-right">
-		   					<button class="btn btn-primary" ng-click="detailsEditorVm.openPropertyEditor(entry)">
+		   					<button class="btn btn-primary" ui-sref="list.entity.edit.items({item: entry, selectedEntity: detailsEditorVm.entityForEdit})">
 							  <i class="fa fa-pencil" aria-hidden="true"></i>
 							</button>
 							<button class="btn btn-danger" ng-click="detailsEditorVm.deleteProperty(entry)">
@@ -98,6 +97,33 @@
 				</div>
 				
 			</div>	
+			
+			<div class="tab-pane fade" role="tabpanel" id="relations">
+	
+				<div class="items-list">
+					<div ng-hide="detailsEditorVm.propertyItems.length" class="nodata-text">No Items</div>				
+					<ul class="list-group" ng-show="detailsEditorVm.propertyItems.length">
+					  <li class="list-group-item" ng-repeat="entry in detailsEditorVm.propertyItems|filter:detailsEditorVm.searchText|orderBy:['bor_name']" ng-click="$event.stopPropagation();" style="outline: none; cursor: auto;">
+						<div style="display:inline-block">					  
+							<div class="list-group-item-title">
+								<span class="emphasized">{{entry.bor_name}}</span>
+							</div>
+							<div class="list-group-item-text">
+								Relation Type: <span style="color: gray; font-style: italic">{{entry.bor_type===1?'Association':'Composition'}}</span> <!--of <a ng-href="#/{{entry.bor_target_id}}">{{entry.target.boh_name}}</a>-->
+							</div>
+						</div>
+						<div class="btn-group pull-right">
+		   					<button class="btn btn-primary" ui-sref="list.entity.edit.relations({relation: entry, entityForEdit: detailsEditorVm.entityForEdit})">
+							  <i class="fa fa-pencil" aria-hidden="true"></i>
+							</button>
+							<button class="btn btn-danger" ng-click="detailsEditorVm.deleteProperty(entry)">
+							  <i class="glyphicon glyphicon-remove" aria-hidden="true"></i>
+							</button>
+						</div>					
+					  </li>
+					</ul>
+				</div>
+			</div>			
 			
 			<div class="tab-pane fade" role="tabpanel" id="config">
 				<div>
