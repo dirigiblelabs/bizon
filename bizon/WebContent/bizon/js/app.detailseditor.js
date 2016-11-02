@@ -5,14 +5,12 @@ angular.module('businessObjects')
 	var self = this;
 	var TABS = Object.freeze({PROP_TAB:0, REL_TAB:1, CONF_TAB:2});
 	
-	this.typeOptions = [{id:0, val:'INTEGER'},{id:1, val:'VARCHAR'},{id:2, val:'BIGINT'}];
-	
 	this.showProperties = function(){
 		this.searchText = undefined;	
 		this.tab = TABS.PROP_TAB;
 		if(this.entityForEdit.properties){
 			this.propertyItems = this.entityForEdit.properties.filter(function(v){
-				if(v.action==='remove' || !v.boi_type || v.boi_type!=='Relationship'){
+				if(v.action!=='remove' && v.boi_type!=='Relationship'){
 					return true;
 				}
 				return false;
@@ -33,7 +31,7 @@ angular.module('businessObjects')
 		this.tab = TABS.REL_TAB;	
 		if(this.entityForEdit.properties){
 			this.propertyItems = this.entityForEdit.properties.filter(function(v){
-				if(v.action==='remove' || (v.boi_type && v.boi_type==='Relationship')){
+				if(v.action!=='remove' && v.boi_type === 'Relationship') {
 					return true;
 				}
 				return false;
@@ -78,11 +76,14 @@ angular.module('businessObjects')
 			}
 			self.entityForEdit.properties = self.entityForEdit.properties.map(
 				function(currItem){
+					if(item.boi_id===undefined && currItem === item){
+						return;
+					}
 					if((currItem.boi_id && currItem.boi_id === item.boi_id) || (currItem.bor_id && currItem.bor_id === item.bor_id)){
 						currItem.action = 'remove';
 					}
 					return currItem;
-				});				
+				}).filter(function(n){ return n != undefined; });
         });
         
 	};
@@ -119,6 +120,19 @@ angular.module('businessObjects')
 
 	this.filterConfigurationEntries = function(expression, cfgEntry){
 		return !expression || cfgEntry.indexOf(expression)>-1;
+	};
+
+	this.typeOptions = [{id:0, val:'INTEGER'},{id:1, val:'VARCHAR'},{id:2, val:'BIGINT'}];
+	
+	this.cfgDataTypeSelectedTypeOption = this.typeOptions.find(function(opt){
+			return opt.val.toLowerCase() === self.entityForEdit.boh_id_datatype_code.toLowerCase();
+		});
+	
+	this.cfgDataTypeSelectionChanged = function(option){
+		this.cfgDataTypeSelectedTypeOption = this.typeOptions.find(function(opt){
+			return opt.id === option.id;
+		});
+		this.entityForEdit.boh_id_datatype_code = this.cfgDataTypeSelectedTypeOption.val;
 	};
 			
 }]);

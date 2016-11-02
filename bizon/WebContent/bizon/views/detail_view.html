@@ -81,7 +81,7 @@ button.list-group-item:active, button.list-group-item:focus {
 							<span class="emphasized">{{entry.bor_name}}</span>
 						</div>
 						<div class="list-group-item-text">
-							Relation Type: <span style="color: gray; font-style: italic">{{entry.bor_type===1?'Association':'Composition'}}</span> of <a ng-href="#/{{entry.bor_target_id}}">{{entry.target.boh_name}}</a>
+							Relation Type: <span style="color: gray; font-style: italic">{{entry.bor_type===1?'Association':'Composition'}}</span> in <a ng-href="#/{{entry.bor_target_id}}">{{entry.target.boh_name}}</a>
 						</div>						
 					  </button>
 					</div>
@@ -97,7 +97,7 @@ button.list-group-item:active, button.list-group-item:focus {
 							<span class="emphasized">{{entry.bor_name}}</span>
 						</div>
 						<div class="list-group-item-text">
-							Relation Type: <span style="color: gray; font-style: italic">{{entry.bor_type==1?'Association':'Composition'}}</span> for <a ng-href="#/{{entry.bor_src_id}}">{{entry.source.boh_name}}</a>
+							Relation Type: <span style="color: gray; font-style: italic">{{entry.bor_type==1?'Association':'Composition'}}</span> of <a ng-href="#/{{entry.bor_src_id}}">{{entry.source.boh_name}}</a>
 						</div>						
 					  </button>
 					</div>

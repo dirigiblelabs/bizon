@@ -58,7 +58,7 @@
 		</ul>
 
 		<div class="toolbar btn-group pull-left">
-	   		<button type="submit" class="btn btn-primary" ng-click="detailsEditorVm.openPropertyEditor()" ng-if="detailsEditorVm.tab!==2">
+	   		<button class="btn btn-primary" ng-click="detailsEditorVm.openPropertyEditor()" ng-if="detailsEditorVm.tab!==2">
 			  <i class="fa fa-plus" aria-hidden="true"></i>
 			</button>
 		</div>	
@@ -76,22 +76,22 @@
 				<div class="items-list">
 					<div ng-hide="detailsEditorVm.entityForEdit.properties.length" class="nodata-text">No Items</div>
 					<div class="list-group">
-					  <a class="list-group-item selected-{{entry._selected_}}" ng-repeat="entry in detailsEditorVm.propertyItems|filter:detailsEditorVm.searchText|orderBy:['boi_name']">
+					  <a class="list-group-item" ng-repeat="entry in detailsEditorVm.propertyItems|filter:detailsEditorVm.searchText|orderBy:['boi_name']">
 						<div style="display:inline-block">
 							<div class="list-group-item-heading">
 								<span ng-class="{emphasized: !entry.boi_null}">{{entry.boi_name}}</span><i class="fa fa-asterisk required" aria-hidden="true" ng-if="!entry.boi_null"></i>
 								<span class="optional" ng-if="entry.boi_null">(optional)</span>
 							</div>
-							<div class="list-group-item-text" ng-if="entry.boi_type!=='Relationship'">Data Type: <span style="color: gray; font-style: italic">{{entry.boi_type_name}}<span></div>
+							<div class="list-group-item-text">Data Type: <span style="color: gray; font-style: italic">{{entry.boi_type_name}}<span></div>
 						</div>
 						<div class="btn-group pull-right">
-		   					<button class="btn btn-primary" ui-sref="list.entity.edit.items({item: entry, selectedEntity: detailsEditorVm.entityForEdit})">
+		   					<button class="btn btn-primary" ui-sref="list.entity.edit.items({item: entry, entityForEdit:detailsEditorVm.entityForEdit})">
 							  <i class="fa fa-pencil" aria-hidden="true"></i>
 							</button>
 							<button class="btn btn-danger" ng-click="detailsEditorVm.deleteProperty(entry)">
 							  <i class="glyphicon glyphicon-remove" aria-hidden="true"></i>
 							</button>
-						</div>					
+						</div>
 					  </a>
 					</div>
 				</div>
@@ -109,7 +109,7 @@
 								<span class="emphasized">{{entry.bor_name}}</span>
 							</div>
 							<div class="list-group-item-text">
-								Relation Type: <span style="color: gray; font-style: italic">{{entry.bor_type===1?'Association':'Composition'}}</span> <!--of <a ng-href="#/{{entry.bor_target_id}}">{{entry.target.boh_name}}</a>-->
+								Relation Type: <span style="color: gray; font-style: italic">{{entry.bor_type===1?'Association':'Composition'}}</span> <!--in <a ng-href="#/{{entry.bor_target_id}}">{{entry.target.boh_name}}</a>-->
 							</div>
 						</div>
 						<div class="btn-group pull-right">
@@ -152,7 +152,7 @@
 						  <div class="form-group" ng-if="detailsEditorVm.filterConfigurationEntries(detailsEditorVm.searchText, 'Entity Identifier Data Type')">
 						    <label for="primaryKeyType" class="col-sm-3 control-label" required="true">Entity Identifier Data Type</label>
 						    <div class="col-sm-8">
-			    			  <select name="primaryKeyType" id="primaryKeyType" class="form-control" ng-options="option.val for option in detailsEditorVm.typeOptions track by option.id" ng-model="detailsEditorVm.entityForEdit.boh_id_datatype_code" ng-disabled="!detailsEditorVm.entityForEdit.boh_ds_gen_enabled" required="true"></select>
+			    			  <select name="primaryKeyType" id="primaryKeyType" class="form-control" ng-options="option.val for option in detailsEditorVm.typeOptions track by option.id" ng-model="detailsEditorVm.cfgDataTypeSelectedTypeOption" ng-change="detailsEditorVm.cfgDataTypeSelectionChanged(detailsEditorVm.cfgDataTypeSelectedTypeOption)" ng-disabled="!detailsEditorVm.entityForEdit.boh_ds_gen_enabled" required="true"></select>
 						    </div>
 						  </div>
 					  </div>

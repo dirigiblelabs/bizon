@@ -75,7 +75,6 @@ angular.module('businessObjects')
 			this.relation.bor_src_type = MULTIPLICITY_OPTS.ONE;
 			this.relation.bor_name = selectedEntity.boh_name +'- ';
 		} else {
-//			this.relation = $stateParams.item;
 			if(this.relation.bor_target_id){
 				masterDataSvc.get(this.relation.bor_target_id, true)
 				.then(function(target){
@@ -121,7 +120,7 @@ angular.module('businessObjects')
 	};
     
     this.cancel = function() {
-   		$scope.$dismiss($stateParams.selectedEntity);
+   		$scope.$dismiss();
     };
 
     this.ok = function($event) {

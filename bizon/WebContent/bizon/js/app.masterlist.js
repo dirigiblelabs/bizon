@@ -31,66 +31,6 @@ angular.module('businessObjects')
 	var loadMoreBreakNumber = this.querySettings.limit*2;
 	var self = this;
 	
-/*	function initList(selectedEntity) {
-		this.items = masterDataSvc.getLoadedData();
-		if(this.items.length > 0) {
-			var selectedEntityId;
-			if(!selectedEntity){
-				selectedEntityId = $stateParams.boId || $state.params.boId || this.items[0].boh_id;
-			} else {
-				selectedEntityId = selectedEntity.boh_id;
-			}
-			masterDataSvc.get(selectedEntityId, true)
-			.then(function(item){
-				//the list might have been expanded to search for an entity by deep link so it needs to be initialized again.
-				self.items = masterDataSvc.getLoadedData();
-				if(item === undefined){
-					fireLocationError.apply(self);
-					item = self.items[0];
-				}
-				return self.selectItem.apply(self, [item]);//select the selection candidate
-			})
-			.then(function(){
-				if(self.items.length === loadMoreBreakNumber){
-					return masterDataSvc.hasMore()
-					.then(function(_hasMore){
-						self.showLoadMore = _hasMore;
-						loadMoreBreakNumber = loadMoreBreakNumber + self.querySettings*2;
-					});
-				} else {
-					self.showLoadMore = false;
-				}
-				self.count = masterDataSvc._itemsCount;
-				return;
-			})
-			.catch(function(error){
-				handleServiceError('Looking up Buisness Object failed', error.message);
-				$state.go($state.current, $stateParams, {reload: true});
-			})
-			.finally(function(){
-				if(!self.showLoadMore)
-					self.busy = false;
-			});
-		} else {
-			$state.go('list.empty', {});
-		}
-	};
-	
-	function fireLocationError(){
-		$log.debug('The requested application path ' + $window.location.href + " is not valid.");
-		Notifications.createMessageError($window.location.href + ' is not valid application path. Check the URL and try again.');
-	}
-
-	this.selectItem = function(item){
-		masterDataSvc.select([item]);
-		self.selectedEntity = item;
-		$stateParams = angular.extend($stateParams, {
-			selectedEntity: item,
-			boId: item.boh_id
-		});
-		$state.go('list.entity', $stateParams, {reload: false});
-	};*/
-	
 	this.createItem = function(){
 		masterDataSvc.create()
 		.then(function(newItem){
@@ -100,7 +40,6 @@ angular.module('businessObjects')
 			Notifications.createMessageSuccess('Business Object created successfully');
 			masterDataSvc.selection = [newItem];
 			self.items = masterDataSvc.getLoadedData();
-//			initList.apply(self, [masterDataSvc.selection[0]]);
 			return;
 		})
 		.catch(function(reason){

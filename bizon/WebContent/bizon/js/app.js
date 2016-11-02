@@ -88,7 +88,10 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		    onEnter: ['$state', '$uibModal', 'entityForEdit', 'item', function($state, $modal, entityForEdit, item) {
 		    	
 		    	function goBack(_selectedEntity) {
-		        	$state.go("list.entity.edit", {entityForEdit: _selectedEntity}, {reload:true});
+		    		if(_selectedEntity)
+		        		$state.go("list.entity.edit", {entityForEdit: _selectedEntity}, {reload:true});
+		        	else
+		        		$state.go("list.entity.edit");
 		        }
 		    	
 		        var modalInstance = $modal.open({
@@ -144,7 +147,10 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		    onEnter: ['$state', '$uibModal', 'entityForEdit', 'relation', function($state, $modal, entityForEdit, relation) {
 		    	
 		    	function goBack(_selectedEntity) {
-		        	$state.go("list.entity.edit", {entityForEdit: _selectedEntity}, {reload:true});
+		    		if(_selectedEntity)
+		        		$state.go("list.entity.edit", {entityForEdit: _selectedEntity}, {reload:true});
+		        	else
+		        		$state.go("list.entity.edit");
 		        }
 		    	
 		        var modalInstance = $modal.open({

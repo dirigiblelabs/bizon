@@ -68,28 +68,27 @@ angular.module('businessObjects')
 	};
 
 	function init(){
-		$scope.$$postDigest(function () {
+		$scope.$$postDigest(function() {
 			    $scope.$broadcast('rzSliderForceRender');
-		});
+			});
 		if(isNewProperty) {
 			this.item = angular.copy(Item.newObjectTemplate);
 			this.item.boi_boh_id = selectedEntity.boh_id;
-		} else {
-			this.selectedTypeOption = this.typeOptions.find(function(typeOption){
-						return typeOption.val === self.item.boi_type_name;
-					});
-			if(this.selectedTypeOption.variants){
-				this.typeVariantsSlider.options.stepsArray = this.selectedTypeOption.variants;
-				this.selectedTypeOption.variant = this.selectedTypeOption.variants.find(function(variant){
-						return variant.typemap === self.item.boi_type;
-					});
-				this.typeVariantsSlider.value = this.selectedTypeOption.variant.value;
-			}
+		}
+		this.selectedTypeOption = this.typeOptions.find(function(typeOption){
+					return typeOption.val === self.item.boi_type_name;
+				});
+		if(this.selectedTypeOption.variants){
+			this.typeVariantsSlider.options.stepsArray = this.selectedTypeOption.variants;
+			this.selectedTypeOption.variant = this.selectedTypeOption.variants.find(function(variant){
+					return variant.typemap === self.item.boi_type;
+				});
+			this.typeVariantsSlider.value = this.selectedTypeOption.variant.value;
 		}
 	}
     
    this.cancel = function() {
-      $scope.$dismiss(selectedEntity);
+      $scope.$dismiss();
     };
 
     this.ok = function() {
