@@ -17,20 +17,9 @@ angular.module('businessObjects')
 	};
 	
 	this.filterPopover = {
-	    templateUrl: 'filter-popover-view.html'
+	    templateUrl: 'filter-popover-view'
 	};
-	  
-	//TODO: move to directive
-	angular.element('.filter-popover').popover({
-	    html: true,
-	    title: function () {
-	        return angular.element('.filter-popover-markup').find('.head').html();
-	    },
-	    content: function () {
-	        return angular.element('.filter-popover-markup').find('.content').html();
-	    }
-	});
-	
+
 	var loadMoreBreakNumber = this.querySettings.limit*2;
 	var self = this;
 	
@@ -143,6 +132,31 @@ angular.module('businessObjects')
 		$state.go('list.entity.build',$stateParams,{reload:true,location:true});
 	};
 
+}])
+.directive('filterPopover', ['$timeout',
+        function($timeout) {
+            return {
+                restrict: 'A',
+                link: function(scope, element, attrs) {
 
-}]);
+					var templateDOMElementSelector = attrs['filterPopoverTemplateSelector'] || '#'+scope.masterVm.filterPopover.templateUrl;
+					
+					$timeout(function(){
+						var templateElement = angular.element(element[0].ownerDocument.querySelector(templateDOMElementSelector));
+						if(templateElement){
+							element.popover({
+							    html: true,
+							    title: function () {
+							        return angular.element(templateElement[0].querySelector('.head')).html();
+							    },
+							    content: function () {
+									return angular.element(templateElement[0].querySelector('.content')).html();
+							    }
+							});
+						}
+					});
+                }
+            };
+        }
+    ]);
 })(angular);

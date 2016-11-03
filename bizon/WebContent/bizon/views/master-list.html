@@ -9,7 +9,7 @@
 	<header class="header text-center">
 	
 	  <div class="btn-group pull-left">
-	  	<button popover-placement="right-top" uib-popover-template="masterVm.filterPopover.templateUrl" popover-title="Search" type="button" class="btn btn-primary">
+	  	<button popover-placement="right-top" uib-popover-template="masterVm.filterPopover.templateUrl" popover-title="Search" type="button" class="btn btn-primary" filter-popover>
 	  		<i class="glyphicon glyphicon-filter" aria-hidden="true"></i>
 	  	</button>
       </div>
@@ -43,7 +43,7 @@
 	</div>
 </section>
 
-<script type="text/ng-template" id="filter-popover-view.html">
+<script type="text/ng-template" id="filter-popover-view">
 	<div ng-show="!masterVm.showAdvanced">
 		<input type="text" ng-model="masterVm.searchText" class="form-control"> 
 		<a href ng-click='masterVm.showAdvanced=true'>Advanced</a>
