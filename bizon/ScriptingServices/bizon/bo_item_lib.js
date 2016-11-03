@@ -1,5 +1,7 @@
 /* globals $ */
 /* eslint-env node, dirigible */
+(function(){
+"use strict";
 
 var request = require("net/http/request");
 var response = require("net/http/response");
@@ -518,14 +520,14 @@ exports.http = {
 		}
 		if (offset === undefined || offset === null) {
 			offset = 0;
-		} else if(isNaN(parseInt(offset)) || offset<0) {
+		} else if(isNaN(parseInt(offset,10)) || offset<0) {
 			this.printError(response.BAD_REQUEST, 1, "Invallid offset parameter: " + offset + ". Must be a positive integer.");
 			return;
 		}
 
 		if (limit === undefined || limit === null) {
 			limit = 0;
-		}  else if(isNaN(parseInt(limit)) || limit<0) {
+		}  else if(isNaN(parseInt(limit,10)) || limit<0) {
 			this.printError(response.BAD_REQUEST, 1, "Invallid limit parameter: " + limit + ". Must be a positive integer.");
 			return;			
 		}
@@ -593,3 +595,4 @@ exports.http = {
 	}
 	
 };
+})();

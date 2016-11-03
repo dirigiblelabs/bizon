@@ -1,3 +1,6 @@
+(function(angular){
+"use strict";
+
 angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.bootstrap', 'xeditable', 'infinite-scroll', 'angular-loading-bar', 'rzModule'])
 .value('THROTTLE_MILLISECONDS', 500)
 .config(['$stateProvider', '$urlRouterProvider', 'cfpLoadingBarProvider', function($stateProvider, $urlRouterProvider, cfpLoadingBarProvider) {
@@ -151,9 +154,9 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		    params: {
 				message: {value: undefined}
 		    },
-		    onEnter: ['$stateParams', '$state', '$uibModal', function($stateParams, $state, $modal) {
+		    onEnter: ['$uibModal', function($modal) {
 		    			    	
-		        var modalInstance = $modal.open({
+		        $modal.open({
 		        	animation: true,
 		            templateUrl: "views/buildDialog.html",
 		            controller: 'BuildDialogCtrl',
@@ -230,3 +233,4 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 	.run(['editableOptions', function(editableOptions)  {
 	  editableOptions.theme = 'bs3'; // bootstrap3 theme. Can be also 'bs2', 'default'
 	}]);
+})(angular);

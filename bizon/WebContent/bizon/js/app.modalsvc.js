@@ -1,3 +1,6 @@
+(function(angular){
+"use strict";
+
 angular.module('businessObjects')
 .service('modalService', ['$uibModal', function ($uibModal) {
 	/* http://weblogs.asp.net/dwahlin/building-an-angularjs-modal-service */
@@ -51,4 +54,5 @@ angular.module('businessObjects')
         return $uibModal.open(tempModalDefaults).result;
     };
 
-}])
+}]);
+})(angular);

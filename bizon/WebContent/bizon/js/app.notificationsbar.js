@@ -1,3 +1,6 @@
+(function(angular){
+"use strict";
+
 angular.module('businessObjects')
 .provider('notificationsConfig', function() {
 	var config = {};
@@ -83,7 +86,7 @@ angular.module('businessObjects')
 	};
 			
 }])
-.directive('msgShow', ['notificationsConfig', '$timeout', function(notificationsConfig, $timeout) {
+.directive('msgShow', ['notificationsConfig', 'Notifications', '$timeout', function(notificationsConfig, Notifications, $timeout) {
         return {
             restrict: 'A',
 			template: function(elem, attr){
@@ -209,7 +212,7 @@ angular.module('businessObjects')
 					var id = 'notif_' + (new Date()).getTime();
 					notifications.push({id: id, type: type, message: message, animation: animation});
 					if (hide) {
-						var timer = $timeout(function () {
+						$timeout(function () {
 							removeById(id);
 							$timeout.cancel(timer);
 						}, hideDelay);
@@ -244,3 +247,4 @@ angular.module('businessObjects')
         };
     }
 ]);
+})(angular);

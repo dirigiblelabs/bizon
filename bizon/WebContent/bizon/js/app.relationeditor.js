@@ -1,5 +1,8 @@
+(function(angular){
+"use strict";
+
 angular.module('businessObjects')
-.controller('RelationEditorCtrl', ['$scope', 'masterDataSvc', '$log', '$stateParams', 'selectedEntity', 'relation', '$timeout', function($scope, masterDataSvc, $log, $stateParams, selectedEntity, relation, $timeout) {
+.controller('RelationEditorCtrl', ['$scope', 'masterDataSvc', '$log', 'selectedEntity', 'relation', function($scope, masterDataSvc, $log, selectedEntity, relation) {
 	
 	this.relation = relation;
 	
@@ -33,7 +36,7 @@ angular.module('businessObjects')
 	};
 	
 	var MULTIPLICITY_OPTS = Object.freeze({ONE:1, MANY:2});
-	var isNewProperty = (relation === undefined ? true : false);
+	var isNewProperty = relation === undefined ? true : false;
 	
 	var self = this;
 
@@ -143,3 +146,4 @@ angular.module('businessObjects')
     init.apply(this);
     
 }]);
+})(angular);

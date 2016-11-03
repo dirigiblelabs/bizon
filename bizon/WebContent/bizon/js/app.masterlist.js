@@ -1,3 +1,6 @@
+(function(angular){
+"use strict";
+
 angular.module('businessObjects')
 .controller('MasterListCtrl', ['masterDataSvc', 'modalService', 'Notifications', '$log', '$q', '$state', '$stateParams', '$window', function (masterDataSvc, modalService, Notifications, $log, $q, $state, $stateParams, $window) {
 
@@ -60,7 +63,7 @@ angular.module('businessObjects')
         };
 
         modalService.showModal({}, modalOptions)
-        .then(function (result) {
+        .then(function () {
 			self.busy = true;
 			masterDataSvc.remove(entity.boh_id, true)
 			.then(function(){
@@ -87,7 +90,20 @@ angular.module('businessObjects')
 		var message = masterDataSvc.serviceErrorMessageFormatter(text, errorPayload);
 		$log.error('Deleting Buisness Object failed:' + message);
 		Notifications.createMessageError('Deleting Buisness Object failed.');
-	};
+	}
+
+	function postNext(){
+		if(self.items.length === loadMoreBreakNumber){
+			return masterDataSvc.hasMore()
+			.then(function(_hasMore){
+				self.showLoadMore = _hasMore;
+				loadMoreBreakNumber = loadMoreBreakNumber + self.querySettings*2;
+			});
+		} else {
+			self.showLoadMore = false;
+		}
+		self.count = masterDataSvc._itemsCount;
+	}
 	
 	this.next = function(){
 		if(!self.busy || (self.busy && self.showLoadMore)){
@@ -123,22 +139,10 @@ angular.module('businessObjects')
 		self.busy = true;
 	};
 	
-	var postNext = function(){
-		if(self.items.length === loadMoreBreakNumber){
-			return masterDataSvc.hasMore()
-			.then(function(_hasMore){
-				self.showLoadMore = _hasMore;
-				loadMoreBreakNumber = loadMoreBreakNumber + self.querySettings*2;
-			});
-		} else {
-			self.showLoadMore = false;
-		}
-		self.count = masterDataSvc._itemsCount;
-	}
-	
 	this.build = function(){
 		$state.go('list.entity.build',$stateParams,{reload:true,location:true});
 	};
 
 
 }]);
+})(angular);

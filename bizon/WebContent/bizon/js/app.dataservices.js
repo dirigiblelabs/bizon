@@ -1,5 +1,8 @@
+(function(angular){
+"use strict";
+
 	angular.module('businessObjects')
-	.service('ResourceSvcConfiguration', function() {
+	.service('ResourceSvcConfiguration', ['$log', function($log) {
 	
 		return {
 			cfg: {
@@ -12,7 +15,7 @@
 		                		var id = location.substring(location.lastIndexOf('/')+1);
 		                		angular.extend(res.resource, { "boh_id": id });
 	                		} else {
-	                			console.error('Cannot infer id after save operation. HTTP Response Header "Location" is missing: ' + location);
+	                			$log.error('Cannot infer id after save operation. HTTP Response Header "Location" is missing: ' + location);
 	            			}
 	                        return res.resource;
 		                }
@@ -24,7 +27,7 @@
 			    }
 		    }
 		};
-	})
+	}])
 	.service('Entity', ['$resource', 'ResourceSvcConfiguration', function($resource, ResourceSvcConfiguration) {
 		var cfg = angular.copy(ResourceSvcConfiguration.cfg);
 		cfg.count = {method:'GET', params:{count:true}, isArray:false};
@@ -107,7 +110,7 @@
 			settings.expanded = (settings && settings.expanded!==undefined) || true;
 			var deferred = $q.defer();
 			Entity.query(settings).$promise
-			.then(jQuery.proxy(function(data){
+			.then(function(data){
 				if(data)
 					data = data.map(function(entity){
 						if(entity.properties){
@@ -128,7 +131,8 @@
 					self.batchLoadedMasterData = data;//overwrite
 				}
 				deferred.resolve(data);
-			}, this), function(error){
+			})
+			.catch(function(error){
 				deferred.resolve(error);
 			});
 			return deferred.promise;
@@ -282,11 +286,12 @@
 					refresh.apply(self)
 					.then(function(){
 						deferred.resolve();
-					}, function(refreshErr){
+					})
+					.catch(function(refreshErr){
 						deferred.reject(refreshErr);
 					});
-				},
-				function(removeErr){
+				})
+			.catch(function(removeErr){
 					deferred.reject(removeErr);
 				});
 			return deferred.promise;
@@ -303,3 +308,4 @@
 		};
 				
 	}])  
+})(angular);

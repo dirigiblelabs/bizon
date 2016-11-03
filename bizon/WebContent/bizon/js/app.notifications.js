@@ -1,3 +1,6 @@
+(function(angular){
+"use strict";
+
 angular.module('businessObjects')
 .provider('notificationsConfig', function() {
 	var config = {};
@@ -142,3 +145,4 @@ angular.module('businessObjects')
         };
     }
 ]);
+})(angular);

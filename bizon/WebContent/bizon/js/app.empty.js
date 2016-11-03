@@ -1,3 +1,6 @@
+(function(angular){
+"use strict";
+
 angular.module('businessObjects')
 .controller('EmptyCtrl', ['masterDataSvc', '$log', '$state', '$stateParams', function (masterDataSvc, $log, $state, $stateParams) {
 	
@@ -23,3 +26,4 @@ angular.module('businessObjects')
 	};
 
 }]);
+})(angular);

@@ -1,5 +1,8 @@
+(function(angular){
+"use strict";
+
 angular.module('businessObjects')
-.controller('DetailsCtrl', ['masterDataSvc', 'modalService', 'Notifications', 'selectedEntity', '$log', '$state', '$stateParams', 'Relation', '$q', function (masterDataSvc, modalService, Notifications, selectedEntity, $log, $state, $stateParams, Relation, $q) {
+.controller('DetailsCtrl', ['masterDataSvc', 'modalService', 'Notifications', 'selectedEntity', '$log', '$state', '$stateParams', 'Relation', function (masterDataSvc, modalService, Notifications, selectedEntity, $log, $state, $stateParams, Relation) {
 	
 	this.selectedEntity = selectedEntity;
 	var self = this;
@@ -26,32 +29,6 @@ angular.module('businessObjects')
 	
 	this.showRelationships = function(){
 		this.searchText = undefined;
-/*		if(this.selectedEntity.properties){
-			this.propertyItems = this.selectedEntity.properties.filter(function(v){
-				if(v.boi_type && v.boi_type==='Relationship'){
-					return true;
-				}
-				return false;
-			}, this);
-			this.propertyItems = this.propertyItems.map(function(relation){
-				if(relation.bor_target_id){
-					masterDataSvc.get(relation.bor_target_id, true)
-					.then(function(targetEntity){
-						relation.target = targetEntity;
-					});
-				}
-				return relation;
-			});
-			var relatedIn = this.propertyItems.map(function(relation){
-				if(relation.bor_target_id){
-					masterDataSvc.get(relation.bor_target_id, true)
-					.then(function(targetEntity){
-						relation.target = targetEntity;
-					});
-				}
-				return relation;
-			});			
-		}*/
 		getInboundRelations.apply(self);
 		getOutboundRelations.apply(self);		
 	};
@@ -168,3 +145,4 @@ angular.module('businessObjects')
 	};
 	
 }]);
+})(angular);

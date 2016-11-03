@@ -1,5 +1,7 @@
 /* globals $ */
 /* eslint-env node, dirigible */
+(function(){
+"use strict";
 
 var entityBo_relation = require('bizon/bo_relation_lib');
 var request = require("net/http/request");
@@ -39,15 +41,15 @@ function handleRequest() {
 		
 		var urlParameters =  {
 			"id": id,
-			"metadata": (metadata!==null),
-			"count": (count!==null),
+			"metadata": metadata!==null,
+			"count": count!==null,
 			"list" : {
 				"limit": limit,
 				"offset": offset,
 				"sort": sort,	
 				"order": order			
 			},
-			"expanded": (expanded!==null),
+			"expanded": expanded!==null,
 			"srcId": srcId,
 			"targetId": targetId			
 		};
@@ -71,3 +73,4 @@ function checkConflictingParameters(id, count, metadata) {
     }
     return true;
 }
+})();

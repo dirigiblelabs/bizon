@@ -1,8 +1,11 @@
+(function(angular){
+"use strict";
+
 angular.module('businessObjects')
-.controller('PropertyEditorCtrl', ['$scope', '$timeout', 'Item', 'selectedEntity', 'item', function($scope, $timeout, Item, selectedEntity, item) {
+.controller('PropertyEditorCtrl', ['$scope', 'Item', 'selectedEntity', 'item', function($scope, Item, selectedEntity, item) {
 	
 	this.item = item;
-	var isNewProperty = (item === undefined ? true : false);
+	var isNewProperty = item === undefined ? true : false;
 							
 	this.typeOptions = [{
 							id: '0',
@@ -117,3 +120,4 @@ angular.module('businessObjects')
     }
         
 }]);
+})(angular);

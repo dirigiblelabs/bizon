@@ -1,5 +1,7 @@
 /* globals $ */
 /* eslint-env node, dirigible */
+(function(){
+"use strict";
 
 var database = require("db/database");
 var boItemLib = require("bizon/bo_item_lib");
@@ -21,7 +23,7 @@ var parseIntStrict = function (value) {
   if(/^(\-|\+)?([0-9]+|Infinity)$/.test(value))
     return Number(value);
   return NaN;
-}
+};
 
 // Parse JSON entity into SQL and insert in db. Returns the new record id.
 exports.insert = function(entity, cascaded) {
@@ -711,3 +713,4 @@ exports.http = {
 	}
 	
 };
+})();

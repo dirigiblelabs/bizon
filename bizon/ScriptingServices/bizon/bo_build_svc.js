@@ -1,5 +1,7 @@
 /* globals $ */
 /* eslint-env node, dirigible */
+(function(){
+"use strict";
 
 var request = require('net/http/request');
 var response = require('net/http/response');
@@ -221,7 +223,7 @@ function generateUIForEntity(entity, template, worker){
 	});	
 	console.info('[UI Template Source]:' + template);
 	return worker.generate(template);
-};
+}
 
 //Prepare a JSON object for insert into DB
 function createSQLEntity(item) {
@@ -244,10 +246,10 @@ function createSQLEntity(item) {
 	}	
 	console.debug("Transformation to DB JSON object finished: " + persistentItem);
 	return persistentItem;
-};
+}
 
 function stringToCodeItemTypeMapping(typeIndex) {
-	if(!isNaN(parseInt(typeIndex))){
+	if(!isNaN(parseInt(typeIndex, 10))){
 		return typeIndex;
 	}
 	if(typeIndex === 'Integer')
@@ -280,3 +282,4 @@ function listTemplates(category){
 	}
 	return _templates;
 }
+})();

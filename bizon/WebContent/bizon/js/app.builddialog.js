@@ -1,3 +1,6 @@
+(function(angular){
+"use strict";
+
 angular.module('businessObjects')
 .controller('BuildDialogCtrl', ['masterDataSvc', 'BuildService', '$scope', '$log', '$stateParams', '$window', function(masterDataSvc, BuildService, $scope, $log, $stateParams, $window) {
 
@@ -68,3 +71,4 @@ angular.module('businessObjects')
 		$scope.$dismiss();
 	};
 }]);
+})(angular);
