@@ -74,7 +74,7 @@
 	.service('Relation', ['$resource', 'ResourceSvcConfiguration', function($resource, ResourceSvcConfiguration) {
 	  	return $resource('../../js/bizon/bo_relation.js/:boId', { boId:'@id' }, ResourceSvcConfiguration.cfg);
 	}])		
-	.service('masterDataSvc', ['Entity', 'Item', 'Relation', '$q', function(Entity, Item, Relation, $q) {
+	.service('masterDataSvc', ['Entity', 'Item', 'Relation', '$q', '$log', function(Entity, Item, Relation, $q, $log) {
 	
 		function createMasterDataTemplateObject(){
 			var obj = angular.copy(Entity.newObjectTemplate);
@@ -306,6 +306,14 @@
 			}
 			return message;
 		};
+		
+		this.exportData = function(){
+			$log.info('Data exported');
+		};
+		
+		this.importData = function(){
+			$log.info('Data imported');
+		};
 				
-	}])  
+	}]);
 })(angular);

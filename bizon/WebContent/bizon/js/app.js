@@ -151,17 +151,43 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		    }]
 		  })		  
 		  .state("list.entity.build", {
-		    params: {
-				message: {value: undefined}
-		    },
-		    onEnter: ['$uibModal', function($modal) {
-		    			    	
-		        $modal.open({
+		    onEnter: ['$state', '$uibModal', function($state, $modal) {	
+		    	function goBack() {
+	        		$state.go("list.entity");
+		        }		    		    
+		        var modalInstance = $modal.open({
 		        	animation: true,
 		            templateUrl: "views/buildDialog.html",
 		            controller: 'BuildDialogCtrl',
 		            controllerAs: 'builderVm'
 		        });
+		        modalInstance.result.then(goBack, goBack);
+		    }]
+		  })
+		  .state("list.entity.export", {
+		  	onEnter: ['$state', 'masterDataSvc', function($state, masterDataSvc) {
+		  		masterDataSvc.exportData();
+				$state.go('list.entity');		      	
+		    }]
+		  })
+		  .state("list.entity.import", {
+		  	onEnter: ['$state', 'masterDataSvc', function($state, masterDataSvc) {
+		  		masterDataSvc.importData();		  	
+		      	$state.go('list.entity');
+		    }]
+		  }) 
+		  .state("list.entity.settings", {
+		    onEnter: ['$state', '$uibModal', function($state, $modal) {
+		    	function goBack() {
+	        		$state.go("list.entity");
+		        }		    
+		        var modalInstance = $modal.open({
+		        	animation: true,
+		            templateUrl: "views/settings.html",
+		            controller: 'SettingsCtrl',
+		            controllerAs: 'settingsVm'
+		        });
+				modalInstance.result.then(goBack, goBack);		        
 		    }]
 		  });
 		  
