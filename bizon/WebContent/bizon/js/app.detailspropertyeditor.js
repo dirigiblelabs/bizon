@@ -1,5 +1,5 @@
 angular.module('businessObjects')
-.controller('PropertyEditorCtrl', ['$scope', 'Item', 'selectedEntity', 'item', function($scope, Item, selectedEntity, item) {
+.controller('PropertyEditorCtrl', ['$scope', '$timeout', 'Item', 'selectedEntity', 'item', function($scope, $timeout, Item, selectedEntity, item) {
 	
 	this.item = item;
 	var isNewProperty = (item === undefined ? true : false);

@@ -37,9 +37,6 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		   })			    
 		.state('list.entity', {
 			url: "{boId}",
-/*		    params: {
-			  	selectedEntity: undefined
-		    }, */
 			resolve: { 
 	            selectedEntity: ['$stateParams', 'masterDataSvc',
 	                function($stateParams, masterDataSvc) {
@@ -108,26 +105,6 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		            controller: 'PropertyEditorCtrl',
 		            controllerAs: 'propsEditorVm'
 		        });
-		        modalInstance.rendered.then(function(){
-		        	var $validator = $('.modal-body form').validate({
-		        		errorClass: 'has-error',
-		        		validClass : 'has-success',
- 		        		highlight: function (element, errorClass, validClass) {
-				            $(element).closest('.form-group').removeClass('has-success').addClass('has-error');
-				            if($validator.numberOfInvalids()>0)
-				            	$('.modal-footer .btn.btn-success').addClass('disabled');
-				        },
-				        unhighlight: function(element, errorClass, validClass) {
-				        	$(element).closest('.form-group').removeClass('has-error').addClass('has-success');
-				        	if($validator.numberOfInvalids()<1)
-					        	$('.modal-footer .btn.btn-success').removeClass('disabled');	
-				        },
-		 		        success: "has-success"
-		        	});
-		        	$('.form-control[required]').each(function(i){
-		        		$validator.element(this);
-		        	});
-		        });
 		        modalInstance.result.then(goBack, goBack);
 		    }]
 		  })
@@ -167,9 +144,6 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		            controller: 'RelationEditorCtrl',
 		            controllerAs: 'relEditorVm'
 		        });
-		        modalInstance.rendered.then(function(){
-		        	//moved to controller
-		        });
 		        modalInstance.result.then(goBack, goBack);
 		    }]
 		  })		  
@@ -184,27 +158,6 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		            templateUrl: "views/buildDialog.html",
 		            controller: 'BuildDialogCtrl',
 		            controllerAs: 'builderVm'
-		        });
-		    	
-		        modalInstance.rendered.then(function(){
-		        	var $validator = $('.modal-body form').validate({
-		        		errorClass: 'has-error',
-		        		validClass : 'has-success',
- 		        		highlight: function (element, errorClass, validClass) {
-				            $(element).closest('.form-group').removeClass('has-success').addClass('has-error');
-				            if($validator.numberOfInvalids()>0)
-				            	$('.modal-footer .btn.btn-success').addClass('disabled');
-				        },
-				        unhighlight: function(element, errorClass, validClass) {
-				        	$(element).closest('.form-group').removeClass('has-error').addClass('has-success');
-				        	if($validator.numberOfInvalids()<1)
-					        	$('.modal-footer .btn.btn-success').removeClass('disabled');	
-				        },
-		 		        success: "has-success"
-		        	});
-		        	$('.form-control[required]').each(function(i){
-		        		$validator.element(this);
-		        	});
 		        });
 		    }]
 		  });
@@ -240,6 +193,40 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
             };
         }
     ])
+	.directive('formValidation', ['$timeout',
+        function($timeout) {
+            return {
+                restrict: 'A',
+                link: function(scope, element, attrs) {
+                	var $validator;
+                	var formValidationOptions = {
+						errorClass: 'has-error',
+				     	validClass : 'has-success',
+				     	ignore: 'input[style*="position: absolute"]',
+				 		highlight: function (element, errorClass, validClass) {
+				            angular.element(element).closest('.form-group').removeClass('has-success').addClass('has-error');
+				            if($validator.numberOfInvalids()>0)
+				            	angular.element('.modal-footer .btn.btn-success').addClass('disabled');
+				        },
+						unhighlight: function(element, errorClass, validClass) {
+					        	angular.element(element).closest('.form-group').removeClass('has-error').addClass('has-success');
+					        	if($validator.numberOfInvalids()<1)
+						        	angular.element('.modal-footer .btn.btn-success').removeClass('disabled');
+					        },
+						success: "has-success"	    
+					};			
+					$timeout(function(){
+						$validator = angular.element(element).validate(formValidationOptions);
+			//			validator.form();//This doesn't work as expected
+						angular.element('.form-control[required]', angular.element(element)).each(function(i){
+			        		$validator.element(this);
+			        	});
+		        	});
+
+                }
+            };
+        }
+    ])    
 	.run(['editableOptions', function(editableOptions)  {
 	  editableOptions.theme = 'bs3'; // bootstrap3 theme. Can be also 'bs2', 'default'
 	}]);

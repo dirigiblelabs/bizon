@@ -36,36 +36,7 @@ angular.module('businessObjects')
 	var isNewProperty = (relation === undefined ? true : false);
 	
 	var self = this;
-	
-	//TODO:move to directive	
-	this.registerForValidation = function () {
-		//$timeout without delay will wait for the view tempalte to load
-		$timeout(function(){
-			self.form = angular.element('.modal-dialog form');		
-			self.formValidationOptions = {
-				errorClass: 'has-error',
-		     	validClass : 'has-success',
-		     	ignore: 'input[style*="position: absolute"]',
-		 		highlight: function (element, errorClass, validClass) {
-					            angular.element(element).closest('.form-group').removeClass('has-success').addClass('has-error');
-					            if($validator.numberOfInvalids()>0)
-					            	angular.element('.modal-footer .btn.btn-success').addClass('disabled');
-					        },
-				unhighlight: function(element, errorClass, validClass) {
-					        	$(element).closest('.form-group').removeClass('has-error').addClass('has-success');
-					        	if($validator.numberOfInvalids()<1)
-						        	angular.element('.modal-footer .btn.btn-success').removeClass('disabled');
-					        },
-				success: "has-success"	    
-			};			
-			var $validator = angular.element(self.form).validate(self.formValidationOptions);
-//			validator.form();//This doesn't work as expected
-			$('.modal-dialog form .form-control[required]').each(function(i){
-        		$validator.element(this);
-        	})
-		});
-	};
-			
+
 	function init(){
 		if(isNewProperty) {
 			this.relation = {
@@ -86,7 +57,6 @@ angular.module('businessObjects')
 		$scope.$$postDigest(function () {
 			    $scope.$broadcast('rzSliderForceRender');
 		});	
-		this.registerForValidation();
 	}
 	
 	this.matchTargets = function(name){
