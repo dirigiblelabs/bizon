@@ -308,7 +308,8 @@
 		};
 		
 		this.exportData = function(){
-			$log.info('Data exported');
+			$log.info('Exporting data');
+			return Entity.query({expanded:true}).$promise;
 		};
 		
 		this.importData = function(){

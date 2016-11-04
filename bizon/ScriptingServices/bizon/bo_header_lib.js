@@ -173,7 +173,7 @@ exports.list = function(limit, offset, sort, order, expanded, entityName) {
 			   	if(!entity[itemsEntitySetName])
 			   		entity[itemsEntitySetName] = [];
 			   	 entity[itemsEntitySetName] = entity[itemsEntitySetName].concat(dependentRelationEntities);
-		   	   }		   	   
+		   	   }
 			}
             entities.push(entity);
         }

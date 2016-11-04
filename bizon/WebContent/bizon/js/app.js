@@ -166,8 +166,16 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		  })
 		  .state("list.entity.export", {
 		  	onEnter: ['$state', 'masterDataSvc', function($state, masterDataSvc) {
-		  		masterDataSvc.exportData();
-				$state.go('list.entity');		      	
+		  		masterDataSvc.exportData().then(function(data){
+					var blob = new Blob([ JSON.stringify(data) ], { type : 'text/json' });
+		  			var objectURL = window.URL.createObjectURL(blob);
+		  			var a = document.createElement('a');
+				      a.href = objectURL;
+				      a.download = 'bizon.json';
+				      a.target = '_blank';
+				      a.click();
+		  			$state.go('list.entity');
+		  		});
 		    }]
 		  })
 		  .state("list.entity.import", {
