@@ -312,7 +312,7 @@
 			return Entity.query({expanded:true}).$promise;
 		};
 		
-		this.importData = function(){
+		this.importData = function(data){
 			$log.info('Data imported');
 		};
 				

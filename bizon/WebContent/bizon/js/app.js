@@ -1,7 +1,7 @@
 (function(angular){
 "use strict";
 
-angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.bootstrap', 'xeditable', 'infinite-scroll', 'angular-loading-bar', 'rzModule'])
+angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.bootstrap', 'xeditable', 'infinite-scroll', 'angular-loading-bar', 'rzModule', 'angularFileUpload'])
 .value('THROTTLE_MILLISECONDS', 500)
 .config(['$stateProvider', '$urlRouterProvider', 'cfpLoadingBarProvider', function($stateProvider, $urlRouterProvider, cfpLoadingBarProvider) {
 
@@ -179,8 +179,17 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		    }]
 		  })
 		  .state("list.entity.import", {
-		  	onEnter: ['$state', 'masterDataSvc', function($state, masterDataSvc) {
-		  		masterDataSvc.importData();		  	
+		  	onEnter: ['$state', '$uibModal', function($state, $modal) {
+		    	function goBack() {
+	        		$state.go("list.entity");
+		        }
+		        var modalInstance = $modal.open({
+		        	animation: true,
+		            templateUrl: "views/import.html",
+		            controller: 'ImportCtrl',
+		            controllerAs: 'importVm'
+		        });
+				modalInstance.result.then(goBack, goBack);		        
 		      	$state.go('list.entity');
 		    }]
 		  }) 

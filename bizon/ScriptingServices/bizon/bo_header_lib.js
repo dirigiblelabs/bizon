@@ -10,6 +10,7 @@ var boRelationLib = require("bizon/bo_relation_lib");
 /* required for the exports.http module only */
 var request = require("net/http/request");
 var response = require("net/http/response");
+var upload = require('net/http/upload');
 
 var datasource = database.getDatasource();
 
@@ -549,7 +550,11 @@ exports.http = {
 		console.info('Dispatching operation request for HTTP Verb['+ method +'] and URL parameters: ' + urlParameters);
 
 		if('POST' === method){
-			this.create(urlParameters.cascaded);
+			if (upload.isMultipartContent()) {
+				this.importData();
+			} else {
+				this.create(urlParameters.cascaded);
+			}
 		} else if('PUT' === method){
 			this.update(urlParameters.cascaded);
 		} else if('DELETE' === method){
@@ -699,6 +704,42 @@ exports.http = {
         	this.printError(errorCode, errorCode, e.message, e.errContext);
         	throw e;        	
 		}		
+	},
+	
+	importData: function(){
+		try{
+			var files = upload.parseRequest();
+			var json = [];
+			files.forEach(function(file) {
+				var uploadStatus = {
+					"file": file.name,
+				};
+				var content = String.fromCharCode.apply(null, file.data);		
+				try {
+					var objectsForImport = JSON.parse(content);
+					for(var i=0; i< objectsForImport.length; i++){
+						console.info('Inserting object ' + objectsForImport[i].boh_name);
+						objectsForImport[i][this.idPropertyName] = exports.insert(objectsForImport[i], true);
+					}
+					uploadStatus.status="ok";
+				} catch (err) {
+					uploadStatus.status="error";
+					uploadStatus.details = err.message;
+					throw err;
+				} finally {
+					json.push(uploadStatus);
+				}
+			});
+			response.println(JSON.stringify(json));
+			response.setStatus(response.OK);
+		} catch(err){
+			var errorCode = response.INTERNAL_SERVER_ERROR;
+        	this.printError(errorCode, errorCode, err.message, err.errContext);
+        	throw err;
+		} finally {
+			response.flush();
+			response.close();
+		}
 	},
 	
 	printError: function(httpCode, errCode, errMessage, errContext) {
