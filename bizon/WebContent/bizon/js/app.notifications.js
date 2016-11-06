@@ -137,6 +137,7 @@ angular.module('businessObjects')
 						$element.parent().slideUp(slideDuration, function(){
 							if(timer)
 								$timeout.cancel(timer);
+							$scope.messagesVm.hide.apply($scope.messagesVm);
 						});
 					});
         		}

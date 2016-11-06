@@ -179,9 +179,9 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		    }]
 		  })
 		  .state("list.entity.import", {
-		  	onEnter: ['$state', '$uibModal', function($state, $modal) {
+		  	onEnter: ['$state', '$stateParams', '$uibModal', function($state, $stateParams, $modal) {
 		    	function goBack() {
-	        		$state.go("list.entity");
+	        		$state.go("list.entity", {boId: $stateParams.boId}, {reload:true});
 		        }
 		        var modalInstance = $modal.open({
 		        	animation: true,
