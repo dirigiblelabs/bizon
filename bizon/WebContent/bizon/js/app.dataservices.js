@@ -30,7 +30,7 @@
 	}])
 	.service('Entity', ['$resource', 'ResourceSvcConfiguration', function($resource, ResourceSvcConfiguration) {
 		var cfg = angular.copy(ResourceSvcConfiguration.cfg);
-		cfg.count = {method:'GET', params:{count:true}, isArray:false};
+		cfg.count = {method:'GET', params:{count:true}, isArray:false, ignoreLoadingBar: true};
 	  	var res = $resource('../../js/bizon/bo_header.js/:boId', { boId:'@id' }, cfg);
 		
 		res.newObjectTemplate = {
@@ -43,6 +43,15 @@
 			
 		return res;
 	}])
+	.service('EntityQueryByName', ['$resource', function($resource) {
+	  	return $resource('../../js/bizon/bo_header.js', {}, {
+	  		queryByName: {
+	  			method:'GET', 
+	  			isArray:true, 
+	  			ignoreLoadingBar: true
+  			}
+	  	});
+	}])	
 	.service('Item', ['$resource', 'ResourceSvcConfiguration', function($resource, ResourceSvcConfiguration) {
 	
 	  	var res = $resource('../../js/bizon/bo_item.js/:boId', { boId:'@id' }, ResourceSvcConfiguration.cfg);
@@ -74,7 +83,7 @@
 	.service('Relation', ['$resource', 'ResourceSvcConfiguration', function($resource, ResourceSvcConfiguration) {
 	  	return $resource('../../js/bizon/bo_relation.js/:boId', { boId:'@id' }, ResourceSvcConfiguration.cfg);
 	}])		
-	.service('masterDataSvc', ['Entity', 'Item', 'Relation', '$q', '$log', function(Entity, Item, Relation, $q, $log) {
+	.service('masterDataSvc', ['Entity', 'Item', 'Relation', 'EntityQueryByName', '$q', '$log', function(Entity, Item, Relation, EntityQueryByName, $q, $log) {
 	
 		function createMasterDataTemplateObject(){
 			var obj = angular.copy(Entity.newObjectTemplate);
@@ -188,7 +197,7 @@
 				  The second parameter addresses precisely these situations.	
 		*/
 		this.findByName = function(name){
-			return Entity.query({name:name}).$promise;
+			return EntityQueryByName.queryByName({name:name}).$promise;
 		};		
 
 		this._itemsCount;
