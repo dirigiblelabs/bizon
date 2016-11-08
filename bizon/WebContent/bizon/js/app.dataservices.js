@@ -288,7 +288,13 @@
 			var reqParams = {};
 			if(cascaded)
 				reqParams.cascaded = cascaded;
-			reqParams.boId = headerId;
+			if(headerId !== undefined){
+				if(headerId.constructor === Array){
+					reqParams = headerId;
+				} else {
+					reqParams.boId = headerId;
+				}
+			}
 			var deferred = $q.defer();
 			Entity.remove(reqParams).$promise
 			.then(function(){

@@ -35,9 +35,26 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 					  templateUrl: "views/empty.html",
 					  controller: 'EmptyCtrl',
 		              controllerAs: 'emptyVm'
+			      },
+			      'templateLib@list.empty': {
+					templateUrl: 'views/templates.html',
+					controller: 'TemplatesCtrl',
+					controllerAs: 'tmplVm'
 			      }
 		      }
-		   })			    
+		   })		   
+		.state('list.empty.tmplfamiliy', {
+			params: {
+				tmplFamily:undefined
+			},
+		      views: {
+			      'templateLib@list.empty': {
+					templateUrl: 'views/templateFamily.html',
+					controller: 'TemplatesCtrl',
+					controllerAs: 'tmplVm'
+			      }
+		      }
+		   })		   		   
 		.state('list.entity', {
 			url: "{boId}",
 			resolve: { 
@@ -272,7 +289,7 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
                 }
             };
         }
-    ])    
+    ])
 	.run(['editableOptions', function(editableOptions)  {
 	  editableOptions.theme = 'bs3'; // bootstrap3 theme. Can be also 'bs2', 'default'
 	}]);

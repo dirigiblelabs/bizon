@@ -378,18 +378,27 @@ exports.remove = function(id, cascaded) {
 
 	console.info('Deleting BO_HEADER entity with id[' + id + '], cascaded['+cascaded+']');
 
-	if(id === undefined || id === null){
-		throw new Error('Illegal argument: id[' + id + ']');
-	}
-
     var connection = datasource.getConnection();
     try {
-    	var sql = "DELETE FROM BO_HEADER WHERE " + exports.pkToSQL();
+    
+    	var sql = "DELETE FROM BO_HEADER";
+    	
+    	if(id !== null){
+    	 	sql += " WHERE " + exports.pkToSQL();
+    	 	if(id.constructor === Array){
+    	 		sql += "IN ("+id.join(',')+")";
+    	 	} else {
+    	 		" = "  + id;
+    	 	}
+		}
+
         var statement = connection.prepareStatement(sql);
-        statement.setString(1, id);
+        if(id!==null && id.constructor !== Array){
+        	statement.setString(1, id);
+        }
         statement.executeUpdate();
         
-		if(cascaded && id){
+		if(cascaded===true && id!==null){
 			var dependentItems = boItemLib.list(id);
 			for(var i = 0; i < dependentItems.length; i++) {
         		boItemLib.remove(dependentItems[i].boi_id);
@@ -539,7 +548,6 @@ exports.pkToSQL = function() {
     return pks[0] + " = ?";
 };
 
-
 exports.http = {
 
 	idPropertyName: 'boh_id',
@@ -558,7 +566,11 @@ exports.http = {
 		} else if('PUT' === method){
 			this.update(urlParameters.cascaded);
 		} else if('DELETE' === method){
-			this.remove(urlParameters.id, urlParameters.cascaded);
+			if(urlParameters.id !== null){
+				this.remove(urlParameters.id, urlParameters.cascaded);	
+			} else {
+				this.deleteData(urlParameters.cascaded);	
+			}
 		} else if('GET' === method){
 			if(urlParameters){
 				if(urlParameters.id){
@@ -732,6 +744,27 @@ exports.http = {
 			});
 			response.println(JSON.stringify(json));
 			response.setStatus(response.OK);
+		} catch(err){
+			var errorCode = response.INTERNAL_SERVER_ERROR;
+        	this.printError(errorCode, errorCode, err.message, err.errContext);
+        	throw err;
+		} finally {
+			response.flush();
+			response.close();
+		}
+	},
+	
+	deleteData: function(cascaded){
+		console.info('Deleting multiple objects');
+		try{
+			var input = request.readInputText();
+			console.info('Deleting entities '+ (input || 'all'));
+			var ids = null;
+			if(input){
+				ids = JSON.parse(input);
+			}
+	    	exports.remove(ids, cascaded);
+			response.setStatus(response.NO_CONTENT);
 		} catch(err){
 			var errorCode = response.INTERNAL_SERVER_ERROR;
         	this.printError(errorCode, errorCode, err.message, err.errContext);

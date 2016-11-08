@@ -24,6 +24,6 @@ angular.module('businessObjects')
 			$state.go($state.current, $stateParams, {reload: true});
 		});
 	};
-
+	
 }]);
 })(angular);

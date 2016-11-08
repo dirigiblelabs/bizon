@@ -1,0 +1,52 @@
+<style>
+
+.generic-background:after {
+	content: "\f247";
+}
+
+.templateLibrary {
+    min-height: 20vh;
+}
+
+
+.templateLibrary .template-family-item {
+	min-width: 20vw;
+    max-width: 20vw;
+    min-height: 20vh;
+    max-height: 20vh;
+    margin-bottom: 2rem;
+}
+
+.template-family-item i.fa::before {
+	position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    opacity: 0.3;
+    color: rgba(0, 0, 0, 0.3);
+    font-size: 16vh;
+    line-height: 20vh;
+    text-align: center;
+}
+
+.template-family-item .btn .title {
+	flex: 1 0 auto;
+    align-self: center;
+	overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 100%;    
+    font-weight: 700;
+}
+
+</style>
+
+<div class="masonry templateLibrary">
+    <div class="brick template-family-item" ng-repeat="domain in tmplVm.items">
+        <div class="btn btn-default ng-repeat="domain in tmplVm.items" ui-sref="list.empty.tmplfamiliy({tmplFamily: domain.tmplId})">
+            <span class="title" ng-bind="domain.label"/>
+        	<i ng-class="domain.icon || 'fa fa-object-group'"></i>            
+        </div>
+    </div>
+</div>

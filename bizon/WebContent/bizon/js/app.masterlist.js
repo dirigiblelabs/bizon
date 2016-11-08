@@ -75,6 +75,38 @@ angular.module('businessObjects')
         
 	};
 	
+	this.deleteAll = function(){
+		
+		var modalOptions = {
+            closeButtonText: 'Cancel',
+            actionButtonText: 'Delete entity',
+            headerText: 'Delete everything?',
+            bodyText: 'Are you sure you want to completely delete all objects?'
+        };
+
+        modalService.showModal({}, modalOptions)
+        .then(function () {
+			self.busy = true;
+			masterDataSvc.remove(undefined, true)
+			.then(function(){
+				delete $stateParams.boId;
+				delete $state.params.boId;
+				delete $stateParams.selectedEntity;
+				delete $state.params.selectedEntity;			
+				$log.debug('All business objects deleted');
+				Notifications.createMessageSuccess('All Business Object successfully deleted.');
+
+			})
+			.catch(function(reason){
+				handleServiceError('Deleting All Buisness Objects failed', reason);
+			})
+			.finally(function(){
+				$state.go('list', {message: $stateParams.message}, {reload: true, inheirt: false});
+			});	        
+        });
+        
+	};	
+	
 	function handleServiceError(text, errorPayload){
 		var message = masterDataSvc.serviceErrorMessageFormatter(text, errorPayload);
 		$log.error('Deleting Buisness Object failed:' + message);
