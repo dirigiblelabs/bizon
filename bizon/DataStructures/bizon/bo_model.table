@@ -1,0 +1,32 @@
+{
+  "tableName":"BO_MODEL",
+  "columns":
+    [
+      {
+        "name":"bom_id",
+        "type":"INTEGER",
+        "length":"0",
+        "notNull":"true",
+        "primaryKey":"true",
+        "defaultValue":""
+      }
+      ,
+      {
+        "name":"bom_label",
+        "type":"VARCHAR",
+        "length":"255",
+        "notNull":"true",
+        "primaryKey":"false",
+        "defaultValue":""
+      }
+      ,
+      {
+        "name":"bom_json",
+        "type":"BLOB",
+        "length":"0",
+        "notNull":"false",
+        "primaryKey":"false",
+        "defaultValue":""
+      }
+    ]
+}

@@ -31,10 +31,20 @@
 	.service('Entity', ['$resource', 'ResourceSvcConfiguration', function($resource, ResourceSvcConfiguration) {
 		var cfg = angular.copy(ResourceSvcConfiguration.cfg);
 		cfg.count = {method:'GET', params:{count:true}, isArray:false, ignoreLoadingBar: true};
-	  	var res = $resource('../../js/bizon/bo_header.js/:boId', { boId:'@id' }, cfg);
+		cfg.getByName = {method:'GET', isArray:false, ignoreLoadingBar: false};
 		
+	  	var res = $resource('../../js/bizon/bo_header.js/:boId', { boId:'@id' }, cfg);
+		var createRadnomAlphanumeric = function(length){
+			if(!length)
+				length = 4;
+			var power = length;
+			var sliceIndex = -Math.abs(length);
+		    return ("0000" + (Math.random()*Math.pow(36,power) << 0).toString(36)).slice(sliceIndex);
+		}
+
 		res.newObjectTemplate = {
-				"boh_name":"Business Object Name",
+				"boh_name":"BizEntity"+ createRadnomAlphanumeric(),
+				"boh_label":"Business Object Name",
 				"boh_description":"Description for business object",
 				"boh_ds_gen_enabled": true,
 				"boh_svc_gen_enabled": true,
@@ -92,6 +102,7 @@
 				var item = angular.copy(Item.newObjectTemplate);
 				item.boi_name += ' ' +i;
 				item.boi_column += i;
+				item.boi_boh_name = obj.boh_name;
 				obj.properties.push(item);
 			}
 			obj.properties[0].boi_null = false;			
@@ -102,7 +113,7 @@
 		this.batchLoadedMasterData = [];//data cache
 		this.querySettings = {
 			limit: 100,
-			sort: 'boh_name',
+			sort: 'boh_label',
 			order: 'ASC'
 		};
 		this.selection = [];
@@ -189,6 +200,37 @@
 			}
 			return;
 		};
+		
+		this.getByName = function(name, lookupRemotelyOnDemand){
+			var itemHit = this.batchLoadedMasterData.filter(function(item){
+					if(item.boh_name == name ){
+						return true;
+					}
+					return false;
+				})[0];
+			if(itemHit) {
+				return $q.when(itemHit);
+			} else if(lookupRemotelyOnDemand) {
+				return Entity.getByName({getByName:name}).$promise
+				.then(function(item){
+					if(item){
+						return self.next.apply(self);
+					}
+					return;
+				})
+				.then(function(){
+					return self.get.apply(self, [name, lookupRemotelyOnDemand]);
+				})
+				.catch(function(response){
+					if(response.status===404){
+						return;
+					} else {
+						throw response.data.err;
+					}
+				});
+			}
+			return;
+		};		
 		
 		/* 
 			Looks up an object with the given id in the currently loaded data, and if instructed by the reloadDataOnDemand parameter, 

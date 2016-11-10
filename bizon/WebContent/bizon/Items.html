@@ -46,13 +46,12 @@
 				<thead>
 					<tr>
 						<th>BOI_ID</th>
-						<th>BOI_BOH_ID</th>
+						<th>BOI_BOH_NAME</th>
 						<th>BOI_NAME</th>
 						<th>BOI_COLUMN</th>
 						<th>BOI_TYPE</th>
 						<th>BOI_LENGTH</th>
 						<th>BOI_NULL</th>
-						<th>BOI_PK</th>
 						<th>BOI_DEFAULT</th>
 					</tr>
 				</thead>
@@ -60,13 +59,12 @@
 					<tr class="selected-{{entry._selected_}}" ng-repeat="entry in data"
 						ng-click="showInfoForEntry(entry)">
 						<td>{{entry.boi_id}}</td>
-						<td>{{entry.boi_boh_id}}</td>
+						<td>{{entry.boi_boh_name}}</td>
 						<td>{{entry.boi_name}}</td>
 						<td>{{entry.boi_column}}</td>
 						<td>{{entry.boi_type}}</td>
 						<td>{{entry.boi_length}}</td>
 						<td>{{entry.boi_null}}</td>
-						<td>{{entry.boi_pk}}</td>
 						<td>{{entry.boi_default}}</td>
 					</tr>
 				</tbody>
@@ -98,9 +96,9 @@
 					<input type="text" class="form-control" 
 						ng-model="selectedEntry.boi_id" readonly> <br>
 					<br>
-					<label>BOI_BOH_ID</label>
+					<label>BOI_BOH_NAME</label>
 					<input type="text" class="form-control" 
-						ng-model="selectedEntry.boi_boh_id"
+						ng-model="selectedEntry.boi_boh_name"
 						ng-readonly="operation == 'show'" required="required">
 					<br>
 					<label>BOI_NAME</label>
@@ -126,11 +124,6 @@
 					<label>BOI_NULL</label>
 					<input type="text" class="form-control" 
 						ng-model="selectedEntry.boi_null"
-						ng-readonly="operation == 'show'" required="required">
-					<br>
-					<label>BOI_PK</label>
-					<input type="text" class="form-control" 
-						ng-model="selectedEntry.boi_pk"
 						ng-readonly="operation == 'show'" required="required">
 					<br>
 					<label>BOI_DEFAULT</label>
@@ -160,7 +153,7 @@
 		angular.module('page', ['ngAnimate', 'ui.bootstrap']);
 		angular.module('page').controller('ManageController', function ($scope, $http) {
 			
-			var url = '../../js/bo_modeller/bo_item.js';
+			var url = '../../js/bizon/bo_item.js';
 
 			$http.get(url)
 				.success(function(data){

@@ -30,7 +30,7 @@
 	<div class="scrollable">
 		<ul class="nav nav-pills nav-stacked" style="bottom:4rem" infinite-scroll='masterVm.next()' infinite-scroll-disabled="masterVm.busy" infinite-scroll-parent="true">
 	 		<li role="presentation" ui-sref-active="active" ng-repeat="item in masterVm.items | filter:masterVm.searchText track by item.boh_id">
-	 			<a href ui-sref="list.entity({boId:item.boh_id})"><i class="fa fa-th-large"></i> {{item.boh_name}} <span ng-click="masterVm.deleteItem(item)" class="glyphicon glyphicon-remove pull-right tools-remove" aria-hidden="true"></span></a>
+	 			<a href ui-sref="list.entity({boId:item.boh_id})"><i class="fa fa-th-large"></i> {{item.boh_label}} <span ng-click="masterVm.deleteItem(item)" class="glyphicon glyphicon-remove pull-right tools-remove" aria-hidden="true"></span></a>
 	 		</li>
 		</ul>
 		<ul class="nav nav-pills ghost-list-item-active" ng-show="masterVm.showLoadMore">

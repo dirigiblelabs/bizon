@@ -49,7 +49,7 @@
 					 typeahead-no-results="relEditorVm.noResults"
 					 typeahead-show-hint = "true"
 					 typeahead-input-formatter = "relEditorVm.changeTarget(a)"
-					 uib-typeahead="target as target.boh_name for target in relEditorVm.matchTargets($viewValue)">
+					 uib-typeahead="target as target.boh_label for target in relEditorVm.matchTargets($viewValue)">
 			    <i ng-show="relEditorVm.loading" class="glyphicon glyphicon-refresh"></i>
 			    <div ng-show="relEditorVm.noResults">
 			      <i class="glyphicon glyphicon-remove" ng-click="relEditorVm.noResults=false"></i> No Results Found

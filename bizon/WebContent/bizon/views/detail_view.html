@@ -30,7 +30,7 @@ button.list-group-item:active, button.list-group-item:focus {
 				<i class="fa fa-th"></i>
 			</div>
 			<div class="object-title">
-				<p class="title">{{detailsVm.selectedEntity.boh_name}}</p>
+				<p class="title">{{detailsVm.selectedEntity.boh_label}}</p>
 	    		<p class="subtitle">{{detailsVm.selectedEntity.boh_description}}</p>						
 			</div>
 		</section> 
@@ -74,14 +74,14 @@ button.list-group-item:active, button.list-group-item:focus {
 				<div class="items-list">
 					<div class="list-group">
 					  <div class="list-group-item" ng-click="$event.stopPropagation();" style="outline: none; cursor: auto; background-color: #f5f5f5">
-						Outbound relations from <span style="font-style:italic">{{detailsVm.selectedEntity.boh_name}}</span> to other entities <i class="fa fa-arrow-right"></i>
+						Outbound relations from <span style="font-style:italic">{{detailsVm.selectedEntity.boh_label}}</span> to other entities <i class="fa fa-arrow-right"></i>
 					  </div>					
 					  <button type="button" class="list-group-item" ng-repeat="entry in detailsVm.outboundRelations|filter:detailsVm.searchText|orderBy:['bor_name']" ng-click="$event.stopPropagation();" style="outline: none; cursor: auto;">
 						<div class="list-group-item-title">
 							<span class="emphasized">{{entry.bor_name}}</span>
 						</div>
 						<div class="list-group-item-text">
-							Relation Type: <span style="color: gray; font-style: italic">{{entry.bor_type===1?'Association':'Composition'}}</span> in <a ng-href="#/{{entry.bor_target_id}}">{{entry.target.boh_name}}</a>
+							Relation Type: <span style="color: gray; font-style: italic">{{entry.bor_type===1?'Association':'Composition'}}</span> in <a ng-href="#/{{entry.target.boh_id}}">{{entry.target.boh_label}}</a>
 						</div>						
 					  </button>
 					</div>
@@ -90,14 +90,14 @@ button.list-group-item:active, button.list-group-item:focus {
 				<div class="items-list">									
 					<div class="list-group">
 					  <div class="list-group-item" ng-click="$event.stopPropagation();" style="outline: none; cursor: auto; background-color: #f5f5f5">
-						Inbound relations from other entities to <span style="font-style:italic">{{detailsVm.selectedEntity.boh_name}}</span> <i class="fa fa-arrow-left"></i>
+						Inbound relations from other entities to <span style="font-style:italic">{{detailsVm.selectedEntity.boh_label}}</span> <i class="fa fa-arrow-left"></i>
 					  </div>										
 					  <button type="button" class="list-group-item" ng-repeat="entry in detailsVm.inboundRelations|filter:detailsVm.searchText|orderBy:['bor_name']" ng-click="$event.stopPropagation();" style="outline: none; cursor: auto;">
 						<div class="list-group-item-title">
 							<span class="emphasized">{{entry.bor_name}}</span>
 						</div>
 						<div class="list-group-item-text">
-							Relation Type: <span style="color: gray; font-style: italic">{{entry.bor_type==1?'Association':'Composition'}}</span> of <a ng-href="#/{{entry.bor_src_id}}">{{entry.source.boh_name}}</a>
+							Relation Type: <span style="color: gray; font-style: italic">{{entry.bor_type==1?'Association':'Composition'}}</span> of <a ng-href="#/{{entry.source.boh_id}}">{{entry.source.boh_label}}</a>
 						</div>						
 					  </button>
 					</div>

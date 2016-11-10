@@ -178,8 +178,8 @@
 	            	"type": "integer"
 	    		}
 				,
-        		"boi_boh_id": {
-	            	"type":  "integer"
+        		"boi_boh_name": {
+	            	"type":  "string"
 	    		}
 				,
         		"boi_name": {

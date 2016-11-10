@@ -24,7 +24,8 @@ function handleRequest() {
 	var metadata = xss.escapeSql(request.getParameter('metadata'));
 	var expanded = xss.escapeSql(request.getParameter('expanded'));
 	var cascaded = xss.escapeSql(request.getParameter('cascaded'));	
-	var queryByName = xss.escapeSql(request.getParameter('name'));
+	var queryByName = xss.escapeSql(request.getParameter('name'));//TODO rename this and below params
+	var getByName = xss.escapeSql(request.getParameter('getByName'));	
 
 	if(checkConflictingParameters(id, count, metadata)){
 		var limit = xss.escapeSql(request.getParameter('limit'));
@@ -51,7 +52,8 @@ function handleRequest() {
 			},
 			"expanded": expanded!==null,
 			"cascaded": cascaded!==null,
-			"queryByName": queryByName
+			"queryByName": queryByName,
+			"getByName": getByName
 		};
 		
 		entityBo_header.http.dispatch(urlParameters);	

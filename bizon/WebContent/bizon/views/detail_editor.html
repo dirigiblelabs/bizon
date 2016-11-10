@@ -43,7 +43,7 @@
 				<i class="fa fa-th"></i>
 			</div>
 			<div class="object-title">
-				<p class="title" editable-text="detailsEditorVm.entityForEdit.boh_name">{{detailsEditorVm.entityForEdit.boh_name}}</p>
+				<p class="title" editable-text="detailsEditorVm.entityForEdit.boh_label">{{detailsEditorVm.entityForEdit.boh_label}}</p>
 	    		<p class="subtitle" editable-text="detailsEditorVm.entityForEdit.boh_description">{{detailsEditorVm.entityForEdit.boh_description}}</p>											
 			</div>
 		</section>				    		
@@ -109,7 +109,7 @@
 								<span class="emphasized">{{entry.bor_name}}</span>
 							</div>
 							<div class="list-group-item-text">
-								Relation Type: <span style="color: gray; font-style: italic">{{entry.bor_type===1?'Association':'Composition'}}</span> <!--in <a ng-href="#/{{entry.bor_target_id}}">{{entry.target.boh_name}}</a>-->
+								Relation Type: <span style="color: gray; font-style: italic">{{entry.bor_type===1?'Association':'Composition'}}</span> <!--in <a ng-href="#/{{entry.target.boh_id}}">{{entry.target.boh_label}}</a>-->
 							</div>
 						</div>
 						<div class="btn-group pull-right">

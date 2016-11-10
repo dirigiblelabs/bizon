@@ -179,9 +179,8 @@
         "integer"
 	    		}
 				,
-        		"bor_src_id": {
-	            	"type": 
-        "integer"
+        		"bor_src_boh_name": {
+	            	"type": "integer"
 	    		}
 				,
         		"bor_src_type": {
@@ -189,9 +188,8 @@
         "integer"
 	    		}
 				,
-        		"bor_target_id": {
-	            	"type": 
-        "integer"
+        		"bor_target_boh_name": {
+	            	"type": "string"
 	    		}
 				,
         		"bor_target_type": {

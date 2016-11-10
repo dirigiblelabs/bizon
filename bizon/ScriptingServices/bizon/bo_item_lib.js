@@ -10,7 +10,7 @@ var database = require("db/database");
 var datasource = database.getDatasource();
 
 var persistentProperties = {
-	mandatory: ["boi_id", "boi_boh_id", "boi_name", "boi_column", "boi_type", "boi_type_name"],
+	mandatory: ["boi_id", "boi_boh_name", "boi_name", "boi_column", "boi_type", "boi_type_name"],
 	optional: ["boi_length", "boi_null", "boi_default"]
 };
 
@@ -35,7 +35,7 @@ exports.insert = function(item) {
 	
     var connection = datasource.getConnection();
     try {
-        var sql = "INSERT INTO BO_ITEM (BOI_ID, BOI_BOH_ID, BOI_NAME, BOI_COLUMN, BOI_TYPE_NAME, BOI_TYPE, BOI_LENGTH, BOI_NULL, BOI_DEFAULT)";
+        var sql = "INSERT INTO BO_ITEM (BOI_ID, BOI_BOH_NAME, BOI_NAME, BOI_COLUMN, BOI_TYPE_NAME, BOI_TYPE, BOI_LENGTH, BOI_NULL, BOI_DEFAULT)";
         sql += " VALUES (?,?,?,?,?,?,?,?,?)";
 
         var statement = connection.prepareStatement(sql);
@@ -45,7 +45,7 @@ exports.insert = function(item) {
         
         var j = 0;
         statement.setInt(++j, item.boi_id);
-        statement.setInt(++j, item.boi_boh_id);
+        statement.setString(++j, item.boi_boh_name);
         statement.setString(++j, item.boi_name);
         statement.setString(++j, item.boi_column);
         statement.setString(++j, item.boi_type_name);        
@@ -110,7 +110,7 @@ exports.list = function(headerId, limit, offset, sort, order) {
         }
         sql += " * FROM BO_ITEM";
         if(headerId !== null && headerId !== undefined){
-        	sql += " WHERE BOI_BOH_ID=" + headerId;
+        	sql += " WHERE BOI_BOH_NAME='" + headerId+"'";
         }
         if (sort !== null && sort !== undefined) {
             sql += " ORDER BY " + sort;
@@ -144,7 +144,7 @@ exports.list = function(headerId, limit, offset, sort, order) {
 function createEntity(resultSet) {
     var entity = {};
 	entity.boi_id = resultSet.getInt("BOI_ID");
-	entity.boi_boh_id = resultSet.getInt("BOI_BOH_ID");
+	entity.boi_boh_name = resultSet.getString("BOI_BOH_NAME");
     entity.boi_name = resultSet.getString("BOI_NAME");
     entity.boi_column = resultSet.getString("BOI_COLUMN");
 	entity.boi_type_name = resultSet.getString("BOI_TYPE_NAME");    
@@ -246,14 +246,14 @@ exports.update = function(item) {
 
     var connection = datasource.getConnection();
     try {
-        var sql = "UPDATE BO_ITEM SET BOI_BOH_ID = ?, BOI_NAME = ?, BOI_COLUMN = ?, BOI_TYPE_NAME = ?, BOI_TYPE = ?, BOI_LENGTH = ?, BOI_NULL = ?, BOI_DEFAULT = ?";
+        var sql = "UPDATE BO_ITEM SET BOI_BOH_NAME = ?, BOI_NAME = ?, BOI_COLUMN = ?, BOI_TYPE_NAME = ?, BOI_TYPE = ?, BOI_LENGTH = ?, BOI_NULL = ?, BOI_DEFAULT = ?";
         sql += " WHERE BOI_ID = ?";
         
         var statement = connection.prepareStatement(sql);
         item = createSQLEntity(item);
 
         var i = 0;
-        statement.setInt(++i, item.boi_boh_id);
+        statement.setString(++i, item.boi_boh_name);
         statement.setString(++i, item.boi_name);
         statement.setString(++i, item.boi_column);
         statement.setString(++i, item.boi_type_name);        
@@ -349,11 +349,11 @@ exports.metadata = function() {
 	};
     entityMetadata.properties.push(propertyboi_id);
 
-	var propertyboi_boh_id = {
-		name: 'boi_boh_id',
-		type: 'integer'
+	var propertyboi_boh_name = {
+		name: 'boi_boh_name',
+		type: 'varchar'
 	};
-    entityMetadata.properties.push(propertyboi_boh_id);
+    entityMetadata.properties.push(propertyboi_boh_name);
 
 	var propertyboi_name = {
 		name: 'boi_name',
@@ -425,7 +425,7 @@ exports.pkToSQL = function() {
 exports.http = {
 
 	idPropertyName: 'boi_id',
-	validSortPropertyNames: ['boi_id','boi_name','boi_boh_id','boi_column','boi_type_name','boi_type','boi_length','boi_null','boi_default'],
+	validSortPropertyNames: ['boi_id','boi_name','boi_boh_name','boi_column','boi_type_name','boi_type','boi_length','boi_null','boi_default'],
 
 	dispatch: function(urlParameters){
 		var method = request.getMethod().toUpperCase();

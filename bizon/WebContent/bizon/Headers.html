@@ -46,7 +46,8 @@
 				<thead>
 					<tr>
 						<th>BOH_ID</th>
-						<th>BOH_NAME</th>
+						<th>BOH_NAME</th>						
+						<th>BOH_LABEL</th>
 						<th>BOH_TABLE</th>
 						<th>BOH_DESCRIPTION</th>
 					</tr>
@@ -55,7 +56,8 @@
 					<tr class="selected-{{entry._selected_}}" ng-repeat="entry in data"
 						ng-click="showInfoForEntry(entry)">
 						<td>{{entry.boh_id}}</td>
-						<td>{{entry.boh_name}}</td>
+						<td>{{entry.boh_name}}</td>						
+						<td>{{entry.boh_label}}</td>
 						<td>{{entry.boh_table}}</td>
 						<td>{{entry.boh_description}}</td>
 					</tr>
@@ -91,6 +93,11 @@
 					<label>BOH_NAME</label>
 					<input type="text" class="form-control" 
 						ng-model="selectedEntry.boh_name"
+						ng-readonly="operation == 'show'" required="required">
+					<br>					
+					<label>BOH_LABEL</label>
+					<input type="text" class="form-control" 
+						ng-model="selectedEntry.boh_label"
 						ng-readonly="operation == 'show'" required="required">
 					<br>
 					<label>BOH_TABLE</label>

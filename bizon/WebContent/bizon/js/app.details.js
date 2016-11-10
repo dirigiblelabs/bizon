@@ -36,11 +36,11 @@ angular.module('businessObjects')
 	function getInboundRelations(){
 		if(this.selectedEntity){
 			Relation.query({
-				targetId: this.selectedEntity.boh_id
+				targetId: this.selectedEntity.boh_name
 			}).$promise
 			.then(function(relations){
 				self.inboundRelations = relations.map(function(relation){
-					masterDataSvc.get(relation.bor_src_id, true)
+					masterDataSvc.getByName(relation.bor_src_boh_name, true)
 					.then(function(srcEntity){
 						relation.source = srcEntity;
 						return relation;						
@@ -54,11 +54,11 @@ angular.module('businessObjects')
 	function getOutboundRelations(){
 		if(this.selectedEntity){
 			Relation.query({
-				srcId: this.selectedEntity.boh_id
+				srcId: this.selectedEntity.boh_name
 			}).$promise
 			.then(function(relations){
 				self.outboundRelations = relations.map(function(relation){
-					masterDataSvc.get(relation.bor_target_id, true)
+					masterDataSvc.getByName(relation.bor_target_boh_name, true)
 					.then(function(targetEntity){
 						relation.target = targetEntity;
 					});
@@ -87,7 +87,7 @@ angular.module('businessObjects')
 		var modalOptions = {
             closeButtonText: 'Cancel',
             actionButtonText: 'Duplicate entity',
-            headerText: 'Duplicate "' + self.selectedEntity.boh_name + '"?',
+            headerText: 'Duplicate "' + self.selectedEntity.boh_label + '"?',
             bodyText: 'Are you sure you want to duplicate this entity?'
         };
 
@@ -98,7 +98,7 @@ angular.module('businessObjects')
 			duplicateItem.properties = duplicateItem.properties.map(function(item){
 				delete item.boi_id;
 				delete item.bor_id;
-				delete item.boi_boh_id;
+				delete item.boi_boh_name;
 				return item;
 			});
 			masterDataSvc.create(undefined, duplicateItem)
@@ -118,7 +118,7 @@ angular.module('businessObjects')
 		var modalOptions = {
             closeButtonText: 'Cancel',
             actionButtonText: 'Delete entity',
-            headerText: 'Delete "' + self.selectedEntity.boh_name + '"?',
+            headerText: 'Delete "' + self.selectedEntity.boh_label + '"?',
             bodyText: 'Are you sure you want to delete this entity?'
         };
 

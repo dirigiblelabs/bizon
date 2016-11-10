@@ -17,7 +17,7 @@ var datasource = database.getDatasource();
 var itemsEntitySetName = "properties";
 var persistentProperties = {
 	mandatory: ["boh_id", "boh_name"],
-	optional: ["boh_description", "boh_table", "boh_id_name", "boh_id_datatype_code", "boh_svc_name", "boh_svc_gen_enabled", "boh_ds_gen_enabled", "boh_ui_gen_enabled", "boh_ui_title"]
+	optional: ["boh_label", "boh_description", "boh_table", "boh_id_name", "boh_id_datatype_code", "boh_svc_name", "boh_svc_gen_enabled", "boh_ds_gen_enabled", "boh_ui_gen_enabled", "boh_ui_title"]
 };
 
 var parseIntStrict = function (value) {
@@ -54,8 +54,8 @@ exports.insert = function(entity, cascaded) {
     var connection = datasource.getConnection();
     try {
         var sql = "INSERT INTO BO_HEADER (";
-        sql += "BOH_ID, BOH_NAME, BOH_TABLE, BOH_DS_GEN_ENABLED, BOH_ID_NAME, BOH_ID_DATATYPE_CODE, BOH_SVC_NAME, BOH_SVC_GEN_ENABLED, BOH_UI_GEN_ENABLED, BOH_UI_TITLE, BOH_DESCRIPTION) "; 
-        sql += "VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+        sql += "BOH_ID, BOH_NAME, BOH_LABEL, BOH_TABLE, BOH_DS_GEN_ENABLED, BOH_ID_NAME, BOH_ID_DATATYPE_CODE, BOH_SVC_NAME, BOH_SVC_GEN_ENABLED, BOH_UI_GEN_ENABLED, BOH_UI_TITLE, BOH_DESCRIPTION) "; 
+        sql += "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
 
         var statement = connection.prepareStatement(sql);
         
@@ -63,7 +63,8 @@ exports.insert = function(entity, cascaded) {
         entity.boh_id = datasource.getSequence('BO_HEADER_BOH_ID').next();
          
         statement.setInt(++i,  entity.boh_id);
-        statement.setString(++i, entity.boh_name);
+        statement.setString(++i, entity.boh_name);        
+        statement.setString(++i, entity.boh_label);
         statement.setString(++i, entity.boh_table);
         statement.setShort(++i, entity.boh_ds_gen_enabled);
         statement.setString(++i, entity.boh_id_name);
@@ -81,7 +82,7 @@ exports.insert = function(entity, cascaded) {
 	        	for(var j=0; j<entity[itemsEntitySetName].length; j++){
 	        		var item = entity[itemsEntitySetName][j];
 	        		if(item.boi_type !== 'Relationship'){
-		        		item.boi_boh_id = entity.boh_id;
+		        		item.boi_boh_name = entity.boh_name;
 						boItemLib.insert(item);        				
         			} else {
 		        		item.bor_src_id = entity.boh_id;
@@ -134,6 +135,38 @@ exports.find = function(id) {
     }
 };
 
+// Reads a single entity by id, parsed into JSON object 
+exports.findByName = function(name) {
+
+	console.info('Finding BO_HEADER entity with name ' + name);
+
+	if(name === undefined || name === null){
+		throw new Error('Illegal argument for parameter name[' + name + ']');
+	}
+
+    var connection = datasource.getConnection();
+    try {
+        var entity;
+        var sql = "SELECT * FROM BO_HEADER WHERE BOH_NAME = '" + name + "'";
+        var statement = connection.prepareStatement(sql);
+        statement.setString(1, name);
+        
+        var resultSet = statement.executeQuery();
+        if (resultSet.next()) {
+            entity = createEntity(resultSet);
+			if(entity)
+            	console.info('BO_HEADER entity with name[' + name + '] found');
+        } 
+        return entity;
+    } catch(e) {
+		e.errContext = sql;
+		throw e;
+    } finally {
+        connection.close();
+    }
+};
+
+
 // Read all entities, parse and return them as an array of JSON objets
 exports.list = function(limit, offset, sort, order, expanded, entityName) {
 
@@ -142,13 +175,13 @@ exports.list = function(limit, offset, sort, order, expanded, entityName) {
     var connection = datasource.getConnection();
     try {
         var entities = [];
-        var sql = "SELECT ";
+        var sql = "SELECT";
         if (limit !== null && offset !== null) {
             sql += " " + datasource.getPaging().genTopAndStart(limit, offset);
         }
         sql += " * FROM BO_HEADER";
         if (entityName !== null) {
-        	sql += " WHERE BOH_NAME LIKE '" + entityName + "%%'";
+        	sql += " WHERE BOH_LABEL LIKE '" + entityName + "%%'";
     	}
         if (sort !== null) {
             sql += " ORDER BY " + sort;
@@ -165,11 +198,11 @@ exports.list = function(limit, offset, sort, order, expanded, entityName) {
         while (resultSet.next()) {
         	var entity = createEntity(resultSet);
         	if(expanded !== null && expanded!==undefined){
-			   var dependentItemEntities = boItemLib.list(entity.boh_id, null, null, null, null);
+			   var dependentItemEntities = boItemLib.list(entity.boh_name, null, null, null, null);
 			   if(dependentItemEntities) {
 			   	 entity[itemsEntitySetName] = dependentItemEntities;
 		   	   }
-			   var dependentRelationEntities = boRelationLib.list(null, null, null, null, entity.boh_id, null);
+			   var dependentRelationEntities = boRelationLib.list(null, null, null, null, entity.boh_name, null);
 			   if(dependentRelationEntities) {
 			   	if(!entity[itemsEntitySetName])
 			   		entity[itemsEntitySetName] = [];
@@ -194,7 +227,8 @@ exports.list = function(limit, offset, sort, order, expanded, entityName) {
 function createEntity(resultSet) {
     var entity = {};
 	entity.boh_id = resultSet.getInt("BOH_ID");
-    entity.boh_name = resultSet.getString("BOH_NAME");
+    entity.boh_name = resultSet.getString("BOH_NAME");	
+    entity.boh_label = resultSet.getString("BOH_LABEL");
     entity.boh_table = resultSet.getString("BOH_TABLE");
     entity.boh_ds_gen_enabled = resultSet.getShort("BOH_DS_GEN_ENABLED");    	
     entity.boh_id_name = resultSet.getString("BOH_ID_NAME");
@@ -246,7 +280,7 @@ function createSQLEntity(entity) {
 				throw new Error("Illegal arugment: boh_table["+entity.boh_table+"] does not comply with validation rules [128 Characters, Starts with letter only, Can include or end with numbers, No spaces, Case insensitive]");
 		} else {
 			var regex = new RegExp('[^a-z0-9]*', "ig");
-			var tblName = entity.boh_name.replace(regex, '');
+			var tblName = entity.boh_label.replace(regex, '');
 			if(!/^[a-z]/i.test(tblName)){
 				tblName = 'tbl'+ tblName;
 			}
@@ -281,7 +315,7 @@ function createSQLEntity(entity) {
 			if(!isSvcNameValid || /\s/g.test(entity.boh_svc_name))
 				throw new Error("Illegal arugment: boh_svc_name["+entity.boh_svc_name+"] does not comply with validation rules");
 		} else {
-			var svcName = entity.boh_name;
+			var svcName = entity.boh_label;
 			var invalidSvcNameCharactersMatcher = new RegExp('[\\ \/ : * ? " < > | \s]', "g");
 			svcName = svcName.replace(invalidSvcNameCharactersMatcher , '');
 			if(!/^[a-z]/i.test(svcName)){
@@ -302,7 +336,7 @@ function createSQLEntity(entity) {
 			if(entity.boh_ui_title.length>255)
 				throw new Error("Illegal arugment: bo_ui_title["+entity.boh_ui_title+"] does not comply with validation rules. Longer than 255 characters.");
 		} else {
-			entity.boh_ui_title = entity.boh_name;
+			entity.boh_ui_title = entity.boh_label;
 			console.info('Autoassigned boh_ui_title['+entity.boh_ui_title+']');			
 		}
 	} else {
@@ -343,11 +377,12 @@ exports.update = function(entity) {
     try {
     
         var sql = "UPDATE BO_HEADER";
-        sql += " SET BOH_NAME=?, BOH_TABLE=?, BOH_DS_GEN_ENABLED=?, BOH_ID_NAME=?, BOH_ID_DATATYPE_CODE=?, BOH_SVC_NAME=?, BOH_SVC_GEN_ENABLED=?, BOH_UI_GEN_ENABLED=?, BOH_UI_TITLE=?, BOH_DESCRIPTION = ?"; 
+        sql += " SET BOH_NAME=?, BOH_LABEL=?, BOH_TABLE=?, BOH_DS_GEN_ENABLED=?, BOH_ID_NAME=?, BOH_ID_DATATYPE_CODE=?, BOH_SVC_NAME=?, BOH_SVC_GEN_ENABLED=?, BOH_UI_GEN_ENABLED=?, BOH_UI_TITLE=?, BOH_DESCRIPTION = ?"; 
         sql += " WHERE BOH_ID = ?";
         var statement = connection.prepareStatement(sql);
         var i = 0;
-        statement.setString(++i, entity.boh_name);
+        statement.setString(++i, entity.boh_name);        
+        statement.setString(++i, entity.boh_label);
         statement.setString(++i, entity.boh_table);
         statement.setShort(++i, entity.boh_ds_gen_enabled);
         statement.setString(++i, entity.boh_id_name);
@@ -381,6 +416,14 @@ exports.remove = function(id, cascaded) {
     var connection = datasource.getConnection();
     try {
     
+    	var name;
+    	if(cascaded){
+    		var entity = exports.find(id);
+    		if(entity){
+    			name = entity.boh_name;
+    		}
+    	}
+    
     	var sql = "DELETE FROM BO_HEADER";
     	
     	if(id !== null){
@@ -398,12 +441,12 @@ exports.remove = function(id, cascaded) {
         }
         statement.executeUpdate();
         
-		if(cascaded===true && id!==null){
-			var dependentItems = boItemLib.list(id);
+		if(cascaded===true && name!==null){
+			var dependentItems = boItemLib.list(name);
 			for(var i = 0; i < dependentItems.length; i++) {
         		boItemLib.remove(dependentItems[i].boi_id);
 			}
-			var dependentRelationEntities = boRelationLib.list(null, null, null, null, id, id);
+			var dependentRelationEntities = boRelationLib.list(null, null, null, null, name, name);
 			for(var i = 0; i < dependentRelationEntities.length; i++) {
         		boRelationLib.remove(dependentRelationEntities[i].bor_id);
 			}
@@ -469,6 +512,12 @@ exports.metadata = function() {
 		type: 'string'
 	};
     entityMetadata.properties.push(propertyboh_name);
+
+	var propertyboh_label = {
+		name: 'boh_label',
+		type: 'string'
+	};
+    entityMetadata.properties.push(propertyboh_label);
 
 	var propertyboh_table = {
 		name: 'boh_table',
@@ -551,7 +600,7 @@ exports.pkToSQL = function() {
 exports.http = {
 
 	idPropertyName: 'boh_id',
-	validSortPropertyNames: ['boh_id','boh_name'],
+	validSortPropertyNames: ['boh_id','boh_name','boh_label'],
 
 	dispatch: function(urlParameters){
 		var method = request.getMethod().toUpperCase();
@@ -579,6 +628,8 @@ exports.http = {
 					this.metadata();
 				} else if(urlParameters.count){
 					this.count();
+				}  else if(urlParameters.getByName){
+					this.getByName(urlParameters.getByName);
 				} else if(urlParameters.list){
 					this.query(urlParameters.list.limit, urlParameters.list.offset, urlParameters.list.sort, urlParameters.list.order, urlParameters.expanded, urlParameters.queryByName);
 				}
@@ -639,6 +690,28 @@ exports.http = {
 			var item = exports.find(id, expanded);
 			if(!item){
         		this.printError(response.NOT_FOUND, 1, "Record with id: " + id + " does not exist.");
+        		return;
+			}
+			var jsonResponse = JSON.stringify(item, null, 2);
+	        response.println(jsonResponse);
+		} catch(e) {
+    	    var errorCode = response.INTERNAL_SERVER_ERROR ;
+        	this.printError(errorCode, errorCode, e.message, e.errContext);
+        	throw e;
+		}		
+	},
+	
+	getByName: function(name, expanded){
+		//name is mandatory parameter
+		if(name === undefined) {
+			this.printError(response.BAD_REQUEST, 1, "Invallid name parameter: " + name);
+			return;
+		}
+
+	    try{
+			var item = exports.getByName(name, expanded);
+			if(!item){
+        		this.printError(response.NOT_FOUND, 1, "Record with name: " + name + " does not exist.");
         		return;
 			}
 			var jsonResponse = JSON.stringify(item, null, 2);
@@ -730,7 +803,7 @@ exports.http = {
 				try {
 					var objectsForImport = JSON.parse(content);
 					for(var i=0; i< objectsForImport.length; i++){
-						console.info('Inserting object ' + objectsForImport[i].boh_name);
+						console.info('Inserting object ' + objectsForImport[i].boh_label);
 						objectsForImport[i][this.idPropertyName] = exports.insert(objectsForImport[i], true);
 					}
 					uploadStatus.status="ok";

@@ -175,19 +175,17 @@
 	        "type":"object",
 	        "properties": {
         		"boh_id": {
-	            	"type": 
-        "integer"
-	    		}
-				,
+	            	"type": "integer"
+	    		},
         		"boh_description": {
-	            	"type": 
-        "string"
-	    		}
-				,
-        		"boh_name": {
-	            	"type": 
-        "string"
-	    		}
+	            	"type": "string"
+	    		},
+        		"boh_label": {
+	            	"type": "string"
+	    		},
+                "boh_name": {
+	            	"type": "string"
+	    		}	    		
 	        }
         }
 	}

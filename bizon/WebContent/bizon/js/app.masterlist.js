@@ -12,7 +12,7 @@ angular.module('businessObjects')
 	
 	this.querySettings = {
 		limit: 100,
-		sort: 'boh_name',
+		sort: 'boh_label',
 		order: 'ASC'
 	};
 	
@@ -47,7 +47,7 @@ angular.module('businessObjects')
 		var modalOptions = {
             closeButtonText: 'Cancel',
             actionButtonText: 'Delete entity',
-            headerText: 'Delete "' + entity.boh_name + '"?',
+            headerText: 'Delete "' + entity.boh_label + '"?',
             bodyText: 'Are you sure you want to delete this entity?'
         };
 

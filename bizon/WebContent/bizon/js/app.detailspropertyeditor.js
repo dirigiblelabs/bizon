@@ -76,7 +76,7 @@ angular.module('businessObjects')
 			});
 		if(isNewProperty) {
 			this.item = angular.copy(Item.newObjectTemplate);
-			this.item.boi_boh_id = selectedEntity.boh_id;
+			this.item.boi_boh_name = selectedEntity.boh_name;
 		}
 		this.selectedTypeOption = this.typeOptions.find(function(typeOption){
 					return typeOption.val === self.item.boi_type_name;

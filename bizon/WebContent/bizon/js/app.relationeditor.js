@@ -45,12 +45,12 @@ angular.module('businessObjects')
 			this.relation = {
 				boi_type: 'Relationship'
 			};
-			this.relation.bor_src_id = selectedEntity.boh_id;
+			this.relation.bor_src_boh_name = selectedEntity.boh_name;
 			this.relation.bor_src_type = MULTIPLICITY_OPTS.ONE;
 			this.relation.bor_name = selectedEntity.boh_name +'- ';
 		} else {
-			if(this.relation.bor_target_id){
-				masterDataSvc.get(this.relation.bor_target_id, true)
+			if(this.relation.bor_target_boh_name){
+				masterDataSvc.getByName(this.relation.bor_target_boh_name, true)
 				.then(function(target){
 					self.relation.target = target;
 				});			
@@ -83,13 +83,13 @@ angular.module('businessObjects')
 	this.changeTarget = function(){
 /*		var nameSegments = self.relation.bor_name.split('-');
 		if(self.relation.target){
-			nameSegments[1] = self.relation.target.boh_name;	
+			nameSegments[1] = self.relation.target.boh_label;	
 		} else {
 			nameSegments[1] = "[No target selected yet]";
 		}
 		self.relation.bor_name = nameSegments.join('-');*/
 		//TODO: implement in case we need some special formatting
-		return (self.relation.target && self.relation.target.boh_name) || '';
+		return (self.relation.target && self.relation.target.boh_label) || '';
 	};
     
     this.cancel = function() {
@@ -103,12 +103,13 @@ angular.module('businessObjects')
     	}
 		sliderValueToRelation.apply(self, [self.slider.value, self.relation]);
 		if(this.relation.target)
-  			this.relation.bor_target_id = this.relation.target.boh_id;
+  			this.relation.bor_target_boh_name = this.relation.target.boh_name;
 		if(isNewProperty){      	
 		  this.relation.action = 'save';
 		  selectedEntity.properties.push(this.relation);
 		} else {
-			this.relation.action = 'update';
+			if(this.relation.action!=='save')
+				this.relation.action = 'update';
 			selectedEntity.properties = selectedEntity.properties
 				.map(function(prop){
 					if(prop.bor_id === self.relation.bor_id){

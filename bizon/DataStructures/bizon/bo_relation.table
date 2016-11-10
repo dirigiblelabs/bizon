@@ -3,7 +3,7 @@
   "columns":
     [
       {
-        "name":"bor_id",
+        "name":"BOR_ID",
         "type":"INTEGER",
         "length":"0",
         "notNull":"true",
@@ -12,16 +12,16 @@
       }
       ,
       {
-        "name":"bor_src_id",
-        "type":"INTEGER",
-        "length":"0",
+        "name":"BOR_SRC_BOH_NAME",
+        "type":"VARCHAR",
+        "length":"100",
         "notNull":"true",
         "primaryKey":"false",
         "defaultValue":""
       }
       ,
       {
-        "name":"bor_src_type",
+        "name":"BOR_SRC_TYPE",
         "type":"SMALLINT",
         "length":"1",
         "notNull":"true",
@@ -30,16 +30,16 @@
       }
       ,
       {
-        "name":"bor_target_id",
-        "type":"INTEGER",
-        "length":"0",
+        "name":"BOR_TARGET_BOH_NAME",
+        "type":"VARCHAR",
+        "length":"100",
         "notNull":"true",
         "primaryKey":"false",
         "defaultValue":""
       }
       ,
       {
-        "name":"bor_target_type",
+        "name":"BOR_TARGET_TYPE",
         "type":"SMALLINT",
         "length":"1",
         "notNull":"true",
@@ -48,7 +48,7 @@
       }
       ,
       {
-        "name":"bor_name",
+        "name":"BOR_NAME",
         "type":"VARCHAR",
         "length":"255",
         "notNull":"true",
@@ -57,7 +57,7 @@
       }
       ,
       {
-        "name":"bor_type",
+        "name":"BOR_TYPE",
         "type":"SMALLINT",
         "length":"1",
         "notNull":"true",

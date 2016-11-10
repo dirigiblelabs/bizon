@@ -12,7 +12,7 @@ var response = require("net/http/response");
 var datasource = database.getDatasource();
 
 var persistentProperties = {
-	mandatory: ["bor_id", "bor_src_id", "bor_src_type","bor_target_id","bor_target_type","bor_name","bor_type"],
+	mandatory: ["bor_id", "bor_src_boh_name", "bor_src_type","bor_target_boh_name","bor_target_type","bor_name","bor_type"],
 	optional: []
 };
 
@@ -39,7 +39,7 @@ exports.insert = function(entity) {
 
     var connection = datasource.getConnection();
     try {
-        var sql = "INSERT INTO BO_RELATION (BOR_ID,BOR_SRC_ID,BOR_SRC_TYPE,BOR_TARGET_ID,BOR_TARGET_TYPE,BOR_NAME,BOR_TYPE)"+
+        var sql = "INSERT INTO BO_RELATION (BOR_ID,BOR_SRC_BOH_NAME,BOR_SRC_TYPE,BOR_TARGET_BOH_NAME,BOR_TARGET_TYPE,BOR_NAME,BOR_TYPE)"+
         		  " VALUES (?,?,?,?,?,?,?)";
         
         var statement = connection.prepareStatement(sql);
@@ -48,9 +48,9 @@ exports.insert = function(entity) {
         entity.bor_id = datasource.getSequence('BO_RELATION_BOR_ID').next();
          
         statement.setInt(++i, entity.bor_id);
-        statement.setInt(++i, entity.bor_src_id);
+        statement.setString(++i, entity.bor_src_boh_name);
         statement.setShort(++i, entity.bor_src_type);
-        statement.setInt(++i, entity.bor_target_id);
+        statement.setString(++i, entity.bor_target_boh_name);
         statement.setShort(++i, entity.bor_target_type);
         statement.setString(++i, entity.bor_name);
         statement.setShort(++i, entity.bor_type);
@@ -116,11 +116,11 @@ exports.list = function(limit, offset, sort, order, srcId, targetId) {
         if (srcId !== null || targetId !== null) {
         	sql += " WHERE";
         	if(srcId !== null)
-        		sql += " BOR_SRC_ID = ?";
+        		sql += " BOR_SRC_BOH_NAME = ?";
         	if(srcId !== null && targetId !== null)
         		sql += " OR ";
 			if(targetId !== null)
-        		sql += " BOR_TARGET_ID = ?";
+        		sql += " BOR_TARGET_BOH_NAME = ?";
     	}
         if (sort !== null) {
             sql += " ORDER BY " + sort;
@@ -135,10 +135,9 @@ exports.list = function(limit, offset, sort, order, srcId, targetId) {
         var statement = connection.prepareStatement(sql);
         var i=0;
         if(srcId!==null)
-        	statement.setInt(++i, srcId);
+        	statement.setString(++i, srcId);
         if(targetId!==null)        	
-        	statement.setInt(++i, targetId);
-        
+        	statement.setString(++i, targetId);
         var resultSet = statement.executeQuery();
         while (resultSet.next()) {
         	var entity = createEntity(resultSet);
@@ -160,9 +159,9 @@ exports.list = function(limit, offset, sort, order, srcId, targetId) {
 function createEntity(resultSet) {
     var entity = {};
 	entity.bor_id = resultSet.getInt("BOR_ID");
-    entity.bor_src_id = resultSet.getInt("BOR_SRC_ID");
+    entity.bor_src_boh_name = resultSet.getString("BOR_SRC_BOH_NAME");
     entity.bor_src_type = resultSet.getShort("BOR_SRC_TYPE");    
-    entity.bor_target_id = resultSet.getInt("BOR_TARGET_ID");
+    entity.bor_target_boh_name = resultSet.getString("BOR_TARGET_BOH_NAME");
     entity.bor_target_type = resultSet.getShort("BOR_TARGET_TYPE"); 
     entity.bor_name = resultSet.getString("BOR_NAME");     
     entity.bor_type = resultSet.getShort("BOR_TYPE");         
@@ -194,7 +193,7 @@ exports.update = function(entity) {
 		var propName = persistentProperties.mandatory[i];
 		var propValue = entity[propName];
 		if(propValue === undefined || propValue === null){
-			throw new Error('Illegal ' + propName + ' attribute value in BO_RELATON entity for insert: ' + propValue);
+			throw new Error('Illegal ' + propName + ' attribute value in BO_RELATON entity for update: ' + propValue);
 		}
 	}	
 
@@ -202,11 +201,11 @@ exports.update = function(entity) {
     try {
     
         var sql = "UPDATE BO_RELATION SET ";
-        sql += "BOR_SRC_ID = ?";
+        sql += "BOR_SRC_BOH_NAME = ?";
         sql += ",";
         sql += "BOR_SRC_TYPE = ?";
         sql += ",";
-        sql += "BOR_TARGET_ID = ?";
+        sql += "BOR_TARGET_BOH_NAME = ?";
         sql += ",";
         sql += "BOR_TARGET_TYPE = ?";
         sql += ",";
@@ -216,9 +215,9 @@ exports.update = function(entity) {
         sql += " WHERE BOR_ID = ?";
         var statement = connection.prepareStatement(sql);
         var i = 0;
-        statement.setInt(++i, entity.bor_src_id);
+        statement.setString(++i, entity.bor_src_boh_name);
         statement.setShort(++i, entity.bor_src_type);
-        statement.setInt(++i, entity.bor_target_id);
+        statement.setString(++i, entity.bor_target_boh_name);
         statement.setShort(++i, entity.bor_target_type);
         statement.setString(++i, entity.bor_name);        
         statement.setShort(++i, entity.bor_type);        
@@ -306,11 +305,11 @@ exports.metadata = function() {
 	};
     entityMetadata.properties.push(propertybor_id);
 
-	var propertybor_src_id = {
-		name: 'bor_src_id',
-		type: 'integer'
+	var propertybor_src_boh_name = {
+		name: 'bor_src_boh_name',
+		type: 'string'
 	};
-    entityMetadata.properties.push(propertybor_src_id);
+    entityMetadata.properties.push(propertybor_src_boh_name);
 
 	var propertybor_src_type = {
 		name: 'bor_src_type',
@@ -318,11 +317,11 @@ exports.metadata = function() {
 	};
     entityMetadata.properties.push(propertybor_src_type);
 
-	var propertybor_target_id = {
-		name: 'bor_target_id',
+	var propertybor_target_boh_name = {
+		name: 'bor_target_boh_name',
 		type: 'integer'
 	};
-    entityMetadata.properties.push(propertybor_target_id);
+    entityMetadata.properties.push(propertybor_target_boh_name);
 
 	var propertybor_target_type = {
 		name: 'bor_target_type',

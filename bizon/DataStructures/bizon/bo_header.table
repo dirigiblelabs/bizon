@@ -14,6 +14,15 @@
       {
         "name":"BOH_NAME",
         "type":"VARCHAR",
+        "length":"100",
+        "notNull":"true",
+        "primaryKey":"false",
+        "defaultValue":""
+      }
+      ,
+      {
+        "name":"BOH_LABEL",
+        "type":"VARCHAR",
         "length":"255",
         "notNull":"true",
         "primaryKey":"false",

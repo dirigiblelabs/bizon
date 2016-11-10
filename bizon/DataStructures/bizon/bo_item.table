@@ -12,9 +12,9 @@
       }
       ,
       {
-        "name":"BOI_BOH_ID",
-        "type":"INTEGER",
-        "length":"0",
+        "name":"BOI_BOH_NAME",
+        "type":"VARCHAR",
+        "length":"100",
         "notNull":"true",
         "primaryKey":"false",
         "defaultValue":""
