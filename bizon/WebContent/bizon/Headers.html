@@ -132,7 +132,7 @@
 		angular.module('page', ['ngAnimate', 'ui.bootstrap']);
 		angular.module('page').controller('ManageController', function ($scope, $http) {
 			
-			var url = '../../js/bo_modeller/bo_header.js';
+			var url = '../../js/bizon/bo_header.js';
 
 			$http.get(url)
 				.success(function(data){

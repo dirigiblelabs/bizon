@@ -33,17 +33,10 @@
 		cfg.count = {method:'GET', params:{count:true}, isArray:false, ignoreLoadingBar: true};
 		cfg.getByName = {method:'GET', isArray:false, ignoreLoadingBar: false};
 		
-	  	var res = $resource('../../js/bizon/bo_header.js/:boId', { boId:'@id' }, cfg);
-		var createRadnomAlphanumeric = function(length){
-			if(!length)
-				length = 4;
-			var power = length;
-			var sliceIndex = -Math.abs(length);
-		    return ("0000" + (Math.random()*Math.pow(36,power) << 0).toString(36)).slice(sliceIndex);
-		}
+	  	var res = $resource('../../js/bizon/svc/v1/header.js/:boId', { boId:'@id' }, cfg);
 
 		res.newObjectTemplate = {
-				"boh_name":"BizEntity"+ createRadnomAlphanumeric(),
+				"boh_name":"BizEntity",
 				"boh_label":"Business Object Name",
 				"boh_description":"Description for business object",
 				"boh_ds_gen_enabled": true,
@@ -54,7 +47,7 @@
 		return res;
 	}])
 	.service('EntityQueryByName', ['$resource', function($resource) {
-	  	return $resource('../../js/bizon/bo_header.js', {}, {
+	  	return $resource('../../js/bizon/svc/v1/header.js', {}, {
 	  		queryByName: {
 	  			method:'GET', 
 	  			isArray:true, 
@@ -64,8 +57,7 @@
 	}])	
 	.service('Item', ['$resource', 'ResourceSvcConfiguration', function($resource, ResourceSvcConfiguration) {
 	
-	  	var res = $resource('../../js/bizon/bo_item.js/:boId', { boId:'@id' }, ResourceSvcConfiguration.cfg);
-		
+	  	var res = $resource('../../js/bizon/svc/v1/item.js/:boId', { boId:'@id' }, ResourceSvcConfiguration.cfg);
 		
 		res.newObjectTemplate = {
 					"boi_name":"Item",
@@ -91,9 +83,17 @@
 	  	});
 	}])	
 	.service('Relation', ['$resource', 'ResourceSvcConfiguration', function($resource, ResourceSvcConfiguration) {
-	  	return $resource('../../js/bizon/bo_relation.js/:boId', { boId:'@id' }, ResourceSvcConfiguration.cfg);
+	  	return $resource('../../js/bizon/svc/v1/relation.js/:boId', { boId:'@id' }, ResourceSvcConfiguration.cfg);
 	}])		
 	.service('masterDataSvc', ['Entity', 'Item', 'Relation', 'EntityQueryByName', '$q', '$log', function(Entity, Item, Relation, EntityQueryByName, $q, $log) {
+
+		var createRandomAlphanumeric = function(length){
+			if(!length)
+				length = 4;
+			var power = length;
+			var sliceIndex = -Math.abs(length);
+		    return ("0000" + (Math.random()*Math.pow(36,power) << 0).toString(36)).slice(sliceIndex);
+		}
 	
 		function createMasterDataTemplateObject(){
 			var obj = angular.copy(Entity.newObjectTemplate);
@@ -285,7 +285,16 @@
 		this.create = function(cascaded, template){
 			var reqParams = {};
 			reqParams.cascaded = cascaded || true;
-			return Entity.save(reqParams, template || this.masterDataTemplateObject).$promise
+			var entity = template;
+			if(!entity){
+				entity = this.masterDataTemplateObject;
+				entity.boh_name += createRandomAlphanumeric();
+				entity.properties.map(function(prop){
+					prop.boi_boh_name = entity.boh_name;
+					return prop;
+				});
+			}
+			return Entity.save(reqParams, entity).$promise
 			.then(function(newItem){
 				return refresh.apply(self)
 				.then(function(){

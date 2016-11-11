@@ -49,6 +49,7 @@
 						<th>BOI_BOH_NAME</th>
 						<th>BOI_NAME</th>
 						<th>BOI_COLUMN</th>
+						<th>BOI_TYPE_NAME</th>
 						<th>BOI_TYPE</th>
 						<th>BOI_LENGTH</th>
 						<th>BOI_NULL</th>
@@ -62,7 +63,8 @@
 						<td>{{entry.boi_boh_name}}</td>
 						<td>{{entry.boi_name}}</td>
 						<td>{{entry.boi_column}}</td>
-						<td>{{entry.boi_type}}</td>
+						<td>{{entry.boi_type_name}}</td>
+						<td>{{entry.boi_type}}</td>						
 						<td>{{entry.boi_length}}</td>
 						<td>{{entry.boi_null}}</td>
 						<td>{{entry.boi_default}}</td>
@@ -111,11 +113,16 @@
 						ng-model="selectedEntry.boi_column"
 						ng-readonly="operation == 'show'" required="required">
 					<br>
+					<label>BOI_TYPE_NAME</label>
+					<input type="text" class="form-control" 
+						ng-model="selectedEntry.boi_type_name"
+						ng-readonly="operation == 'show'" required="required">
+					<br>
 					<label>BOI_TYPE</label>
 					<input type="text" class="form-control" 
 						ng-model="selectedEntry.boi_type"
 						ng-readonly="operation == 'show'" required="required">
-					<br>
+					<br>					
 					<label>BOI_LENGTH</label>
 					<input type="text" class="form-control" 
 						ng-model="selectedEntry.boi_length"

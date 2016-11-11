@@ -3,10 +3,9 @@
 (function(){
 "use strict";
 
+var database = require("db/database");
 var request = require("net/http/request");
 var response = require("net/http/response");
-var database = require("db/database");
-
 var datasource = database.getDatasource();
 
 var persistentProperties = {

@@ -79,7 +79,7 @@ angular.module('businessObjects')
 			}
 			self.entityForEdit.properties = self.entityForEdit.properties.map(
 				function(currItem){
-					if(item.boi_id===undefined && currItem === item){
+					if(item.boi_id===undefined && item.bor_id===undefined && currItem === item){
 						return;
 					}
 					if((currItem.boi_id && currItem.boi_id === item.boi_id) || (currItem.bor_id && currItem.bor_id === item.bor_id)){
