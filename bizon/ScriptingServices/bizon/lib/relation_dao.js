@@ -337,7 +337,7 @@ exports.metadata = function() {
 	};
     entityMetadata.properties.push(propertybor_type);        
 
-	return JSON.stringify(entityMetadata);
+	return JSON.stringify(entityMetadata, null, 2);
 };
 
 exports.getPrimaryKeys = function() {

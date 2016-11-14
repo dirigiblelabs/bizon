@@ -132,7 +132,7 @@
 		angular.module('page', ['ngAnimate', 'ui.bootstrap']);
 		angular.module('page').controller('ManageController', function ($scope, $http) {
 			
-			var url = '../../js/bizon/bo_header.js';
+			var url = '../../js/bizon/svc/v1/header.js';
 
 			$http.get(url)
 				.success(function(data){
@@ -227,7 +227,7 @@
                     
 			function newEntry(entry){
 				delete $scope.selectedEntry._selected_;
-				$http.post(url, entry)
+				$http.post(url+'/'+entry.boh_id, entry)
 				.success(function(){
 					refreshData();
 					$scope.selectedEntry = null;
@@ -241,7 +241,7 @@
 			
 			function updateEntry(entry){
 				delete $scope.selectedEntry._selected_;
-				$http.put(url, entry)
+				$http.put(url+'/'+entry.boh_id, entry)
 					.success(function(){
 						refreshData();
 	                    $scope.operation = 'show';
@@ -255,7 +255,7 @@
 			function deleteEntry(entry){
 				var primaryKey;
 				primaryKey = "boh_id";
-				var deleteUrl = url+"?"+primaryKey+"="+entry[primaryKey];
+				var deleteUrl = url+'/'+entry[primaryKey];
 				$http.delete(deleteUrl)
 				.success(function(){
 					refreshData();

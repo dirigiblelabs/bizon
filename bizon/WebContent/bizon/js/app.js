@@ -184,7 +184,7 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		  .state("list.entity.export", {
 		  	onEnter: ['$state', 'masterDataSvc', function($state, masterDataSvc) {
 		  		masterDataSvc.exportData().then(function(data){
-					var blob = new Blob([ JSON.stringify(data) ], { type : 'text/json' });
+					var blob = new Blob([ JSON.stringify(data, null, 2) ], { type : 'text/json' });
 		  			var objectURL = window.URL.createObjectURL(blob);
 		  			var a = document.createElement('a');
 				      a.href = objectURL;

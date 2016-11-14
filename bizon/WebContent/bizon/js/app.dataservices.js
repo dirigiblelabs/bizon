@@ -30,7 +30,7 @@
 	}])
 	.service('Entity', ['$resource', 'ResourceSvcConfiguration', function($resource, ResourceSvcConfiguration) {
 		var cfg = angular.copy(ResourceSvcConfiguration.cfg);
-		cfg.count = {method:'GET', params:{count:true}, isArray:false, ignoreLoadingBar: true};
+/*		cfg.count = {method:'GET', params:{count:true}, isArray:false, ignoreLoadingBar: true};*/
 		cfg.getByName = {method:'GET', isArray:false, ignoreLoadingBar: false};
 		
 	  	var res = $resource('../../js/bizon/svc/v1/header.js/:boId', { boId:'@id' }, cfg);
@@ -46,6 +46,10 @@
 			
 		return res;
 	}])
+	.service('EntityCount', ['$resource', function($resource) {
+	  	return $resource('../../js/bizon/svc/v1/header.js/count', {}, 
+	  			{get: {method:'GET', params:{}, isArray:false, ignoreLoadingBar: true}});
+	}])	
 	.service('EntityQueryByName', ['$resource', function($resource) {
 	  	return $resource('../../js/bizon/svc/v1/header.js', {}, {
 	  		queryByName: {
@@ -70,7 +74,7 @@
 		return res;
 	}])	
 	.service('BuildService', ['$resource', function($resource) {
-	  	return $resource('../../js/bizon/bo_build_svc.js/:path', {}, {
+	  	return $resource('../../js/bizon/svc/v1/build_svc.js/:path', {}, {
 	  		build: {
 	  			method: 'POST',
 	  			isArray: false
@@ -85,7 +89,7 @@
 	.service('Relation', ['$resource', 'ResourceSvcConfiguration', function($resource, ResourceSvcConfiguration) {
 	  	return $resource('../../js/bizon/svc/v1/relation.js/:boId', { boId:'@id' }, ResourceSvcConfiguration.cfg);
 	}])		
-	.service('masterDataSvc', ['Entity', 'Item', 'Relation', 'EntityQueryByName', '$q', '$log', function(Entity, Item, Relation, EntityQueryByName, $q, $log) {
+	.service('masterDataSvc', ['Entity', 'Item', 'Relation', 'EntityCount', 'EntityQueryByName', '$q', '$log', function(Entity, Item, Relation, EntityCount, EntityQueryByName, $q, $log) {
 
 		var createRandomAlphanumeric = function(length){
 			if(!length)
@@ -245,7 +249,7 @@
 		this._itemsCount;
 
 		this.count = function(){
-			return Entity.count().$promise
+			return EntityCount.get().$promise
 			.then(function(_data){
 				self._itemsCount = _data.count;
 				return self._itemsCount;

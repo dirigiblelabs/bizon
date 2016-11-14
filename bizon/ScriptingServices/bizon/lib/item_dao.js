@@ -97,7 +97,7 @@ exports.find = function(id) {
 // Read all entities, parse and return them as an array of JSON objets
 exports.list = function(headerId, limit, offset, sort, order) {
 
-	console.log('Listing BO_ITEM entity collection for header id ' + headerId + ' with list operators: limit['+limit+'], offset['+offset+'], sort['+sort+'], order['+order+']');
+	console.log('Listing BO_ITEM entity collection for header ' + headerId + ' with list operators: limit['+limit+'], offset['+offset+'], sort['+sort+'], order['+order+']');
 
     var connection = datasource.getConnection();
     try {
@@ -395,7 +395,7 @@ exports.metadata = function() {
 	};
     entityMetadata.properties.push(propertyboi_default);
 
-	return JSON.stringify(entityMetadata);
+	return JSON.stringify(entityMetadata, null, 2);
 
 };
 

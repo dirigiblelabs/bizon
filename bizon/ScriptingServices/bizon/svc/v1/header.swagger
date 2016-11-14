@@ -1,46 +1,49 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "0.0.0",
-        "title": "bo_header Entity Service",
+        "version": "1.0.0",
+        "title": "Header Entity Service",
         "description":"This is a RESTful web service for listing, viewing and managing entities of the type 'bo_header'"
     },
     "basePath":"/services",
     "tags":[
       {
-         "name":"bo_header",
-         "description":"View and manage bo_header objects"
+         "name":"header",
+         "description":"List, view and manage bo_header objects"
       }
     ],
     "paths": {
-        "/js/bo_modeller/bo_header.js": {
+        "/js/bizon/svc/v1/header.js": {
             "get": {
             	"tags":[
                		"bo_header"
             	],
-                "description": "Gets 'bo_header' objects.\n",
+                "description": "List 'bo_header' objects.\n",
+            	"produces":[
+	               "application/json"
+	            ],                
                 "parameters": [
                     {
                         "name": "count",
                         "in": "query",
-                        "description": "Count of all the records",
+                        "description": "Count of all the records. If used, no other properties are permitted.",
+                        "required": false,
+                        "type": "boolean"
+                    },
+                    {
+                        "name": "metadata",
+                        "in": "query",
+                        "description": "Metadata describing the 'bo_header' object schema. If used, no other properties are permitted.",
                         "required": false,
                         "type": "boolean"
                     },
                     {
                         "name": "boh_id",
                         "in": "query",
-                        "description": "Identifier of the 'bo_header' object",
+                        "description": "Identifier of the 'bo_header' object. It can be specified also as last segment in path. If both are present, the query parameter wins.",
                         "required": false,
                         "type": "integer",
                         "format": "int32"
-                    },
-                    {
-                        "name": "metadata",
-                        "in": "query",
-                        "description": "Metadata of the 'bo_header' object",
-                        "required": false,
-                        "type": "boolean"
                     },
                     {
                         "name": "limit",
@@ -71,6 +74,13 @@
                         "description": "Descending order",
                         "required": false,
                         "type": "boolean"
+                    },
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "description": "Name pattern to filter objects list",
+                        "required": false,
+                        "type": "string"
                     }
                 ],
                 "responses": {
@@ -91,7 +101,7 @@
 	               "application/json"
 	            ],
 	            "produces":[
-	               "plain/text"
+	               "application/json"
 	            ],
 	            "parameters":[
 	               {
@@ -109,7 +119,13 @@
                         "description": "Successful response",
                         "schema":{
 		                     "$ref":"#/definitions/bo_header"
-                        }
+                        },
+                        "headers": {
+                            "Location": {
+                                "description": "The URL of the newly cretaed object",
+                                "type": "string"
+                            }
+                        }    
                     }
                 }
             },
@@ -121,14 +137,11 @@
                 "consumes":[
 	               "application/json"
 	            ],
-	            "produces":[
-	               "plain/text"
-	            ],
 	            "parameters":[
 	               {
 	                  "in":"body",
 	                  "name":"body",
-	                  "description":"bo_header object that needs to be added",
+	                  "description":"bo_header object that needs to be updated",
 	                  "required":true,
 	                  "schema":{
 	                     "$ref":"#/definitions/bo_header"
@@ -136,11 +149,8 @@
 	               }
 	            ],
                 "responses": {
-                    "200": {
-                        "description": "Successful response",
-                        "schema":{
-		                     "$ref":"#/definitions/bo_header"
-                        }
+                    "204": {
+                        "description": "Successful response"
                     }
                 }
             },
@@ -154,17 +164,21 @@
                         "name": "boh_id",
                         "in": "query",
                         "description": "Identifier of the 'bo_header' object",
-                        "required": true,
+                        "required": false,
                         "type": "integer",
                         "format": "int64"
+                    },
+                    {
+                        "name": "cascaded",
+                        "in": "query",
+                        "description": "Specifies if dependenb objects should be deleted too",
+                        "required": false,
+                        "type": "boolean"
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "Successful response",
-                        "schema":{
-		                     "$ref":"#/definitions/bo_header"
-                        }
+                    "204": {
+                        "description": "Successful response"
                     }
                 }
             }
@@ -185,7 +199,7 @@
 	    		},
                 "boh_name": {
 	            	"type": "string"
-	    		}	    		
+	    		}
 	        }
         }
 	}

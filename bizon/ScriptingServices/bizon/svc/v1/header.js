@@ -8,14 +8,7 @@
 	var request = require("net/http/request");
 	var response = require("net/http/response");
 	var upload = require('net/http/upload');
-	var xss = require("utils/xss");
 	var restUtils = require("bizon/svc/rest/utils");
-	
-/*	var parseIntStrict = function (value) {
-	  if(/^(\-|\+)?([0-9]+|Infinity)$/.test(value))
-	    return Number(value);
-	  return NaN;
-	};*/
 	
 	var $log = {
 		error: function(errCode, errMessage, errContext){
@@ -34,6 +27,7 @@
 		this.getByName = function(name, expanded){
 			//name is mandatory parameter
 			if(name === undefined) {
+				$log.error(1, "Invallid name parameter: " + name);
 				restUtils.printError(response.BAD_REQUEST, 1, "Invallid name parameter: " + name);
 				return;
 			}
@@ -41,6 +35,7 @@
 		    try{
 				var item = entityDAO.getByName(name, expanded);
 				if(!item){
+					$log.error(1, "Record with name: " + name + " does not exist.");
 	        		restUtils.printError(response.NOT_FOUND, 1, "Record with name: " + name + " does not exist.");
 	        		return;
 				}
@@ -48,6 +43,7 @@
 		        response.println(jsonResponse);
 			} catch(e) {
 	    	    var errorCode = response.INTERNAL_SERVER_ERROR ;
+	    	    $log.error(errorCode, e.message, e.errContext);
 	        	restUtils.printError(errorCode, errorCode, e.message, e.errContext);
 	        	throw e;
 			}		
@@ -70,6 +66,7 @@
 						}
 						uploadStatus.status="ok";
 					} catch (err) {
+						$log.error(1, err.message);
 						uploadStatus.status="error";
 						uploadStatus.details = err.message;
 						throw err;
@@ -81,6 +78,7 @@
 				response.setStatus(response.OK);
 			} catch(err){
 				var errorCode = response.INTERNAL_SERVER_ERROR;
+				$log.error(errorCode, err.message, err.errContext);
 	        	restUtils.printError(errorCode, errorCode, err.message, err.errContext);
 	        	throw err;
 			} finally {
@@ -102,6 +100,7 @@
 				response.setStatus(response.NO_CONTENT);
 			} catch(err){
 				var errorCode = response.INTERNAL_SERVER_ERROR;
+				$log.error(errorCode, err.message, err.errContext);
 	        	restUtils.printError(errorCode, errorCode, err.message, err.errContext);
 	        	throw err;
 			} finally {
@@ -109,49 +108,50 @@
 				response.close();
 			}
 		};	
-	
-		this.dispatch = function(urlParameters){
-			var method = request.getMethod().toUpperCase();
-			console.info('Dispatching operation request for HTTP Verb['+ method +'] and URL parameters: ' + urlParameters);
-	
-			if('POST' === method){
-				if (upload.isMultipartContent()) {
-					this.importData();
-				} else {
-					this.create(urlParameters.cascaded);
-				}
-			} else if('PUT' === method){
-				this.update(urlParameters.cascaded);
-			} else if('DELETE' === method){
-				if(urlParameters.id !== null){
-					this.remove(urlParameters.id, urlParameters.cascaded);	
-				} else {
-					this.deleteData(urlParameters.cascaded);	
-				}
-			} else if('GET' === method){
-				if(urlParameters){
-					if(urlParameters.id){
-						this.get(urlParameters.id, urlParameters.expanded);
-					} else if(urlParameters.metadata){
-						this.metadata();
-					} else if(urlParameters.count){
-						this.count();
-					}  else if(urlParameters.getByName){
-						this.getByName(urlParameters.getByName);
-					} else if(urlParameters.list){
-						this.query(urlParameters.list.limit, urlParameters.list.offset, urlParameters.list.sort, urlParameters.list.order, urlParameters.expanded, urlParameters.queryByName);
-					}
-				} else {
-					this.query();
-				}
-			} else {
-				restUtils.printError(response.BAD_REQUEST, 4, "Invalid HTTP Method", method);
-			}
-		};
 		return this;
 	};	
 	
 	restUtils.asRestAPI.call(api.prototype, entityDAO);
+
+	//override default GET list operation handler for this resource
+	api.prototype.cfg[""].get.handler = function(context){
+		var limit = context.queryParams.limit;
+		var offset = context.queryParams.offset;
+		var sort = context.queryParams.sort || null;
+		var order = context.queryParams.order || null;
+		var expanded = context.queryParams.expanded || false;
+		var queryByName = context.queryParams.entityName || null;
+		var getByName = context.queryParams.getByName || null;
+		
+		if(getByName!==null){
+			this.getByName(getByName, expanded);
+		} else {
+		    try{
+				var entities = this.getDAO().list(limit, offset, sort, order, expanded, queryByName);
+		        var jsonResponse = JSON.stringify(entities, null, 2);
+		    	response.println(jsonResponse);      	
+			} catch(e) {
+	    	    var errorCode = response.INTERNAL_SERVER_ERROR ;
+	    	    $log.error(errorCode, e.message, e.errContext);					
+	        	restUtils.printError(errorCode, errorCode, e.message, e.errContext);
+	        	throw e;
+			}	
+		} 		
+	};
+	
+	api.prototype.cfg[""].post = {
+		consumes: ['application/json'],
+		handler: function(context) {
+			this.importData();
+		}
+	};
+	
+	api.prototype.cfg[""]["delete"] = {
+		consumes: ['application/json'],
+		handler: function(context) {
+			this.deleteData(context.queryParams.cascaded);
+		}	
+	};	
 	
 	var headerREST = new api(entityDAO);
 	
@@ -159,16 +159,9 @@
 		
 		response.setContentType("application/json; charset=UTF-8");
 		response.setCharacterEncoding("UTF-8");
-		
-		//get primary keys (one primary key is supported!)
-		var idParameter = entityDAO.getPrimaryKey();
-		var urlParameters = restUtils.urlParametersDigest(idParameter);
-		if(urlParameters){
-			urlParameters.queryByName = xss.escapeSql(request.getParameter('name'));//TODO rename this and below params
-			urlParameters.getByName = xss.escapeSql(request.getParameter('getByName'));
-			headerREST.dispatch(urlParameters);		
-		}	
-		// flush and close the response
+
+		headerREST.service();
+
 		response.flush();
 		response.close();
 		

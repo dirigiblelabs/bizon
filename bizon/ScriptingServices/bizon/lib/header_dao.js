@@ -4,8 +4,8 @@
 "use strict";
 
 var database = require("db/database");
-var boItemLib = require("bizon/bo_item_lib");
-var boRelationLib = require("bizon/bo_relation_lib");
+var boItemLib = require("bizon/lib/item_dao");
+var boRelationLib = require("bizon/lib/relation_dao");
 
 var datasource = database.getDatasource();
 
@@ -568,7 +568,7 @@ exports.metadata = function() {
 	};
     entityMetadata.properties.push(propertyboh_description);
 
-	return JSON.stringify(entityMetadata);
+	return JSON.stringify(entityMetadata, null, 2);
 };
 
 exports.getPrimaryKeys = function() {
