@@ -12,10 +12,13 @@ var persistentProperties = {
 	optional: ["boi_length", "boi_null", "boi_default"]
 };
 
+var $log = require("bizon/lib/logger").logger;
+$log.ctx = "Item DAO";
+
 // Parse JSON entity into SQL and insert in db. Returns the new record id.
 exports.insert = function(item) {
 	
-	console.log('Inserting BO_ITEM entity ' + item);
+	$log.info('Inserting BO_ITEM entity');
 	
 	if(item === undefined || item === null){
 		throw new Error('Illegal argument: item is ' + item);
@@ -53,7 +56,7 @@ exports.insert = function(item) {
         statement.setString(++j, item.boi_default);
         statement.executeUpdate();
         
-        console.log('BO_ITEM entity inserted with boi_id[' + item.boi_id + ']');
+        $log.info('BO_ITEM entity inserted with boi_id[' + item.boi_id + ']');
         
         return item.boi_id;
         
@@ -68,7 +71,7 @@ exports.insert = function(item) {
 // Reads a single entity by id, parsed into JSON object 
 exports.find = function(id) {
 
-	console.log('Finding BO_ITEM entity with id ' + id);
+	$log.info('Finding BO_ITEM entity with id[' + id + ']');
 
     var connection = datasource.getConnection();
     try {
@@ -81,7 +84,7 @@ exports.find = function(id) {
         if (resultSet.next()) {
             item = createEntity(resultSet);
             if(item)
-            	console.log('BO_ITEM entity with id[' + id + '] found');
+            	$log.info('BO_ITEM entity with id[' + id + '] found');
         }
         
         return item;
@@ -97,7 +100,7 @@ exports.find = function(id) {
 // Read all entities, parse and return them as an array of JSON objets
 exports.list = function(headerId, limit, offset, sort, order) {
 
-	console.log('Listing BO_ITEM entity collection for header ' + headerId + ' with list operators: limit['+limit+'], offset['+offset+'], sort['+sort+'], order['+order+']');
+	$log.info('Listing BO_ITEM entity collection for header ' + headerId + ' with list operators: limit['+limit+'], offset['+offset+'], sort['+sort+'], order['+order+']');
 
     var connection = datasource.getConnection();
     try {
@@ -126,7 +129,7 @@ exports.list = function(headerId, limit, offset, sort, order) {
             items.push(createEntity(resultSet));
         }
         
-        console.log('' + items.length +' BO_ITEM entities found');
+        $log.info('' + items.length +' BO_ITEM entities found');
         
         return items;
         
@@ -160,7 +163,7 @@ function createEntity(resultSet) {
     entity.boi_default = resultSet.getString("BOI_DEFAULT");
     if(entity.boi_default === null)
     	delete entity.boi_default;	    
-    console.log("Transformation from DB JSON object finished: " + entity);
+    $log.info("Transformation from DB JSON object finished");
     return entity;
 }
 
@@ -186,15 +189,8 @@ function createSQLEntity(item) {
 	if(persistentItem.boi_length === null){
 		persistentItem.boi_length = 0;
 	}
-	console.log("Transformation to DB JSON object finished: " + persistentItem);
+	$log.info("Transformation to DB JSON object finished");
 	return persistentItem;
-}
-
-function convertToDateString(date) {
-    var fullYear = date.getFullYear();
-    var month = date.getMonth() < 10 ? "0" + date.getMonth() : date.getMonth();
-    var dateOfMonth = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
-    return fullYear + "/" + month + "/" + dateOfMonth;
 }
 
 function stringToCodeItemTypeMapping(typeIndex) {
@@ -228,7 +224,7 @@ function codeToStringItemTypeMapping(code) {
 // update entity from a JSON object. Returns the id of the updated entity.
 exports.update = function(item) {
 
-	console.log('Updating BO_ITEM entity ' + item);
+	$log.info('Updating BO_ITEM entity with id[' + item!==undefined?item.boi_id:item + ']');
 
 	if(item === undefined || item === null){
 		throw new Error('Illegal argument: item is ' + item);
@@ -263,7 +259,7 @@ exports.update = function(item) {
         statement.setInt(++i, id);
         statement.executeUpdate();
         
-        console.log('BO_ITEM entity with boi_id[' + id + '] updated');
+        $log.info('BO_ITEM entity with boi_id[' + id + '] updated');
         
         return this;
 
@@ -278,7 +274,7 @@ exports.update = function(item) {
 // delete entity by id. Returns the id of the deleted entity.
 exports.remove = function(id) {
 
-	console.log('Deleting BO_ITEM entity with id[' + id + ']');
+	$log.info('Deleting BO_ITEM entity with id[' + id + ']');
 	
 	if(id === undefined || id === null){
 		throw new Error('Illegal argument: id[' + id + ']');
@@ -291,7 +287,7 @@ exports.remove = function(id) {
         statement.setString(1, id);
         statement.executeUpdate();
         
-        console.log('BO_ITEM entity with boi_id[' + id + '] deleted');        
+        $log.info('BO_ITEM entity with boi_id[' + id + '] deleted');        
         
         return this;
         
@@ -306,7 +302,7 @@ exports.remove = function(id) {
 
 exports.count = function() {
 
-	console.log('Counting BO_ITEM entities');
+	$log.info('Counting BO_ITEM entities');
 
     var count = 0;
     var connection = datasource.getConnection();
@@ -324,14 +320,14 @@ exports.count = function() {
         connection.close();
     }
     
-    console.log('' + count + ' BO_ITEMS entities counted');         
+    $log.info('' + count + ' BO_ITEMS entities counted');         
     
     return count;
 };
 
 exports.metadata = function() {
 
-	console.log('Exporting metadata for BO_ITEM type');
+	$log.info('Exporting metadata for BO_ITEM type');
 
 	var entityMetadata = {
 		name: 'bo_item',

@@ -2,60 +2,42 @@
 /* eslint-env node, dirigible */
 (function(){
 "use strict";
+	
+	var arester = require("arestme/arester");
 
 	var itemDAO = require("bizon/lib/item_dao");
-	var request = require("net/http/request");
-	var response = require("net/http/response");
-	var restUtils = require("bizon/svc/rest/utils");
-	
-	var $log = {
-		error: function(errCode, errMessage, errContext){
-			console.error('['+errCode+']: '+ errMessage);
-		    if (errContext !== undefined && errContext !== null) {
-		    	console.error(JSON.stringify(errContext));
-		    }
-		}
-	};
-	
-	//the API skeleton
-	var api = function(){	
-		this.idPropertyName = 'boi_id';
-		this.validSortPropertyNames = ['boi_id','boi_name','boi_boh_name','boi_column','boi_type_name','boi_type','boi_length','boi_null','boi_default'];
-		return this;
-	};
-	//mixin
-	restUtils.asRestAPI.call(api.prototype, itemDAO);
+	var Item = arester.asRestAPI(itemDAO);
+	Item.prototype.logger.ctx = "Item Svc";
+	Item.prototype.validSortPropertyNames = ['boi_id','boi_name','boi_boh_name','boi_column','boi_type_name','boi_type','boi_length','boi_null','boi_default'];
 	
 	//override default GET list operation handler for this resource
-	api.prototype.cfg[""].get.handler = function(context){
+	Item.prototype.cfg[""].get.handler = function(context, io){
 		var headerId = context.pathParams.headerId;	
 		var limit = context.queryParams.limit;	
 		var offset = context.queryParams.offset;
 		var sort = context.queryParams.sort;
 		var order = context.queryParams.order;
 	    try{
-			var items = this.getDAO().list(headerId, limit, offset, sort, order);
+			var items = this.dao.list(headerId, limit, offset, sort, order);
 	        var jsonResponse = JSON.stringify(items, null, 2);
-	    	response.println(jsonResponse);      	
+	    	io.response.println(jsonResponse);      	
 		} catch(e) {
-    	    var errorCode = response.INTERNAL_SERVER_ERROR ;
-    	    $log.error(errorCode, e.message, e.errContext);					
-        	restUtils.printError(errorCode, errorCode, e.message, e.errContext);
+    	    var errorCode = io.response.INTERNAL_SERVER_ERROR ;
+    	    this.logger.error(errorCode, e.message, e.errContext);					
+        	this.sendError(io, errorCode, errorCode, e.message, e.errContext);
         	throw e;
 		}
 	};
-
-	var itemREST = new api(itemDAO);//ready to serve requests to this resource
 	
-	(function(request, response) {
-		response.setContentType("application/json; charset=UTF-8");
-		response.setCharacterEncoding("UTF-8");
+	var item = new Item(itemDAO);	
+	
+	(function(item) {
+
+		var request = require("net/http/request");
+		var response = require("net/http/response");
 		
-		itemREST.service.apply(this);
+		item.service(request, response);
 		
-		response.flush();
-		response.close();
-		
-	})(request, response);
+	})(item);
 
 })();

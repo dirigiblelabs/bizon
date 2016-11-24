@@ -12,10 +12,13 @@ var persistentProperties = {
 	optional: []
 };
 
+var $log = require("bizon/lib/logger").logger;
+$log.ctx = "Relation DAO";
+
 // Parse JSON entity into SQL and insert in db. Returns the new record id.
 exports.insert = function(entity) {
 
-	console.log('Inserting BO_RELATION entity[' + entity+"]");
+	$log.info('Inserting BO_RELATION entity');
 
 	if(entity === undefined || entity === null){
 		throw new Error('Illegal argument: entity is ' + entity);
@@ -53,7 +56,7 @@ exports.insert = function(entity) {
         
         statement.executeUpdate();
 
-        console.log('BO_RELATON entity inserted with bor_id[' +  entity.bor_id + ']');
+        $log.info('BO_RELATON entity inserted with bor_id[' +  entity.bor_id + ']');
 
         return entity.bor_id;
 
@@ -68,7 +71,7 @@ exports.insert = function(entity) {
 // Reads a single entity by id, parsed into JSON object 
 exports.find = function(id) {
 
-	console.log('Finding BO_RELATION entity with id[' + id + "]");
+	$log.info('Finding BO_RELATION entity with id[' + id + "]");
 
 	if(id === undefined || id === null){
 		throw new Error('Illegal argument for id parameter:' + id);
@@ -85,7 +88,7 @@ exports.find = function(id) {
         if (resultSet.next()) {
             entity = createEntity(resultSet);
 			if(entity)
-            	console.log('BO_RELATION entity with id[' + id + '] found');
+            	$log.info('BO_RELATION entity with id[' + id + '] found');
         } 
         return entity;
     } catch(e) {
@@ -99,7 +102,7 @@ exports.find = function(id) {
 // Read all entities, parse and return them as an array of JSON objets
 exports.list = function(limit, offset, sort, order, srcId, targetId) {
 
-	console.log('Listing BO_RELATION entity collection with list operators: limit['+limit+'], offset['+offset+'], sort['+sort+'], order['+order+'], srcId['+srcId+'], targetId['+targetId+']');
+	$log.info('Listing BO_RELATION entity collection with list operators: limit['+limit+'], offset['+offset+'], sort['+sort+'], order['+order+'], srcId['+srcId+'], targetId['+targetId+']');
 
     var connection = datasource.getConnection();
     try {
@@ -140,7 +143,7 @@ exports.list = function(limit, offset, sort, order, srcId, targetId) {
             entities.push(entity);
         }
         
-        console.info('' + entities.length +' BO_RELATION entities found');
+        $log.info('' + entities.length +' BO_RELATION entities found');
         
         return entities;
     }  catch(e) {
@@ -161,7 +164,7 @@ function createEntity(resultSet) {
     entity.bor_target_type = resultSet.getShort("BOR_TARGET_TYPE"); 
     entity.bor_name = resultSet.getString("BOR_NAME");     
     entity.bor_type = resultSet.getShort("BOR_TYPE");         
-    console.log("Transformation from DB JSON object finished: " + entity);    
+    $log.info("Transformation from DB JSON object with BOR_ID "+ entity.bor_id + " finished");    
     return entity;
 }
 
@@ -172,14 +175,14 @@ function createSQLEntity(entity) {
 			entity[i] = null;
 		}
 	}
-	console.log("Transformation to DB JSON object finished: " + entity);
+	$log.info("Transformation to DB JSON object finished");
 	return entity;
 }
 
 // update entity from a JSON object. Returns the id of the updated entity.
 exports.update = function(entity) {
 
-	console.log('Updating BO_RELATION entity ' + entity);
+	$log.info('Updating BO_RELATION entity with id['+entity.bor_id + ']');
 
 	if(entity === undefined || entity === null){
 		throw new Error('Illegal argument: entity is ' + entity);
@@ -221,7 +224,7 @@ exports.update = function(entity) {
         statement.setInt(++i, id);
         statement.executeUpdate();
             
-        console.log('BO_RELATION entity with bor_id[' + id + '] updated');
+        $log.info('BO_RELATION entity with bor_id[' + id + '] updated');
         
         return this;
         
@@ -236,7 +239,7 @@ exports.update = function(entity) {
 // delete entity by id. Returns the id of the deleted entity.
 exports.remove = function(id) {
 
-	console.log('Deleting BO_RELATION entity with id[' + id + ']');
+	$log.info('Deleting BO_RELATION entity with id[' + id + ']');
 	
 	if(id === undefined || id === null){
 		throw new Error('Illegal argument: id[' + id + ']');
@@ -249,7 +252,7 @@ exports.remove = function(id) {
         statement.setInt(1, id);
         statement.executeUpdate();
         
-        console.log('BO_RELATION entity with bor_id[' + id + '] deleted');                
+        $log.info('BO_RELATION entity with bor_id[' + id + '] deleted');                
         
         return this;
 
@@ -263,7 +266,7 @@ exports.remove = function(id) {
 
 exports.count = function() {
 
-	console.log('Counting BO_RELATION entities');
+	$log.info('Counting BO_RELATION entities');
 
     var count = 0;
     var connection = datasource.getConnection();
@@ -281,7 +284,7 @@ exports.count = function() {
         connection.close();
     }
     
-    console.log('' + count + ' BO_RELATION entities counted');
+    $log.info('' + count + ' BO_RELATION entities counted');
 
     return count;
 };

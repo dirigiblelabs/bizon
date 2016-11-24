@@ -21,10 +21,13 @@ var parseIntStrict = function (value) {
   return NaN;
 };
 
+var $log = require("bizon/lib/logger").logger;
+$log.ctx = "Header DAO";
+
 // Parse JSON entity into SQL and insert in db. Returns the new record id.
 exports.insert = function(entity, cascaded) {
 
-	console.info('Inserting BO_HEADER entity cascaded['+cascaded+'] :' + entity);
+	$log.info('Inserting BO_HEADER entity cascaded['+cascaded+']');
 
 	if(entity === undefined || entity === null){
 		throw new Error('Illegal argument: entity is ' + entity);
@@ -87,7 +90,7 @@ exports.insert = function(entity, cascaded) {
 	    	}
 		}
 
-        console.info('BO_HEADER entity inserted with boh_id[' +  entity.boh_id + ']');
+        $log.info('BO_HEADER entity inserted with boh_id[' +  entity.boh_id + ']');
 
         return entity.boh_id;
 
@@ -102,7 +105,7 @@ exports.insert = function(entity, cascaded) {
 // Reads a single entity by id, parsed into JSON object 
 exports.find = function(id) {
 
-	console.info('Finding BO_HEADER entity with id ' + id);
+	$log.info('Finding BO_HEADER entity with id[' + id + ']');
 
 	if(id === undefined || id === null){
 		throw new Error('Illegal argument for id parameter:' + id);
@@ -119,7 +122,7 @@ exports.find = function(id) {
         if (resultSet.next()) {
             entity = createEntity(resultSet);
 			if(entity)
-            	console.info('BO_HEADER entity with id[' + id + '] found');
+            	$log.info('BO_HEADER entity with id[' + id + '] found');
         } 
         return entity;
     } catch(e) {
@@ -130,10 +133,10 @@ exports.find = function(id) {
     }
 };
 
-// Reads a single entity by id, parsed into JSON object 
+// Reads a single entity by name, parsed into JSON object 
 exports.findByName = function(name) {
 
-	console.info('Finding BO_HEADER entity with name ' + name);
+	$log.info('Finding BO_HEADER entity with name[' + name +']');
 
 	if(name === undefined || name === null){
 		throw new Error('Illegal argument for parameter name[' + name + ']');
@@ -142,7 +145,7 @@ exports.findByName = function(name) {
     var connection = datasource.getConnection();
     try {
         var entity;
-        var sql = "SELECT * FROM BO_HEADER WHERE BOH_NAME = '" + name + "'";
+        var sql = "SELECT * FROM BO_HEADER WHERE BOH_NAME LIKE ?";
         var statement = connection.prepareStatement(sql);
         statement.setString(1, name);
         
@@ -150,7 +153,7 @@ exports.findByName = function(name) {
         if (resultSet.next()) {
             entity = createEntity(resultSet);
 			if(entity)
-            	console.info('BO_HEADER entity with name[' + name + '] found');
+            	$log.info('BO_HEADER entity with name[' + name + '] found');
         } 
         return entity;
     } catch(e) {
@@ -165,7 +168,7 @@ exports.findByName = function(name) {
 // Read all entities, parse and return them as an array of JSON objets
 exports.list = function(limit, offset, sort, order, expanded, entityName) {
 
-	console.info('Listing BO_HEADER entity collection expanded['+expanded+'] with list operators: limit['+limit+'], offset['+offset+'], sort['+sort+'], order['+order+'], entityName['+entityName+']');
+	$log.info('Listing BO_HEADER entity collection expanded['+expanded+'] with list operators: limit['+limit+'], offset['+offset+'], sort['+sort+'], order['+order+'], entityName['+entityName+']');
 	
     var connection = datasource.getConnection();
     try {
@@ -207,7 +210,7 @@ exports.list = function(limit, offset, sort, order, expanded, entityName) {
             entities.push(entity);
         }
         
-        console.info('' + entities.length +' BO_HEADER entities found');
+        $log.info('' + entities.length +' BO_HEADER entities found');
         
         return entities;
     }  catch(e) {
@@ -255,7 +258,7 @@ function createEntity(resultSet) {
 		if(entity[key] === null)
 			entity[key] = undefined;
 	}	
-    console.error("Transformation from DB JSON object finished: " + entity);    
+    $log.info("Transformation from DB JSON object finished");    
     return entity;
 }
 
@@ -283,7 +286,7 @@ function createSQLEntity(entity) {
 				tblName = tblName.substring(0, 124);
 			tblName += createRadnomAlphanumeric(4);
 			entity.boh_table = tblName;
-			console.info('Generated boh_table['+entity.boh_table+']');
+			$log.info('Generated boh_table['+entity.boh_table+']');
 		}
 		if(entity.boh_id_name !== undefined){
 			var isIdNameValid = /^[a-zA-Z_][a-zA-Z0-9_]{0,255}$/.test(entity.boh_id_name);//TODO: validation needs to come from database dialect provider
@@ -291,7 +294,7 @@ function createSQLEntity(entity) {
 				throw new Error("Illegal arugment: boh_id_name["+entity.boh_id_name+"] does not comply with validation rules");
 		} else {
 			entity.boh_id_name = "id";
-			console.info('Generated boh_id_name['+entity.boh_id_name+']');
+			$log.info('Generated boh_id_name['+entity.boh_id_name+']');
 		}
 		if(entity.boh_id_datatype_code !== undefined){
 			/*var isIdDataTypeValid = !isNaN(entity.boh_id_datatype_code) && [0,1,2,3,4,5,6,7,8,9].indexOf(entity.boh_id_datatype_code);//TODO: extenralize valid codes
@@ -320,7 +323,7 @@ function createSQLEntity(entity) {
 				svcName = svcName.substring(0, 251);			
 			svcName += createRadnomAlphanumeric(4);
 			entity.boh_svc_name = svcName;
-			console.info('Generated boh_svc_name['+entity.boh_svc_name+']');
+			$log.info('Generated boh_svc_name['+entity.boh_svc_name+']');
 		}
 	} else {
 		entity.boh_svc_gen_enabled = 0;	
@@ -332,12 +335,12 @@ function createSQLEntity(entity) {
 				throw new Error("Illegal arugment: bo_ui_title["+entity.boh_ui_title+"] does not comply with validation rules. Longer than 255 characters.");
 		} else {
 			entity.boh_ui_title = entity.boh_label;
-			console.info('Autoassigned boh_ui_title['+entity.boh_ui_title+']');			
+			$log.info('Autoassigned boh_ui_title['+entity.boh_ui_title+']');			
 		}
 	} else {
 		entity.boh_ui_gen_enabled = 0;	
 	}		
-	console.info("Transformation to DB JSON object finished: " + entity);
+	$log.info("Transformation to DB JSON object finished");
 	return entity;
 }
 
@@ -352,7 +355,7 @@ function createRadnomAlphanumeric(length){
 // update entity from a JSON object. Returns the id of the updated entity.
 exports.update = function(entity) {
 
-	console.info('Updating BO_HEADER entity ' + entity);
+	$log.info('Updating BO_HEADER entity with id[' + entity!==undefined?entity.boh_id:entity + ']');
 
 	if(entity === undefined || entity === null){
 		throw new Error('Illegal argument: entity is ' + entity);
@@ -391,7 +394,7 @@ exports.update = function(entity) {
         statement.setInt(++i, id);
         statement.executeUpdate();
             
-        console.info('BO_HEADER entity with boh_id[' + id + '] updated');
+        $log.info('BO_HEADER entity with boh_id[' + id + '] updated');
         
         return this;
         
@@ -406,7 +409,7 @@ exports.update = function(entity) {
 // delete entity by id. Returns the id of the deleted entity.
 exports.remove = function(id, cascaded) {
 
-	console.info('Deleting BO_HEADER entity with id[' + id + '], cascaded['+cascaded+']');
+	$log.info('Deleting BO_HEADER entity with id[' + id + '], cascaded['+cascaded+']');
 
     var connection = datasource.getConnection();
     try {
@@ -447,7 +450,7 @@ exports.remove = function(id, cascaded) {
 			}
 		}        
         
-        console.info('BO_HEADER entity with boh_id[' + id + '] deleted');                
+        $log.info('BO_HEADER entity with boh_id[' + id + '] deleted');                
         
         return this;
 
@@ -461,7 +464,7 @@ exports.remove = function(id, cascaded) {
 
 exports.count = function() {
 
-	console.info('Counting BO_HEADER entities');
+	$log.info('Counting BO_HEADER entities');
 
     var count = 0;
     var connection = datasource.getConnection();
@@ -479,14 +482,14 @@ exports.count = function() {
         connection.close();
     }
     
-    console.info('' + count + ' BO_HEADER entities counted');
+    $log.info('' + count + ' BO_HEADER entities counted');
 
     return count;
 };
 
 exports.metadata = function() {
 
-	console.info('Exporting metadata for BO_HEADER type');
+	$log.info('Exporting metadata for BO_HEADER type');
 
 	var entityMetadata = {
 		name: 'bo_header',
