@@ -1,30 +1,28 @@
 {
-    "guid":"bizon",
-    "repository":{"type":"git","branch":"master","url":"https://github.com/dirigiblelabs/bizon.git"},
-    "licenses": [
-        {
-            "name": "Eclipse Public License - v 1.0",
-            "url": "https://www.eclipse.org/legal/epl-v10.html" 
-        } 
-    ],
-    "dependencies": [
-        {
-            "guid":"qunit",
+    "guid": "bizon",
+    "repository": {
+        "type": "git",
+        "branch": "master",
+        "url": "https://github.com/dirigiblelabs/bizon.git"},
+    "licenses": [{
+        "name": "Eclipse Public License - v 1.0",
+        "url": "https://www.eclipse.org/legal/epl-v10.html" 
+    }],
+    "dependencies": [{
+            "guid": "qunit",
             "type": "git",
             "url": "https://github.com/dirigiblelabs/qunit.git",
-            "branch":"master"
-    	},
-        {
-            "guid":"jsmockito",
+            "branch": "master"
+    	}, {
+            "guid": "jsmockito",
             "type": "git",
             "url": "https://github.com/dirigiblelabs/jsmockito.git",
-            "branch":"master"
-    	},
-        {
-            "guid":"arestme",
+            "branch": "master"
+    	}, {
+            "guid": "arestme",
             "type": "git",
             "url": "https://github.com/dirigiblelabs/arestme.git",
-            "branch":"master"
+            "branch": "master"
     	}    	
 	]
 }
