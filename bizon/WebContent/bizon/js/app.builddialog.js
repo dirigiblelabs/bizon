@@ -43,20 +43,14 @@ angular.module('businessObjects')
 		});
 
 	this.build = function(){
-		var buildRequestPayload = angular.copy(self.cfg);
-		buildRequestPayload.entities = masterDataSvc.getLoadedData();
+		var entities = masterDataSvc.getLoadedData();
 		try{
-			if(self.slider.value === 1){
-				buildRequestPayload.ds = true;
-			} else if(self.slider.value === 2){
-				buildRequestPayload.ds = true;
-				buildRequestPayload.svc = true;
-			}  else if(self.slider.value === 3){
-				buildRequestPayload.ds = true;
-				buildRequestPayload.svc = true;
-				buildRequestPayload.web = true;
-			}
-			BuildService.build(buildRequestPayload);
+			var addDataStructures = self.slider.value >= 1;
+			var addScriptingServices = self.slider.value >= 2;
+			var addWebContent = self.slider.value === 3;
+
+			var buildTemplate = getBuildTemplate(self.cfg, entities, addDataStructures, addScriptingServices, addWebContent);
+			BuildService.build(buildTemplate);
 		} catch(err){
 			$log.debug('The requested application path ' + $window.location.href + " is not valid.");
 			$stateParams.message = {
@@ -67,8 +61,84 @@ angular.module('businessObjects')
 			$scope.$close();
 		}
 	};
+
 	this.cancel = function(){
 		$scope.$dismiss();
 	};
+
+	function getBuildTemplate(buildTemplate, entities, addDataStructures, addScriptingServices, addWebContent) {
+		if (addDataStructures) {
+			addDataStructuresTemplate(buildTemplate, entities);
+		}
+		if (addScriptingServices) {
+			addScriptingServicesTemplate(buildTemplate, entities);
+		}
+		if (addWebContent) {
+			addWebContentTemplate(buildTemplate, entities);
+		}
+		return buildTemplate;
+	}
+
+	function addDataStructuresTemplate(template, entities) {
+		// Add DataStructures Generation
+		template.dataStructures = {};
+		template.dataStructures.fileName = entities[0].boh_table.toLowerCase() + '.table';
+		template.dataStructures.columns = [];
+		for (var i in entities[0].properties) {
+			var nextColumn = entities[0].properties[i];
+			template.dataStructures.columns.push({
+				'name': nextColumn.boi_name.toUpperCase(),
+	            'type': nextColumn.boi_type.toUpperCase(),
+	            'length': nextColumn.boi_length,
+	            'notNull': !nextColumn.boi_null,
+	            'primaryKey': nextColumn.boi_name === entities[0].boh_id_name,
+	            'defaultValue': ''
+	         });
+		}
+	}
+
+	function addScriptingServicesTemplate(template, entities) {
+		// Add ScriptingServices Generation
+		template.scriptingServices = {};
+		template.scriptingServices.fileName = entities[0].boh_svc_name + '.js';
+		template.scriptingServices.tableName = entities[0].boh_table.toUpperCase();
+		template.scriptingServices.columns = [];
+		for (var i in entities[0].properties) {
+			var nextColumn = entities[0].properties[i];
+			template.scriptingServices.columns.push({  
+	    		'name': nextColumn.boi_name.toUpperCase(),
+	            'type': nextColumn.boi_type.toUpperCase(),
+	            'primaryKey': nextColumn.boi_name === entities[0].boh_id_name
+	         });
+		}
+	}
+
+	function addWebContentTemplate(template, entities) {
+		// Add WebContent Generation
+		var widgetsMapping = {
+			'DATE': 'date',
+			'VARCHAR': 'textarea',
+			'SMALLINT': 'integer',
+			'INTEGER': 'integer', // TODO Add more integer-compliant types 
+			'FLOAT': 'float',
+			'DROPDOWN': 'dropdown', // TODO What about the dropdown & list?
+			'LIST': 'list'
+		}
+		template.webContent = {};
+		template.webContent.fileName = entities[0].boh_svc_name + '.html';
+		template.webContent.pageTitle = entities[0].boh_ui_title;
+		template.webContent.serviceFileName = '../../js/' + template.packageName + '/' + template.scriptingServices.fileName;
+		template.webContent.columns = [];
+		for (var i in entities[0].properties) {
+			var nextColumn = entities[0].properties[i];
+			template.webContent.columns.push({
+				'name': nextColumn.boi_name.toLowerCase(),
+	            "label": nextColumn.boi_label ? nextColumn.boi_label : nextColumn.boi_name,
+	            "widgetType": widgetsMapping[nextColumn.boi_type],
+	            "primaryKey": nextColumn.boi_name === entities[0].boh_id_name,
+	            "visible": true
+	         });
+		}
+	}
 }]);
 })(angular);
