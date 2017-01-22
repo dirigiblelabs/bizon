@@ -146,7 +146,7 @@ angular.module('businessObjects')
 				var nextColumn = entities[i].properties[j];
 				web.columns.push({
 					'name': nextColumn.boi_name.toLowerCase(),
-		            'labe': nextColumn.boi_label ? nextColumn.boi_label : nextColumn.boi_name,
+		            'label': nextColumn.boi_label ? nextColumn.boi_label : nextColumn.boi_name,
 		            'widgetType': widgetsMapping[nextColumn.boi_type],
 		            'primaryKey': nextColumn.boi_name === entities[i].boh_id_name,
 		            'visible': true
