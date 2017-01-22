@@ -139,7 +139,7 @@ angular.module('businessObjects')
 			var web = {
 				'fileName': entities[i].boh_svc_name + '.html',
 				'pageTitle': entities[i].boh_ui_title,
-				'serviceFileName': '../../js/' + template.packageName + '/' + template.scriptingServices.fileName,
+				'serviceFileName': '../../js/' + template.packageName + '/' + template.scriptingServices[i].fileName,
 				'columns': []
 			};
 			for (var j in entities[i].properties) {
