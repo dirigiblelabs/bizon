@@ -81,35 +81,45 @@ angular.module('businessObjects')
 
 	function addDataStructuresTemplate(template, entities) {
 		// Add DataStructures Generation
-		template.dataStructures = {};
-		template.dataStructures.fileName = entities[0].boh_table.toLowerCase() + '.table';
-		template.dataStructures.columns = [];
-		for (var i in entities[0].properties) {
-			var nextColumn = entities[0].properties[i];
-			template.dataStructures.columns.push({
-				'name': nextColumn.boi_name.toUpperCase(),
-	            'type': nextColumn.boi_type.toUpperCase(),
-	            'length': nextColumn.boi_length,
-	            'notNull': !nextColumn.boi_null,
-	            'primaryKey': nextColumn.boi_name === entities[0].boh_id_name,
-	            'defaultValue': ''
-	         });
+		template.dataStructures = [];
+		for (var i = 0 ; i < entities.length; i ++) {
+			var dataStructure = {
+				'fileName': entities[i].boh_table.toLowerCase() + '.table',
+				'columns': []
+			}
+			for (var j in entities[i].properties) {
+				var nextColumn = entities[i].properties[j];
+				dataStructure.columns.push({
+					'name': nextColumn.boi_name.toUpperCase(),
+		            'type': nextColumn.boi_type.toUpperCase(),
+		            'length': nextColumn.boi_length,
+		            'notNull': !nextColumn.boi_null,
+		            'primaryKey': nextColumn.boi_name === entities[i].boh_id_name,
+		            'defaultValue': ''
+		         });
+			}
+			template.dataStructures.push(dataStructure);
 		}
 	}
 
 	function addScriptingServicesTemplate(template, entities) {
 		// Add ScriptingServices Generation
-		template.scriptingServices = {};
-		template.scriptingServices.fileName = entities[0].boh_svc_name + '.js';
-		template.scriptingServices.tableName = entities[0].boh_table.toUpperCase();
-		template.scriptingServices.columns = [];
-		for (var i in entities[0].properties) {
-			var nextColumn = entities[0].properties[i];
-			template.scriptingServices.columns.push({  
-	    		'name': nextColumn.boi_name.toUpperCase(),
-	            'type': nextColumn.boi_type.toUpperCase(),
-	            'primaryKey': nextColumn.boi_name === entities[0].boh_id_name
-	         });
+		template.scriptingServices = [];
+		for (var i = 0 ; i < entities.length; i ++) {
+			var scriptingService = {
+				'fileName': entities[i].boh_svc_name + '.js',
+				'tableName': entities[i].boh_table.toUpperCase(),
+				'columns': []
+			};
+			for (var j in entities[i].properties) {
+				var nextColumn = entities[i].properties[j];
+				scriptingService.columns.push({  
+		    		'name': nextColumn.boi_name.toUpperCase(),
+		            'type': nextColumn.boi_type.toUpperCase(),
+		            'primaryKey': nextColumn.boi_name === entities[i].boh_id_name
+		         });
+			}
+			template.scriptingServices.push(scriptingService);
 		}
 	}
 
@@ -124,20 +134,25 @@ angular.module('businessObjects')
 			'DROPDOWN': 'dropdown', // TODO What about the dropdown & list?
 			'LIST': 'list'
 		}
-		template.webContent = {};
-		template.webContent.fileName = entities[0].boh_svc_name + '.html';
-		template.webContent.pageTitle = entities[0].boh_ui_title;
-		template.webContent.serviceFileName = '../../js/' + template.packageName + '/' + template.scriptingServices.fileName;
-		template.webContent.columns = [];
-		for (var i in entities[0].properties) {
-			var nextColumn = entities[0].properties[i];
-			template.webContent.columns.push({
-				'name': nextColumn.boi_name.toLowerCase(),
-	            "label": nextColumn.boi_label ? nextColumn.boi_label : nextColumn.boi_name,
-	            "widgetType": widgetsMapping[nextColumn.boi_type],
-	            "primaryKey": nextColumn.boi_name === entities[0].boh_id_name,
-	            "visible": true
-	         });
+		template.webContent = [];
+		for (var i = 0 ; i < entities.length; i ++) {
+			var web = {
+				'fileName': entities[i].boh_svc_name + '.html',
+				'pageTitle': entities[i].boh_ui_title,
+				'serviceFileName': '../../js/' + template.packageName + '/' + template.scriptingServices.fileName,
+				'columns': []
+			};
+			for (var j in entities[i].properties) {
+				var nextColumn = entities[i].properties[j];
+				web.columns.push({
+					'name': nextColumn.boi_name.toLowerCase(),
+		            'labe': nextColumn.boi_label ? nextColumn.boi_label : nextColumn.boi_name,
+		            'widgetType': widgetsMapping[nextColumn.boi_type],
+		            'primaryKey': nextColumn.boi_name === entities[i].boh_id_name,
+		            'visible': true
+		         });
+			}
+			template.webContent.push(web);
 		}
 	}
 }]);
