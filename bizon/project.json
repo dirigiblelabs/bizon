@@ -28,21 +28,6 @@
             "type": "git",
             "url": "https://github.com/ThuF/bizon_generator.git",
             "branch": "master"
-    	}, {
-            "guid": "template_data_table",
-            "type": "git",
-            "url": "https://github.com/ThuF/template_data_table.git",
-            "branch": "master"
-    	}, {
-            "guid": "template_js_database_crud_extended",
-            "type": "git",
-            "url": "https://github.com/ThuF/template_js_database_crud_extended.git",
-            "branch": "master"
-    	}, {
-            "guid": "template_web_list_and_manage",
-            "type": "git",
-            "url": "https://github.com/ThuF/template_web_list_and_manage.git",
-            "branch": "master"
     	}
 	]
 }
