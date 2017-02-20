@@ -25,13 +25,13 @@ QUnit.test("get_not_found", function(assert) {
 	var ItemDAO = require('bizon/lib/item_dao');
 	var mockedDAO = mockito.mock(ItemDAO);
 	mockito.when(mockedDAO).find(hamcrest.Matchers.anything(), hamcrest.Matchers.anything()).thenReturn(null);
-
-	var api = function(){};
-	var rest = require("bizon/svc/rest/utils");		
-	rest.asRestAPI.call(api.prototype, mockedDAO, mockedRequest, mockedResponse);	
-	var a = new api(mockedDAO, mockedRequest, mockedResponse);
-	a.service();
 	
+	var arester = require("arestme/arester");
+	var Item = arester.asRestAPI(mockedDAO);
+	Item.prototype.logger.ctx = "API Svc";
+	var item = new Item(mockedDAO);
+	
+	item.service(mockedRequest, mockedResponse);	
 	try {
 		mockito.verify(mockedDAO).find(hamcrest.Matchers.anything(), hamcrest.Matchers.anything());
 		QUnit.assertThat(mockedDAO.find(hamcrest.Matchers.anything(), hamcrest.Matchers.anything()), hamcrest.Matchers.equalTo(null), undefined, assert);
@@ -66,11 +66,12 @@ QUnit.test("get_ok", function(assert) {
 	var mockedDAO = mockito.mock(ItemDAO);
 	mockito.when(mockedDAO).find(hamcrest.Matchers.anything(), hamcrest.Matchers.anything()).thenReturn(testEntity);
 
-	var api = function(){};
-	var rest = require("bizon/svc/rest/utils");		
-	rest.asRestAPI.call(api.prototype, mockedDAO, mockedRequest, mockedResponse);	
-	var a = new api(mockedDAO, mockedRequest, mockedResponse);
-	a.service();
+	var arester = require("arestme/arester");
+	var Item = arester.asRestAPI(mockedDAO);
+	Item.prototype.logger.ctx = "API Svc";
+	var item = new Item(mockedDAO);
+	
+	item.service(mockedRequest, mockedResponse);
 	
 	try {
 		mockito.verify(mockedDAO).find(hamcrest.Matchers.anything(), hamcrest.Matchers.anything());

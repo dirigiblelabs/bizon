@@ -48,15 +48,17 @@ describe("Header REST API Test Suite", function() {
     	
 		mockedDAO = require('bizon/lib/header_dao');
 		spyOn(mockedDAO, 'find').and.returnValue(testEntity);
+	
+		var arester = require("arestme/arester");
+		var Header = arester.asRestAPI(mockedDAO);
+		Header.prototype.logger.ctx = "Header Svc";
+		var header = new Header(mockedDAO);
 		
-		var Header_REST_API = function(){};
-		require("bizon/svc/rest/utils").asRestAPI.call(Header_REST_API.prototype, mockedDAO, mockedRequest, mockedResponse);	
-		restAPI = new Header_REST_API(mockedDAO, mockedRequest, mockedResponse);
+		header.service(mockedRequest, mockedResponse);	
 		
 /*		var spy = jasmine.createSpy('getHandlerMock');
 		restAPI.cfg['{id}'].get.handler = spy;
 */		
-		restAPI.service(); 		
 	});
     
     it("should get request attributes", function() {

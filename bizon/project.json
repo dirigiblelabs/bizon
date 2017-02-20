@@ -21,6 +21,12 @@
             "branch":"master"
     	},
         {
+            "guid":"jasmine",
+            "type": "git",
+            "url": "https://github.com/dirigiblelabs/jasmine.git",
+            "branch":"master"
+    	},    	
+        {
             "guid":"arestme",
             "type": "git",
             "url": "https://github.com/dirigiblelabs/arestme.git",
