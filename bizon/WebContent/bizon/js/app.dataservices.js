@@ -291,7 +291,7 @@
 			var entity = template;
 			if(!entity){
 				entity = this.masterDataTemplateObject = createMasterDataTemplateObject();
-				entity.boh_name += createRandomAlphanumeric();
+				entity.boh_table += createRandomAlphanumeric();
 				entity.properties.map(function(prop){
 					prop.boi_boh_name = entity.boh_name;
 					return prop;

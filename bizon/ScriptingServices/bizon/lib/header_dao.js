@@ -12,7 +12,7 @@
 //Prepare a JSON object for insert into DB
 function _createSQLEntity(entity) {
 	if(entity.boh_ds_gen_enabled === 1){
-		if(entity.boh_table !== undefined){
+		if(entity.boh_table !== undefined  && entity.boh_table !== null){
 			// Validation rule: up to 128 Characters, Starts with letter only, Can include or end with number, No spaces, case insensitive
 			var isTableNameValid = /^[A-Za-z][A-Za-z0-9]{0,127}$/.test(entity.boh_table);//TODO: validation needs to come from database dialect provider
 			if(!isTableNameValid)

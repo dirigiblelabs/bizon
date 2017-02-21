@@ -9,7 +9,7 @@ function getBaseTemplate(projectName, packageName, entity){
 	var baseTemplate = {
 		"projectName":projectName,
 		"packageName":packageName,
-	  	"fileName": entity.boh_name.replace(/\s+/g, '_')
+	  	"fileName": entity.boh_label.replace(/\s+/g, '_')
 	};
 	baseTemplate.columns = [];	
 	if(entity.properties){
