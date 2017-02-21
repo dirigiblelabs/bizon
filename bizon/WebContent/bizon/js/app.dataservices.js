@@ -13,7 +13,7 @@
 		                	var location = res.headers('Location');
 		                	if(location){
 		                		var id = location.substring(location.lastIndexOf('/')+1);
-		                		angular.extend(res.resource, { "boh_id": id });
+		                		angular.extend(res.resource, { "boh_name": id });
 	                		} else {
 	                			$log.error('Cannot infer id after save operation. HTTP Response Header "Location" is missing: ' + location);
 	            			}
@@ -68,7 +68,7 @@
 					"boi_column":"Item",
 					"boi_type_name": "Text",					
 					"boi_type": "VARCHAR",
-					"length": "100",					
+					"boi_length": 100,					
 					"boi_null": true,
 				};
 		return res;
@@ -116,9 +116,9 @@
 		this.masterDataTemplateObject = createMasterDataTemplateObject();
 		this.batchLoadedMasterData = [];//data cache
 		this.querySettings = {
-			limit: 100,
-			sort: 'boh_label',
-			order: 'ASC'
+			$limit: 100,
+			$sort: 'boh_label',
+			$order: 'asc'
 		};
 		this.selection = [];
 		
@@ -131,7 +131,7 @@
 		/* make sure that sort and order properties of settings have not changed when paging and after the first page has been loaded. purge and start over again otehrwise */
 		function query(settings){
 			this.querySettings = settings;
-			settings.expanded = (settings && settings.expanded!==undefined) || true;
+			settings.$expand = (settings && settings.$expand!==undefined) || 'properties,inbound-relations,outbound-relations,inbound-entities'; 
 			var deferred = $q.defer();
 			Entity.query(settings).$promise
 			.then(function(data){
@@ -147,7 +147,7 @@
 						return entity;
 					});
 				if(self.querySettings.limit){
-					if(!self.querySettings.offset)
+					if(!self.querySettings.$offset)
 						self.batchLoadedMasterData = data;//invalidate cached data
 					else
 						self.batchLoadedMasterData = [].concat(self.batchLoadedMasterData, data);//append next page of data
@@ -164,7 +164,7 @@
 		
 		function refresh(){
 			this.batchLoadedMasterData = [];
-			this.querySettings.offset = 0;
+			this.querySettings.$offset = 0;
 			return query.apply(this, [this.querySettings]).then(self.count);
 		};
 		
@@ -176,7 +176,7 @@
 		*/
 		this.get = function(id, lookupRemotelyOnDemand){
 			var itemHit = this.batchLoadedMasterData.filter(function(item){
-					if(item.boh_id == id ){
+					if(item.boh_name == id ){
 						return true;
 					}
 					return false;
@@ -215,7 +215,7 @@
 			if(itemHit) {
 				return $q.when(itemHit);
 			} else if(lookupRemotelyOnDemand) {
-				return Entity.getByName({getByName:name}).$promise
+				return Entity.getByName({"boh_name":name, $filter:"boh_name"}).$promise
 				.then(function(item){
 					if(item){
 						return self.next.apply(self);
@@ -243,7 +243,7 @@
 				  The second parameter addresses precisely these situations.	
 		*/
 		this.findByName = function(name){
-			return EntityQueryByName.queryByName({name:name}).$promise;
+			return EntityQueryByName.queryByName({"boh_label":name, $filter:"boh_label"}).$promise;
 		};		
 
 		this._itemsCount;
@@ -271,7 +271,7 @@
 			return this.hasMore()
 			.then(function(_hasMore){
 				if(_hasMore){
-					self.querySettings.offset = self.batchLoadedMasterData.length;
+					self.querySettings.$offset = self.batchLoadedMasterData.length;
 					return query.apply(self, [self.querySettings])
 					.then(function(){
 						return self.batchLoadedMasterData;
@@ -288,7 +288,6 @@
 
 		this.create = function(cascaded, template){
 			var reqParams = {};
-			reqParams.cascaded = cascaded || true;
 			var entity = template;
 			if(!entity){
 				entity = this.masterDataTemplateObject = createMasterDataTemplateObject();
@@ -309,30 +308,43 @@
 		
 		this.update = function(header){
 			if(header.properties){
-				var items = header.properties.filter(function(item){
+				var props = header.properties.filter(function(item){
 					if(!item.action){
 						return false;
 					}
 					return true;
 				});
-				var promises = items.map(function(item) {
+				var promises = props.map(function(item) {
 					var action = item.action;
 					delete item.action;
+					var $promise;
 					if(action === 'remove') {
-						if(item.boi_type !== 'Relationship')
-			        		return Item.remove({boId: item.boi_id}).$promise;
-			        	else
-			        		return Relation.remove({boId: item.bor_id}).$promise;			        	
+			        	$promise = Item.remove({boId: item.boi_id}).$promise;
 		        	} else {
-		        		if(item.boi_type !== 'Relationship')
-		        			return Item[action]({boId: item.boi_id}, item).$promise;
-		        		else
-		        			return Relation[action]({boId: item.boi_id}, item).$promise;		        		
+	        			$promise = Item[action]({boId: item.boi_id}, item).$promise;
 	        		}
+	        		return $promise;
 		    	});
+				var rels = header["inbound-relations"].filter(function(item){
+					if(!item.action){
+						return false;
+					}
+					return true;
+				});
+				promises = promises.concat(rels.map(function(item) {
+					var action = item.action;
+					delete item.action;
+					var $promise;
+					if(action === 'remove') {
+			        	$promise = Relation.remove({boId: item.bor_id}).$promise;			        	
+		        	} else {
+		        		$promise = Relation[action]({boId: item.bor_id}, item).$promise;		        		
+	        		}
+	        		return $promise;
+		    	}));
 			}
 
-			promises.unshift(Entity.update({boId: header.boh_id}, header).$promise);
+			promises.unshift(Entity.update({boId: header.boh_name}, header).$promise);
 			//promises.push(refresh.apply(self));
 	    	return $q.all(promises).then(function(){
 	    		refresh.apply(self);
@@ -379,7 +391,7 @@
 		
 		this.exportData = function(){
 			$log.info('Exporting data');
-			return Entity.query({expanded:true}).$promise;
+			return Entity.query({$expand:''}).$promise;
 		};
 		
 		this.importData = function(data){

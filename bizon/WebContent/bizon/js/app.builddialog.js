@@ -21,7 +21,7 @@ angular.module('businessObjects')
 		.then(function(templates){
 			self.templates = templates;
 			self.cfg.templates = {};
-			//set defualt templates
+			//set default templates
 			if(templates.ds){
 				self.cfg.templates.ds = templates.ds.find(function(tmpl){
 					return tmpl.name === 'ds_table';

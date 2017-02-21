@@ -106,17 +106,17 @@ angular.module('businessObjects')
   			this.relation.bor_target_boh_name = this.relation.target.boh_name;
 		if(isNewProperty){      	
 		  this.relation.action = 'save';
-		  selectedEntity.properties.push(this.relation);
+		  selectedEntity['inbound-relations'].push(this.relation); 
 		} else {
 			if(this.relation.action!=='save')
 				this.relation.action = 'update';
-			selectedEntity.properties = selectedEntity.properties
-				.map(function(prop){
-					if(prop.bor_id === self.relation.bor_id){
-						return self.relation;
-					}
-					return prop;
-				});
+			selectedEntity['inbound-relations'] = selectedEntity['inbound-relations']
+										.map(function(rel){
+											if(rel.bor_id === self.relation.bor_id){
+												return self.relation;
+											}
+											return rel;
+										});
 		}
 		$scope.$close(selectedEntity);
     };

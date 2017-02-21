@@ -13,7 +13,7 @@ angular.module('businessObjects')
 		this.tab = TABS.PROP_TAB;
 		if(this.entityForEdit.properties){
 			this.propertyItems = this.entityForEdit.properties.filter(function(v){
-				if(v.action!=='remove' && v.boi_type!=='Relationship'){
+				if(v.action!=='remove'){
 					return true;
 				}
 				return false;
@@ -32,14 +32,12 @@ angular.module('businessObjects')
 	this.showRelationships = function(){
 		this.searchText = undefined;
 		this.tab = TABS.REL_TAB;	
-		if(this.entityForEdit.properties){
-			this.propertyItems = this.entityForEdit.properties.filter(function(v){
-				if(v.action!=='remove' && v.boi_type === 'Relationship') {
-					return true;
-				}
-				return false;
-			}, this);
-		}
+		this.propertyItems = this.entityForEdit['outbound-relations'].filter(function(v){
+			if(v.action!=='remove') {
+				return true;
+			}
+			return false;
+		}, this);
 	};
 	
 	this.showConfig = function(){
@@ -102,7 +100,7 @@ angular.module('businessObjects')
         modalService.showModal({}, modalOptions)
         .then(function () {
 			delete $stateParams.entityForEdit;			
-		    $state.go('list.entity', {boId:self.entityForEdit.boh_id});
+		    $state.go('list.entity', {boId:self.entityForEdit.boh_name});
         });
 	};
 	
@@ -111,7 +109,7 @@ angular.module('businessObjects')
 	    .then(function(){
 			$log.debug('Buisness Object updated successfully');
 			Notifications.createMessageSuccess('Buisness Object updated successfully.');
-			$state.go('list.entity', {boId: self.entityForEdit.boh_id}, {reload:true});
+			$state.go('list.entity', {boId: self.entityForEdit.boh_name}, {reload:true});
     	})
     	.catch(function(reason){
     		var message = masterDataSvc.serviceErrorMessageFormatter('Updating Buisness Object failed', reason);
@@ -127,8 +125,9 @@ angular.module('businessObjects')
 
 	this.typeOptions = [{id:0, val:'INTEGER'},{id:1, val:'VARCHAR'},{id:2, val:'BIGINT'}];
 	
+	//FIXME
 	this.cfgDataTypeSelectedTypeOption = this.typeOptions.find(function(opt){
-			return opt.val.toLowerCase() === self.entityForEdit.boh_id_datatype_code.toLowerCase();
+			return true;//opt.val.toLowerCase() === self.entityForEdit.boh_id_datatype_code.toLowerCase();
 		});
 	
 	this.cfgDataTypeSelectionChanged = function(option){

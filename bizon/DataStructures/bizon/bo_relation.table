@@ -4,7 +4,7 @@
     [
       {
         "name":"BOR_ID",
-        "type":"INTEGER",
+        "type":"BIGINT",
         "length":"0",
         "notNull":"true",
         "primaryKey":"true",
@@ -13,8 +13,8 @@
       ,
       {
         "name":"BOR_SRC_BOH_NAME",
-        "type":"VARCHAR",
-        "length":"100",
+        "type":"BIGINT",
+        "length":"0",
         "notNull":"true",
         "primaryKey":"false",
         "defaultValue":""
@@ -31,8 +31,8 @@
       ,
       {
         "name":"BOR_TARGET_BOH_NAME",
-        "type":"VARCHAR",
-        "length":"100",
+        "type":"BIGINT",
+        "length":"0",
         "notNull":"true",
         "primaryKey":"false",
         "defaultValue":""

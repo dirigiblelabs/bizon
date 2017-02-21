@@ -316,10 +316,10 @@
 			
 			//pagination
 			$scope.viewby = 100;
-			var urlCount = url + '?count';
+			var urlCount = url + '/count';
 			$http.get(urlCount)
 				.success(function(count){
-					$scope.totalItems = count;
+					$scope.totalItems = count.count || count;
 				});
 				
 				$scope.currentPage = 1;
@@ -332,7 +332,7 @@
 			};
 			
 			$scope.pageChanged = function() {
-				var urlLimit = url + '?offset=' + ($scope.viewby*($scope.currentPage-1) + '&limit=' + $scope.viewby);
+				var urlLimit = url + '?$offset=' + ($scope.viewby*($scope.currentPage-1) + '&$limit=' + $scope.viewby);
 				$http.get(urlLimit)
 					.success(function(data){
 						$scope.data = data;

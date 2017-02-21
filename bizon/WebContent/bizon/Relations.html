@@ -306,10 +306,10 @@
 			
 			//pagination
 			$scope.viewby = 100;
-			var urlCount = url + '?count';
+			var urlCount = url + '/count';
 			$http.get(urlCount)
 				.success(function(count){
-					$scope.totalItems = count;
+					$scope.totalItems = count.count || count;
 				});
 				
 				$scope.currentPage = 1;

@@ -11,9 +11,9 @@ angular.module('businessObjects')
 	this.busy;
 	
 	this.querySettings = {
-		limit: 100,
-		sort: 'boh_label',
-		order: 'ASC'
+		$limit: 100,
+		$sort: 'boh_label',
+		$order: 'asc'
 	};
 	
 	this.filterPopover = {
@@ -26,9 +26,9 @@ angular.module('businessObjects')
 	this.createItem = function(){
 		masterDataSvc.create()
 		.then(function(newItem){
-			$stateParams.boId = newItem.boh_id;
+			$stateParams.boId = newItem.boh_name;
 			$stateParams.selectedEntity = newItem;
-			$log.debug('Business Object with id '+newItem.boh_id+' created successfully');
+			$log.debug('Business Object with id '+newItem.boh_name+' created successfully');
 			Notifications.createMessageSuccess('Business Object created successfully');
 			masterDataSvc.selection = [newItem];
 			self.items = masterDataSvc.getLoadedData();
@@ -54,7 +54,7 @@ angular.module('businessObjects')
         modalService.showModal({}, modalOptions)
         .then(function () {
 			self.busy = true;
-			masterDataSvc.remove(entity.boh_id, true)
+			masterDataSvc.remove(entity.boh_name, true)
 			.then(function(){
 				delete $stateParams.boId;
 				delete $state.params.boId;
@@ -147,7 +147,7 @@ angular.module('businessObjects')
 					} else {
 						postNext.apply(self);
 						if(masterDataSvc.getLoadedData().length>0){
-		              		$state.go('list.entity', {boId: masterDataSvc.getLoadedData()[0].boh_id});
+		              		$state.go('list.entity', {boId: masterDataSvc.getLoadedData()[0].boh_name});
 		              	}
 		              	self.busy = false;
 					}

@@ -8,14 +8,7 @@ angular.module('businessObjects')
 	var self = this;
 	
 	this.showProperties = function(){
-		if(this.selectedEntity.properties){
-			this.propertyItems = this.selectedEntity.properties.filter(function(v){
-				if(!v.boi_type || v.boi_type!=='Relationship'){
-					return true;
-				}
-				return false;
-			}, this);
-		}
+		this.propertyItems = this.selectedEntity.properties;
 	};
 	
 	function showDetails(item){
@@ -28,14 +21,14 @@ angular.module('businessObjects')
 	showDetails.apply(this, [this.selectedEntity]);
 	
 	this.showRelationships = function(){
-		this.searchText = undefined;
-		getInboundRelations.apply(self);
-		getOutboundRelations.apply(self);		
+		this.searchText = undefined; 
+		this.inboundRelations = getInboundRelations.apply(self);
+		this.outboundRelations = getOutboundRelations.apply(self);
 	};
 	
 	function getInboundRelations(){
 		if(this.selectedEntity){
-			Relation.query({
+			/*Relation.query({
 				targetId: this.selectedEntity.boh_name
 			}).$promise
 			.then(function(relations){
@@ -47,25 +40,28 @@ angular.module('businessObjects')
 					});
 					return relation;					
 				});
-			});
+			});*/
+			return this.selectedEntity['inbound-relations']
+			.map(function(rel){
+				var inboundEntity = this.selectedEntity['inbound-entities']
+									.filter(function(inboundEntity){
+										return inboundEntity.boh_name === rel.bor_target_boh_name;
+									})[0];
+				rel.source = inboundEntity;
+				return rel;
+			}.bind(this));
 		}
 	}
 	
 	function getOutboundRelations(){
-		if(this.selectedEntity){
-			Relation.query({
-				srcId: this.selectedEntity.boh_name
-			}).$promise
-			.then(function(relations){
-				self.outboundRelations = relations.map(function(relation){
-					masterDataSvc.getByName(relation.bor_target_boh_name, true)
+		return this.selectedEntity['outbound-relations']
+				.map(function(rel){
+					masterDataSvc.getByName(rel.bor_target_boh_name, true)
 					.then(function(targetEntity){
-						relation.target = targetEntity;
+						rel.target = targetEntity;
 					});
-					return relation;	
+					return rel;
 				});
-			});
-		}
 	}
 	
 	this.showConfig = function(){

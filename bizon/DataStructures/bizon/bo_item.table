@@ -4,7 +4,7 @@
     [
       {
         "name":"BOI_ID",
-        "type":"INTEGER",
+        "type":"BIGINT",
         "length":"0",
         "notNull":"true",
         "primaryKey":"true",
@@ -13,8 +13,8 @@
       ,
       {
         "name":"BOI_BOH_NAME",
-        "type":"VARCHAR",
-        "length":"100",
+        "type":"BIGINT",
+        "length":"0",
         "notNull":"true",
         "primaryKey":"false",
         "defaultValue":""
