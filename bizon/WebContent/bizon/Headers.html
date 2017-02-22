@@ -45,21 +45,21 @@
 			<table class="table table-condensed">
 				<thead>
 					<tr>
-						<th>BOH_ID</th>
-						<th>BOH_NAME</th>						
-						<th>BOH_LABEL</th>
-						<th>BOH_TABLE</th>
-						<th>BOH_DESCRIPTION</th>
+						<th>ID</th>
+						<th>NAME</th>						
+						<th>LABEL</th>
+						<th>TABLE</th>
+						<th>DESCRIPTION</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr class="selected-{{entry._selected_}}" ng-repeat="entry in data"
 						ng-click="showInfoForEntry(entry)">
-						<td>{{entry.boh_id}}</td>												
-						<td>{{entry.boh_name}}</td>						
-						<td>{{entry.boh_label}}</td>
-						<td>{{entry.boh_table}}</td>
-						<td>{{entry.boh_description}}</td>
+						<td>{{entry.id}}</td>												
+						<td>{{entry.name}}</td>						
+						<td>{{entry.label}}</td>
+						<td>{{entry.table}}</td>
+						<td>{{entry.description}}</td>
 					</tr>
 				</tbody>
 			</table>
@@ -86,29 +86,29 @@
 			<div>
 				<!-- input form -->
 				<div>
-					<label>BOH_ID</label>
+					<label>ID</label>
 					<input type="text" class="form-control" 
-						ng-model="selectedEntry.boh_id"
+						ng-model="selectedEntry.id"
 						ng-readonly="operation == 'show'" required="required">
 					<br>				
-					<label>BOH_NAME</label>
+					<label>NAME</label>
 					<input type="text" class="form-control" 
-						ng-model="selectedEntry.boh_name"
+						ng-model="selectedEntry.name"
 						ng-readonly="operation == 'show'" required="required">
 					<br>					
-					<label>BOH_LABEL</label>
+					<label>LABEL</label>
 					<input type="text" class="form-control" 
-						ng-model="selectedEntry.boh_label"
+						ng-model="selectedEntry.label"
 						ng-readonly="operation == 'show'" required="required">
 					<br>
-					<label>BOH_TABLE</label>
+					<label>TABLE</label>
 					<input type="text" class="form-control" 
-						ng-model="selectedEntry.boh_table"
+						ng-model="selectedEntry.table"
 						ng-readonly="operation == 'show'" required="required">
 					<br>
-					<label>BOH_DESCRIPTION</label>
+					<label>DESCRIPTION</label>
 					<input type="text" class="form-control" 
-						ng-model="selectedEntry.boh_description"
+						ng-model="selectedEntry.description"
 						ng-readonly="operation == 'show'" required="required">
 					<br>
 				</div>
@@ -228,7 +228,7 @@
                     
 			function newEntry(entry){
 				delete $scope.selectedEntry._selected_;
-				$http.post(url+'/'+entry.boh_id, entry)
+				$http.post(url+'/'+entry.id, entry)
 				.success(function(){
 					refreshData();
 					$scope.selectedEntry = null;
@@ -242,7 +242,7 @@
 			
 			function updateEntry(entry){
 				delete $scope.selectedEntry._selected_;
-				$http.put(url+'/'+entry.boh_id, entry)
+				$http.put(url+'/'+entry.id, entry)
 					.success(function(){
 						refreshData();
 	                    $scope.operation = 'show';
@@ -255,7 +255,7 @@
 
 			function deleteEntry(entry){
 				var primaryKey;
-				primaryKey = "boh_id";
+				primaryKey = "id";
 				var deleteUrl = url+'/'+entry[primaryKey];
 				$http.delete(deleteUrl)
 				.success(function(){

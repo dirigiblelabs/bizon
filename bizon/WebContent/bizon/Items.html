@@ -45,29 +45,29 @@
 			<table class="table table-condensed">
 				<thead>
 					<tr>
-						<th>BOI_ID</th>
-						<th>BOI_BOH_NAME</th>
-						<th>BOI_NAME</th>
-						<th>BOI_COLUMN</th>
-						<th>BOI_TYPE_NAME</th>
-						<th>BOI_TYPE</th>
-						<th>BOI_LENGTH</th>
-						<th>BOI_NULL</th>
-						<th>BOI_DEFAULT</th>
+						<th>ID</th>
+						<th>ENTITY_NAME</th>
+						<th>NAME</th>
+						<th>COLUMN</th>
+						<th>TYPE_LABEL</th>
+						<th>TYPE</th>
+						<th>SIZE</th>
+						<th>REQIRED</th>
+						<th>DEFAULT</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr class="selected-{{entry._selected_}}" ng-repeat="entry in data"
 						ng-click="showInfoForEntry(entry)">
-						<td>{{entry.boi_id}}</td>
-						<td>{{entry.boi_boh_name}}</td>
-						<td>{{entry.boi_name}}</td>
-						<td>{{entry.boi_column}}</td>
-						<td>{{entry.boi_type_name}}</td>
-						<td>{{entry.boi_type}}</td>						
-						<td>{{entry.boi_length}}</td>
-						<td>{{entry.boi_null}}</td>
-						<td>{{entry.boi_default}}</td>
+						<td>{{entry.id}}</td>
+						<td>{{entry.entityName}}</td>
+						<td>{{entry.name}}</td>
+						<td>{{entry.column}}</td>
+						<td>{{entry.typeLabel}}</td>
+						<td>{{entry.type}}</td>						
+						<td>{{entry.size}}</td>
+						<td>{{entry.required}}</td>
+						<td>{{entry.defaultValue}}</td>
 					</tr>
 				</tbody>
 			</table>
@@ -94,48 +94,48 @@
 			<div>
 				<!-- input form -->
 				<div>
-					<label>BOI_ID</label>
+					<label>ID</label>
 					<input type="text" class="form-control" 
-						ng-model="selectedEntry.boi_id" readonly> <br>
+						ng-model="selectedEntry.id" readonly> <br>
 					<br>
-					<label>BOI_BOH_NAME</label>
+					<label>ENTITY_NAME</label>
 					<input type="text" class="form-control" 
-						ng-model="selectedEntry.boi_boh_name"
+						ng-model="selectedEntry.entityName"
 						ng-readonly="operation == 'show'" required="required">
 					<br>
-					<label>BOI_NAME</label>
+					<label>NAME</label>
 					<input type="text" class="form-control" 
-						ng-model="selectedEntry.boi_name"
+						ng-model="selectedEntry.name"
 						ng-readonly="operation == 'show'" required="required">
 					<br>
-					<label>BOI_COLUMN</label>
+					<label>COLUMN</label>
 					<input type="text" class="form-control" 
-						ng-model="selectedEntry.boi_column"
+						ng-model="selectedEntry.column"
 						ng-readonly="operation == 'show'" required="required">
 					<br>
-					<label>BOI_TYPE_NAME</label>
+					<label>TYPE_LABEL</label>
 					<input type="text" class="form-control" 
-						ng-model="selectedEntry.boi_type_name"
+						ng-model="selectedEntry.typeLabel"
 						ng-readonly="operation == 'show'" required="required">
 					<br>
-					<label>BOI_TYPE</label>
+					<label>TYPE</label>
 					<input type="text" class="form-control" 
-						ng-model="selectedEntry.boi_type"
+						ng-model="selectedEntry.type"
 						ng-readonly="operation == 'show'" required="required">
 					<br>					
-					<label>BOI_LENGTH</label>
+					<label>SIZE</label>
 					<input type="text" class="form-control" 
-						ng-model="selectedEntry.boi_length"
+						ng-model="selectedEntry.size"
 						ng-readonly="operation == 'show'" required="required">
 					<br>
-					<label>BOI_NULL</label>
+					<label>REQUIRED</label>
 					<input type="text" class="form-control" 
-						ng-model="selectedEntry.boi_null"
+						ng-model="selectedEntry.required"
 						ng-readonly="operation == 'show'" required="required">
 					<br>
-					<label>BOI_DEFAULT</label>
+					<label>DEFAULT</label>
 					<input type="text" class="form-control" 
-						ng-model="selectedEntry.boi_default"
+						ng-model="selectedEntry.defaultValue"
 						ng-readonly="operation == 'show'" required="required">
 					<br>
 				</div>
@@ -269,7 +269,7 @@
 			
 			function updateEntry(entry){
 				delete $scope.selectedEntry._selected_;
-				$http.put(url+'/'+entry["boi_id"], entry)
+				$http.put(url+'/'+entry["id"], entry)
 					.success(function(){
 						refreshData();
 	                    $scope.operation = 'show';
@@ -281,7 +281,7 @@
 			}
 
 			function deleteEntry(entry){
-				var deleteUrl = url+"/"+entry["boi_id"];
+				var deleteUrl = url+"/"+entry["id"];
 				$http.delete(deleteUrl)
 				.success(function(){
 					refreshData();

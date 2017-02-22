@@ -13,7 +13,7 @@
 		                	var location = res.headers('Location');
 		                	if(location){
 		                		var id = location.substring(location.lastIndexOf('/')+1);
-		                		angular.extend(res.resource, { "boh_id": id });
+		                		angular.extend(res.resource, { "id": id });
 	                		} else {
 	                			$log.error('Cannot infer id after save operation. HTTP Response Header "Location" is missing: ' + location);
 	            			}
@@ -36,12 +36,12 @@
 	  	var res = $resource('../../js/bizon/svc/v1/header.js/:boId', { boId:'@id' }, cfg);
 
 		res.newObjectTemplate = {
-				"boh_name":"BizEntity",
-				"boh_label":"Business Object Name",
-				"boh_description":"Description for business object",
-				"boh_ds_gen_enabled": true,
-				"boh_svc_gen_enabled": true,
-				"boh_ui_gen_enabled": true
+				"name":"BizEntity",
+				"label":"Business Object Name",
+				"description":"Description for business object",
+				"dsGenEnabled": true,
+				"svcGenEnabled": true,
+				"uiGenEnabled": true
 			};
 			
 		return res;
@@ -64,12 +64,12 @@
 	  	var res = $resource('../../js/bizon/svc/v1/item.js/:boId', { boId:'@id' }, ResourceSvcConfiguration.cfg);
 		
 		res.newObjectTemplate = {
-					"boi_name":"Item",
-					"boi_column":"Item",
-					"boi_type_name": "Text",					
-					"boi_type": "VARCHAR",
-					"boi_length": 100,					
-					"boi_null": true,
+					"name":"Item",
+					"column":"Item",
+					"typeLabel": "Text",					
+					"type": "VARCHAR",
+					"size": 100,					
+					"required": true,
 				};
 		return res;
 	}])
@@ -107,12 +107,12 @@
 			obj.properties = [];
 			for(var i = 0; i < 3; i++){
 				var item = angular.copy(Item.newObjectTemplate);
-				item.boi_name += ' ' +i;
-				item.boi_column += i;
-				item.boi_boh_name = obj.boh_name;
+				item.name += ' ' +i;
+				item.column += i;
+				item.entityName = obj.name;
 				obj.properties.push(item);
 			}
-			obj.properties[0].boi_null = false;			
+			obj.properties[0].required = false;			
 			return obj;
 		}
 		
@@ -120,7 +120,7 @@
 		this.batchLoadedMasterData = [];//data cache
 		this.querySettings = {
 			$limit: 100,
-			$sort: 'boh_label',
+			$sort: 'label',
 			$order: 'asc'
 		};
 		this.selection = [];
@@ -169,7 +169,7 @@
 		*/
 		this.get = function(id, lookupRemotelyOnDemand){
 			var itemHit = this.batchLoadedMasterData.filter(function(item){
-					if(item.boh_id == id ){
+					if(item.id == id ){
 						return true;
 					}
 					return false;
@@ -200,7 +200,7 @@
 		
 		this.getByName = function(name, lookupRemotelyOnDemand){
 			var itemHit = this.batchLoadedMasterData.filter(function(item){
-					if(item.boh_name == name ){
+					if(item.name == name ){
 						return true;
 					}
 					return false;
@@ -208,7 +208,7 @@
 			if(itemHit) {
 				return $q.when(itemHit);
 			} else if(lookupRemotelyOnDemand) {
-				return Entity.getByName({"boh_name":name, $filter:"boh_name"}).$promise
+				return Entity.getByName({"name":name, $filter:"name"}).$promise
 				.then(function(item){
 					if(item){
 						return self.next.apply(self);
@@ -236,7 +236,7 @@
 				  The second parameter addresses precisely these situations.	
 		*/
 		this.findByName = function(name){
-			return EntityQueryByName.queryByName({"boh_label":name, $filter:"boh_label"}).$promise;
+			return EntityQueryByName.queryByName({"label":name, $filter:"label"}).$promise;
 		};		
 
 		this._itemsCount;
@@ -284,9 +284,9 @@
 			var entity = template;
 			if(!entity){
 				entity = this.masterDataTemplateObject = createMasterDataTemplateObject();
-				entity.boh_name += createRandomAlphanumeric();
+				entity.name += createRandomAlphanumeric();
 				entity.properties.map(function(prop){
-					prop.boi_boh_name = entity.boh_name;
+					prop.entityName = entity.name;
 					return prop;
 				});
 			}
@@ -313,9 +313,9 @@
 					delete item.action;
 					var $promise;
 					if(action === 'remove') {
-			        	$promise = Item.remove({boId: item.boi_id}).$promise;
+			        	$promise = Item.remove({boId: item.id}).$promise;
 		        	} else {
-	        			$promise = Item[action]({boId: item.boi_id}, item).$promise;
+	        			$promise = Item[action]({boId: item.id}, item).$promise;
 	        		}
 	        		return $promise;
 		    	});
@@ -330,15 +330,15 @@
 					delete item.action;
 					var $promise;
 					if(action === 'remove') {
-			        	$promise = Relation.remove({boId: item.bor_id}).$promise;			        	
+			        	$promise = Relation.remove({boId: item.id}).$promise;			        	
 		        	} else {
-		        		$promise = Relation[action]({boId: item.bor_id}, item).$promise;		        		
+		        		$promise = Relation[action]({boId: item.id}, item).$promise;		        		
 	        		}
 	        		return $promise;
 		    	}));
 			}
 			//finally, push request for update for the header too
-			promises.unshift(Entity.update({boId: header.boh_id}, header).$promise);
+			promises.unshift(Entity.update({boId: header.id}, header).$promise);
 			//promises.push(refresh.apply(self));
 	    	return $q.all(promises).then(function(){
 	    		refresh.apply(self);

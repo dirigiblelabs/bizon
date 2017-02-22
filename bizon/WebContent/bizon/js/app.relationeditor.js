@@ -43,14 +43,14 @@ angular.module('businessObjects')
 	function init(){
 		if(isNewProperty) {
 			this.relation = {
-				boi_type: 'Relationship'
+				type: 'Relationship'
 			};
-			this.relation.bor_src_boh_name = selectedEntity.boh_name;
-			this.relation.bor_src_type = MULTIPLICITY_OPTS.ONE;
-			this.relation.bor_name = selectedEntity.boh_name +'- ';
+			this.relation.srcEntityName = selectedEntity.name;
+			this.relation.srcMultiplicity = MULTIPLICITY_OPTS.ONE;
+			this.relation.name = selectedEntity.name +'- ';
 		} else {
-			if(this.relation.bor_target_boh_name){
-				masterDataSvc.getByName(this.relation.bor_target_boh_name, true)
+			if(this.relation.targetEntityName){
+				masterDataSvc.getByName(this.relation.targetEntityName, true)
 				.then(function(target){
 					self.relation.target = target;
 				});			
@@ -81,15 +81,15 @@ angular.module('businessObjects')
 	};
 	
 	this.changeTarget = function(){
-/*		var nameSegments = self.relation.bor_name.split('-');
+/*		var nameSegments = self.relation.name.split('-');
 		if(self.relation.target){
-			nameSegments[1] = self.relation.target.boh_label;	
+			nameSegments[1] = self.relation.target.label;	
 		} else {
 			nameSegments[1] = "[No target selected yet]";
 		}
-		self.relation.bor_name = nameSegments.join('-');*/
+		self.relation.name = nameSegments.join('-');*/
 		//TODO: implement in case we need some special formatting
-		return (self.relation.target && self.relation.target.boh_label) || '';
+		return (self.relation.target && self.relation.target.label) || '';
 	};
     
     this.cancel = function() {
@@ -103,7 +103,7 @@ angular.module('businessObjects')
     	}
 		sliderValueToRelation.apply(self, [self.slider.value, self.relation]);
 		if(this.relation.target)
-  			this.relation.bor_target_boh_name = this.relation.target.boh_name;
+  			this.relation.targetEntityName = this.relation.target.name;
 		if(isNewProperty){      	
 		  this.relation.action = 'save';
 		  selectedEntity['outbound-relations'].push(this.relation); 
@@ -112,7 +112,7 @@ angular.module('businessObjects')
 				this.relation.action = 'update';
 			selectedEntity['outbound-relations'] = selectedEntity['outbound-relations']
 										.map(function(rel){
-											if(rel.bor_id === self.relation.bor_id){
+											if(rel.id === self.relation.id){
 												return self.relation;
 											}
 											return rel;
@@ -123,23 +123,23 @@ angular.module('businessObjects')
     
     function sliderValueToRelation(sliderValue, relation){
     	if(sliderValue === MULTIPLICITY_TYPES.ONE_TO_ONE){
-      		relation.bor_src_type = MULTIPLICITY_OPTS.ONE;
-      		relation.bor_target_type = MULTIPLICITY_OPTS.ONE;
+      		relation.srcMultiplicity = MULTIPLICITY_OPTS.ONE;
+      		relation.targetMultiplicity = MULTIPLICITY_OPTS.ONE;
   		} else if(sliderValue === MULTIPLICITY_TYPES.ONE_TO_MANY){
-  			relation.bor_src_type = MULTIPLICITY_OPTS.MANY;
-      		relation.bor_target_type = MULTIPLICITY_OPTS.ONE;
+  			relation.srcMultiplicity = MULTIPLICITY_OPTS.MANY;
+      		relation.targetMultiplicity = MULTIPLICITY_OPTS.ONE;
   		} else if(sliderValue === MULTIPLICITY_TYPES.MANY_TO_MANY){
-  			relation.bor_src_type = MULTIPLICITY_OPTS.MANY;
-      		relation.bor_target_type = MULTIPLICITY_OPTS.MANY;
+  			relation.srcMultiplicity = MULTIPLICITY_OPTS.MANY;
+      		relation.targetMultiplicity = MULTIPLICITY_OPTS.MANY;
   		}
     }
     
     function relationToSlider(relation, slider){
-		if(relation.bor_src_type === MULTIPLICITY_OPTS.ONE && relation.bor_target_type === MULTIPLICITY_OPTS.ONE){
+		if(relation.srcMultiplicity === MULTIPLICITY_OPTS.ONE && relation.targetMultiplicity === MULTIPLICITY_OPTS.ONE){
       		slider.value = MULTIPLICITY_TYPES.ONE_TO_ONE;
-  		} else if(relation.bor_src_type === MULTIPLICITY_OPTS.MANY && relation.bor_target_type === MULTIPLICITY_OPTS.ONE){
+  		} else if(relation.srcMultiplicity === MULTIPLICITY_OPTS.MANY && relation.targetMultiplicity === MULTIPLICITY_OPTS.ONE){
   		 	slider.value = MULTIPLICITY_TYPES.ONE_TO_MANY;
-  		} else if(relation.bor_src_type === MULTIPLICITY_OPTS.MANY && relation.bor_target_type === MULTIPLICITY_OPTS.MANY){
+  		} else if(relation.srcMultiplicity === MULTIPLICITY_OPTS.MANY && relation.targetMultiplicity === MULTIPLICITY_OPTS.MANY){
   			slider.value = MULTIPLICITY_TYPES.MANY_TO_MANY;
   		}			
     }    

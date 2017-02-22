@@ -22,7 +22,7 @@ new DataService(headerDAO).service();
 				try {
 					var objectsForImport = JSON.parse(content);
 					for(var i=0; i< objectsForImport.length; i++){
-						this.logger.info('Inserting object ' + objectsForImport[i].boh_label);
+						this.logger.info('Inserting object ' + objectsForImport[i].label);
 						objectsForImport[i][self.dao.getPrimaryKey()] = self.dao.insert(objectsForImport[i], true);
 					}
 					uploadStatus.status="ok";

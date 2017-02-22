@@ -61,12 +61,12 @@ angular.module('businessObjects')
 	
 	this.typeSelectionChanged = function(){
 		this.typeVariantsSlider.value = undefined;
-		this.item.boi_type_name = this.selectedTypeOption.val;
+		this.item.typeLabel = this.selectedTypeOption.val;
 		if(this.selectedTypeOption.variants){
 			this.typeVariantsSlider.options.stepsArray = this.selectedTypeOption.variants;
-			this.item.boi_type = this.selectedTypeOption.variants[0].typemap;
+			this.item.type = this.selectedTypeOption.variants[0].typemap;
 		} else {
-			this.item.boi_type = this.selectedTypeOption.typemap;
+			this.item.type = this.selectedTypeOption.typemap;
 		}
 	};
 
@@ -76,15 +76,15 @@ angular.module('businessObjects')
 			});
 		if(isNewProperty) {
 			this.item = angular.copy(Item.newObjectTemplate);
-			this.item.boi_boh_name = selectedEntity.boh_name;
+			this.item.entityName = selectedEntity.name;
 		}
 		this.selectedTypeOption = this.typeOptions.find(function(typeOption){
-					return typeOption.val === self.item.boi_type_name;
+					return typeOption.val === self.item.typeLabel;
 				});
 		if(this.selectedTypeOption.variants){
 			this.typeVariantsSlider.options.stepsArray = this.selectedTypeOption.variants;
 			this.selectedTypeOption.variant = this.selectedTypeOption.variants.find(function(variant){
-					return variant.typemap === self.item.boi_type;
+					return variant.typemap === self.item.type;
 				});
 			this.typeVariantsSlider.value = this.selectedTypeOption.variant.value;
 		}
@@ -101,7 +101,7 @@ angular.module('businessObjects')
       } else {
       	this.item.action = 'update';
       	selectedEntity.properties = selectedEntity.properties.map(function(prop){
-      		if(prop.boi_id === self.item.boi_id){
+      		if(prop.id === self.item.id){
       			return self.item;
       		}
       		return prop;
@@ -116,7 +116,7 @@ angular.module('businessObjects')
     	self.selectedTypeOption.variant = self.selectedTypeOption.variants.find(function(variant){
 	    		return variant.value === modelValue;
 	    	});
-    	self.item.boi_type = self.selectedTypeOption.variant.typemap;    	
+    	self.item.type = self.selectedTypeOption.variant.typemap;    	
     }
         
 }]);

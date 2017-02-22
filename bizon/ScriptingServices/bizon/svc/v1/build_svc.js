@@ -9,13 +9,13 @@ function getBaseTemplate(projectName, packageName, entity){
 	var baseTemplate = {
 		"projectName":projectName,
 		"packageName":packageName,
-	  	"fileName": entity.boh_label.replace(/\s+/g, '_')
+	  	"fileName": entity.label.replace(/\s+/g, '_')
 	};
 	baseTemplate.columns = [];	
 	if(entity.properties){
 		for(var j=0; j< entity.properties.length; j++){
 			var prop = entity.properties[j];
-			if(!prop.boi_name)
+			if(!prop.name)
 				continue;
 			prop = createSQLEntity(prop);
 			baseTemplate.columns.push(prop);
@@ -27,20 +27,20 @@ function getBaseTemplate(projectName, packageName, entity){
 }
 
 function generateDataStructure(entity, template, worker){
-	if(!entity.boh_ds_gen_enabled)
+	if(!entity.dsGenEnabled)
 		return;
 	template.templateType = 'table';
-	template.fileName = entity.boh_table + '.table';
+	template.fileName = entity.table + '.table';
 	console.log('[Table Template Source]:' + template);
 	return worker.generate(template);
 }
 
 function generateService(entity, template, worker){
-	if(!entity.boh_svc_gen_enabled)
+	if(!entity.svcGenEnabled)
 		return;
 	template.templateType = "js_database_crud";
-	template.tableName = entity.boh_table;			
-	template.fileName = entity.boh_svc_name + '.js';
+	template.tableName = entity.table;			
+	template.fileName = entity.svcName + '.js';
 	template.tableType = "table";	
 	template.columns = template.columns.map(function(column){
 		column.visible = column.boi_visible || true;	
@@ -51,10 +51,10 @@ function generateService(entity, template, worker){
 }
 
 function generateUIForEntity(entity, template, worker){
-	if(!entity.boh_ui_gen_enabled)
+	if(!entity.uiGenEnabled)
 		return;
 	template.templateType = "list_and_manage";
-	template.pageTitle = entity.boh_ui_title || entity.boh_name;
+	template.pageTitle = entity.uiTitle || entity.name;
 	template.tableName = template.fileName;
 	template.serviceEndpoint = '/'+template.packageName+'/'+template.fileName;	
 	template.fileName = template.fileName.replace('.js','.html');
@@ -107,12 +107,12 @@ function defaultValueBySQLType(type){
 }
 
 function createEntityIDColumnDef(entity){
-	var dataType = entity.boh_id_datatype_code || 'INTEGER';
+	var dataType = entity.idType || 'INTEGER';
 	return {
-		name: entity.boh_id_name || 'id',	
+		name: entity.idName || 'id',	
 		type: dataType,
 		primaryKey: true,	
-		length: entity.boi_length || lengthBySQLType(dataType),
+		length: entity.size || lengthBySQLType(dataType),
 		notNull: true,
 		defaultValue: defaultValueBySQLType(dataType),
 	};
@@ -121,18 +121,18 @@ function createEntityIDColumnDef(entity){
 //Prepare a JSON object for insert into DB
 function createSQLEntity(item) {
 	var persistentItem = {
-		length: item.boi_length || 0,
-		notNull: item.boi_null || true,
+		length: item.size || 0,
+		notNull: item.required || true,
 		primaryKey: false,
-		defaultValue: item.boi_default || ''
+		defaultValue: item.defaultValue || ''
 	};
-	persistentItem.name = item.boi_name.replace(/\s+/g, '_');	
-	persistentItem.type = item.boi_type;//stringToCodeItemTypeMapping(item.boi_type);
+	persistentItem.name = item.name.replace(/\s+/g, '_');	
+	persistentItem.type = item.type;//stringToCodeItemTypeMapping(item.type);
 	if(!persistentItem.length){
-		if(item.boi_type=== 'VARCHAR'){
+		if(item.type=== 'VARCHAR'){
 			persistentItem.length = 255;
 		}
-		//TODO: add default legnths for all relevant sql types
+		//TODO: add default lengths for all relevant sql types
 	}
 	if(persistentItem.defaultValue === undefined){
 		persistentItem.defaultValue = '';

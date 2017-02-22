@@ -46,25 +46,25 @@
 			<table class="table table-condensed">
 				<thead>
 					<tr>
-						<th>BOR_ID</th>
-						<th>BOR_SRC_BOH_NAME</th>
-						<th>BOR_SRC_TYPE</th>
-						<th>BOR_TARGET_BOH_NAME</th>
-						<th>BOR_TARGET_TYPE</th>
-						<th>BOR_NAME</th>
-						<th>BOR_TYPE</th>						
+						<th>ID</th>
+						<th>SRC ENTITY NAME</th>
+						<th>SRC MULTIPLICITY</th>
+						<th>TARGET ENTITY NAME</th>
+						<th>TARGET MULTIPLICITY</th>
+						<th>NAME</th>
+						<th>TYPE</th>						
 					</tr>
 				</thead>
 				<tbody>
 					<tr class="selected-{{entry._selected_}}" ng-repeat="entry in data"
 						ng-click="showInfoForEntry(entry)">
-						<td>{{entry.bor_id}}</td>
-						<td>{{entry.bor_src_boh_name}}</td>
-						<td>{{entry.bor_src_type}}</td>
-						<td>{{entry.bor_target_boh_name}}</td>
-						<td>{{entry.bor_target_type}}</td>
-						<td>{{entry.bor_name}}</td>						
-						<td>{{entry.bor_type}}</td>												
+						<td>{{entry.id}}</td>
+						<td>{{entry.srcEntityName}}</td>
+						<td>{{entry.srcMultiplicity}}</td>
+						<td>{{entry.targetEntityName}}</td>
+						<td>{{entry.targetMultiplicity}}</td>
+						<td>{{entry.name}}</td>						
+						<td>{{entry.type}}</td>												
 					</tr>
 				</tbody>
 			</table>
@@ -91,38 +91,38 @@
 			<div>
 				<!-- input form -->
 				<div>
-					<label>BOR_ID</label>
+					<label>ID</label>
 					<input type="text" class="form-control" 
-						ng-model="selectedEntry.bor_id" readonly> <br>
+						ng-model="selectedEntry.id" readonly> <br>
 					<br>
-					<label>BOR_SRC_BOH_NAME</label>
+					<label>SRC ENTITY NAME</label>
 					<input type="text" class="form-control" 
-						ng-model="selectedEntry.bor_src_boh_name"
+						ng-model="selectedEntry.srcEntityName"
 						ng-readonly="operation == 'show'" required="required">
 					<br>
-					<label>BOR_SRC_TYPE</label>
+					<label>SRC MULTIPLICITY</label>
 					<input type="text" class="form-control" 
-						ng-model="selectedEntry.bor_src_type"
+						ng-model="selectedEntry.srcMultiplicity"
 						ng-readonly="operation == 'show'" required="required">
 					<br>
-					<label>BOR_TARGET_BOH_NAME</label>
+					<label>TARGET ENTITY NAME</label>
 					<input type="text" class="form-control" 
-						ng-model="selectedEntry.bor_target_boh_name"
+						ng-model="selectedEntry.targetEntityName"
 						ng-readonly="operation == 'show'" required="required">
 					<br>
-					<label>BOR_TARGET_TYPE</label>
+					<label>TARGET MULTIPLICITY</label>
 					<input type="text" class="form-control" 
-						ng-model="selectedEntry.bor_target_type"
+						ng-model="selectedEntry.targetMultiplicity"
 						ng-readonly="operation == 'show'" required="required">
 					<br>
-					<label>BOR_NAME</label>
+					<label>NAME</label>
 					<input type="text" class="form-control" 
-						ng-model="selectedEntry.bor_name"
+						ng-model="selectedEntry.name"
 						ng-readonly="operation == 'show'" required="required">
 					<br>
-					<label>BOR_TYPE</label>
+					<label>TYPE</label>
 					<input type="text" class="form-control" 
-						ng-model="selectedEntry.bor_type"
+						ng-model="selectedEntry.type"
 						ng-readonly="operation == 'show'" required="required">
 						
 					<br>					
@@ -243,7 +243,7 @@
                     
 			function newEntry(entry){
 				delete $scope.selectedEntry._selected_;
-				$http.post(url+'/'+entry.bor_id, entry)
+				$http.post(url+'/'+entry.id, entry)
 				.success(function(){
 					refreshData();
 					$scope.selectedEntry = null;
@@ -257,7 +257,7 @@
 			
 			function updateEntry(entry){
 				delete $scope.selectedEntry._selected_;
-				$http.put(url+'/'+entry.bor_id, entry)
+				$http.put(url+'/'+entry.id, entry)
 					.success(function(){
 						refreshData();
 	                    $scope.operation = 'show';
@@ -270,7 +270,7 @@
 
 			function deleteEntry(entry){
 				var primaryKey;
-				primaryKey = "bor_id";
+				primaryKey = "id";
 				var deleteUrl = url+"?"+primaryKey+"="+entry[primaryKey];
 				$http.delete(deleteUrl)
 				.success(function(){

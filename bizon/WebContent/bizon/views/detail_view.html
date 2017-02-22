@@ -30,8 +30,8 @@ button.list-group-item:active, button.list-group-item:focus {
 				<i class="fa fa-th"></i>
 			</div>
 			<div class="object-title">
-				<p class="title">{{detailsVm.selectedEntity.boh_label}}</p>
-	    		<p class="subtitle">{{detailsVm.selectedEntity.boh_description}}</p>						
+				<p class="title">{{detailsVm.selectedEntity.label}}</p>
+	    		<p class="subtitle">{{detailsVm.selectedEntity.description}}</p>						
 			</div>
 		</section> 
 	</section>
@@ -58,12 +58,12 @@ button.list-group-item:active, button.list-group-item:focus {
 				<div class="items-list">
 					<div ng-hide="detailsVm.propertyItems.length" class="nodata-text">No Items</div>
 					<div class="list-group" ng-if="detailsVm.propertyItems.length>0">
-					  <a class="list-group-item" ng-repeat="entry in detailsVm.propertyItems|filter:detailsVm.searchText|orderBy:['boi_name']">
+					  <a class="list-group-item" ng-repeat="entry in detailsVm.propertyItems|filter:detailsVm.searchText|orderBy:['name']">
 						<div class="list-group-item-title">
-							<span ng-class="{emphasized: !entry.boi_null}">{{entry.boi_name}}</span><i class="fa fa-asterisk required" aria-hidden="true" ng-if="!entry.boi_null"></i>
-							<span class="optional" ng-if="entry.boi_null">(optional)</span>
+							<span ng-class="{emphasized: !entry.required}">{{entry.name}}</span><i class="fa fa-asterisk required" aria-hidden="true" ng-if="!entry.required"></i>
+							<span class="optional" ng-if="entry.required">(optional)</span>
 						</div>
-						<div class="list-group-item-text" ng-if="entry.boi_type!=='Relationship'">Data Type: <span style="color: gray; font-style: italic">{{entry.boi_type_name}}<span></div>
+						<div class="list-group-item-text" ng-if="entry.type!=='Relationship'">Data Type: <span style="color: gray; font-style: italic">{{entry.typeLabel}}<span></div>
 					  </a>
 					</div>
 				</div>	
@@ -74,14 +74,14 @@ button.list-group-item:active, button.list-group-item:focus {
 				<div class="items-list">
 					<div class="list-group">
 					  <div class="list-group-item" ng-click="$event.stopPropagation();" style="outline: none; cursor: auto; background-color: #f5f5f5">
-						Outbound relations from <span style="font-style:italic">{{detailsVm.selectedEntity.boh_label}}</span> to other entities <i class="fa fa-arrow-right"></i>
+						Outbound relations from <span style="font-style:italic">{{detailsVm.selectedEntity.label}}</span> to other entities <i class="fa fa-arrow-right"></i>
 					  </div>					
-					  <button type="button" class="list-group-item" ng-repeat="entry in detailsVm.outboundRelations|filter:detailsVm.searchText|orderBy:['bor_name']" ng-click="$event.stopPropagation();" style="outline: none; cursor: auto;">
+					  <button type="button" class="list-group-item" ng-repeat="entry in detailsVm.outboundRelations|filter:detailsVm.searchText|orderBy:['name']" ng-click="$event.stopPropagation();" style="outline: none; cursor: auto;">
 						<div class="list-group-item-title">
-							<span class="emphasized">{{entry.bor_name}}</span>
+							<span class="emphasized">{{entry.name}}</span>
 						</div>
 						<div class="list-group-item-text">
-							Relation Type: <span style="color: gray; font-style: italic">{{entry.bor_type===1?'Association':'Composition'}}</span> in <a ng-href="#/{{entry.target.boh_id}}">{{entry.target.boh_label}}</a>
+							Relation Type: <span style="color: gray; font-style: italic">{{entry.type===1?'Association':'Composition'}}</span> in <a ng-href="#/{{entry.target.id}}">{{entry.target.label}}</a>
 						</div>						
 					  </button>
 					</div>
@@ -90,14 +90,14 @@ button.list-group-item:active, button.list-group-item:focus {
 				<div class="items-list">									
 					<div class="list-group">
 					  <div class="list-group-item" ng-click="$event.stopPropagation();" style="outline: none; cursor: auto; background-color: #f5f5f5">
-						Inbound relations from other entities to <span style="font-style:italic">{{detailsVm.selectedEntity.boh_label}}</span> <i class="fa fa-arrow-left"></i>
+						Inbound relations from other entities to <span style="font-style:italic">{{detailsVm.selectedEntity.label}}</span> <i class="fa fa-arrow-left"></i>
 					  </div>										
-					  <button type="button" class="list-group-item" ng-repeat="entry in detailsVm.inboundRelations|filter:detailsVm.searchText|orderBy:['bor_name']" ng-click="$event.stopPropagation();" style="outline: none; cursor: auto;">
+					  <button type="button" class="list-group-item" ng-repeat="entry in detailsVm.inboundRelations|filter:detailsVm.searchText|orderBy:['name']" ng-click="$event.stopPropagation();" style="outline: none; cursor: auto;">
 						<div class="list-group-item-title">
-							<span class="emphasized">{{entry.bor_name}}</span>
+							<span class="emphasized">{{entry.name}}</span>
 						</div>
 						<div class="list-group-item-text">
-							Relation Type: <span style="color: gray; font-style: italic">{{entry.bor_type==1?'Association':'Composition'}}</span> of <a ng-href="#/{{entry.source.boh_id}}">{{entry.source.boh_label}}</a>
+							Relation Type: <span style="color: gray; font-style: italic">{{entry.type==1?'Association':'Composition'}}</span> of <a ng-href="#/{{entry.source.id}}">{{entry.source.label}}</a>
 						</div>						
 					  </button>
 					</div>
@@ -110,26 +110,26 @@ button.list-group-item:active, button.list-group-item:focus {
 					<div class="panel panel-default" style="border-left:0; border-right:0; border-radius:0">
 					  <div class="panel-heading clearfix">
 					    <h3 class="panel-title" style="display: inline-block">Data Structure</h3>
-					    <div class="pull-right">[Generation {{detailsVm.selectedEntity.boh_ds_gen_enabled?'Enabled':'Disabled'}}]</div>
+					    <div class="pull-right">[Generation {{detailsVm.selectedEntity.dsGenEnabled?'Enabled':'Disabled'}}]</div>
 					  </div>
 					  <div class="panel-body">
 					  	<div>
 						  <div class="form-group" ng-if="detailsVm.filterConfigurationEntries(detailsVm.searchText, 'Database Table Name')">
 						    <label for="table" class="col-sm-3 control-label" required="true">Database Table Name</label>
 						    <div class="col-sm-5">
-						    	<p name="table" id="table" class="form-control-static" ng-bind="detailsVm.selectedEntity.boh_table"></p>
+						    	<p name="table" id="table" class="form-control-static" ng-bind="detailsVm.selectedEntity.table"></p>
 						    </div>
 						  </div>
 						  <div class="form-group" ng-if="detailsVm.filterConfigurationEntries(detailsVm.searchText, 'Entity Identifier Name')">
 						    <label for="primaryKey" class="col-sm-3 control-label" required="true">Entity Identifier Name</label>
 						    <div class="col-sm-5">
-						    	<p name="primaryKey" id="primaryKey" class="form-control-static" ng-bind="detailsVm.selectedEntity.boh_id_name"></p>				    
+						    	<p name="primaryKey" id="primaryKey" class="form-control-static" ng-bind="detailsVm.selectedEntity.idName"></p>				    
 						    </div>
 						  </div>
 						  <div class="form-group" ng-if="detailsVm.filterConfigurationEntries(detailsVm.searchText, 'Entity Identifier Data Type')">
 						    <label for="primaryKeyType" class="col-sm-3 control-label" required="true">Entity Identifier Data Type</label>
 						    <div class="col-sm-5">
-						    	<p name="primaryKeyType" id="primaryKeyType" class="form-control-static" ng-bind="detailsVm.selectedEntity.boh_id_datatype_code"></p>				    
+						    	<p name="primaryKeyType" id="primaryKeyType" class="form-control-static" ng-bind="detailsVm.selectedEntity.idType"></p>				    
 						    </div>
 						  </div>						  
 						</div>
@@ -138,13 +138,13 @@ button.list-group-item:active, button.list-group-item:focus {
 					<div class="panel panel-default" style="border-left:0; border-right:0; border-radius:0">
 					  <div class="panel-heading">
 					    <h3 class="panel-title clearifx" style="display: inline-block">Service</h3>
-						<div class="pull-right">[Generation {{detailsVm.selectedEntity.boh_svc_gen_enabled?'Enabled':'Disabled'}}]</div>
+						<div class="pull-right">[Generation {{detailsVm.selectedEntity.svcGenEnabled?'Enabled':'Disabled'}}]</div>
 					  </div>
 					  <div class="panel-body">				  
 						<div class="form-group"  ng-if="detailsVm.filterConfigurationEntries(detailsVm.searchText, 'Service Name')">
 						  <label for="service" class="col-sm-3 control-label" required="true">Service Name</label>
 						  <div class="col-sm-5">
-						  	<p name="service" id="service" class="form-control-static" ng-bind="detailsVm.selectedEntity.boh_svc_name"></p>
+						  	<p name="service" id="service" class="form-control-static" ng-bind="detailsVm.selectedEntity.svcName"></p>
 						  </div>
 						</div>						  
 					  </div>
@@ -152,13 +152,13 @@ button.list-group-item:active, button.list-group-item:focus {
 					<div class="panel panel-default" style="border-left:0; border-right:0; border-radius:0">
 					  <div class="panel-heading">
 					    <h3 class="panel-title clearifx" style="display: inline-block">UI</h3>
-						<div class="pull-right">[Generation {{detailsVm.selectedEntity.boh_ui_gen_enabled?'Enabled':'Disabled'}}]</div>
+						<div class="pull-right">[Generation {{detailsVm.selectedEntity.uiGenEnabled?'Enabled':'Disabled'}}]</div>
 					  </div>
 					  <div class="panel-body">
 						<div class="form-group" ng-if="detailsVm.filterConfigurationEntries(detailsVm.searchText, 'Page Title')">
 						  <label for="ui-title" class="col-sm-3 control-label" required="true">Page Title</label>
 						  <div class="col-sm-5">
-						  	<p name="ui-title" id="ui-title" class="form-control-static" ng-bind="detailsVm.selectedEntity.boh_ui_title"></p>
+						  	<p name="ui-title" id="ui-title" class="form-control-static" ng-bind="detailsVm.selectedEntity.uiTitle"></p>
 						  </div>
 						</div>						  
 					  </div>

@@ -28,7 +28,7 @@
                         "type": "boolean"
                     },
                     {
-                        "name": "boi_id",
+                        "name": "id",
                         "in": "query",
                         "description": "Identifier of the 'Bo_item' object",
                         "required": false,
@@ -151,7 +151,7 @@
                 "description": "Deletes 'Bo_item' objects.\n",
                 "parameters": [
                     {
-                        "name": "boi_id",
+                        "name": "id",
                         "in": "query",
                         "description": "Identifier of the 'Bo_item' object",
                         "required": true,
@@ -174,31 +174,31 @@
         "Bo_item": {
 	        "type":"object",
 	        "properties": {
-        		"boi_id": {
+        		"id": {
 	            	"type": "integer"
 	    		}
 				,
-        		"boi_boh_name": {
+        		"entityName": {
 	            	"type":  "string"
 	    		}
 				,
-        		"boi_name": {
+        		"name": {
 	            	"type":  "string"
 	    		}
 	    		,
-        		"boi_null": {
+        		"required": {
 	            	"type": "boolean"
 	    		}
 	    		,
-        		"boi_length": {
+        		"size": {
 	            	"type":   "integer"
 	    		}
 	    		,
-        		"boi_default": {
+        		"defaultValue": {
 	            	"type": "string"
 	    		}
                 ,
-        		"boi_type": {
+        		"type": {
 	            	"type":   "string"
 	    		}	    		
 				,

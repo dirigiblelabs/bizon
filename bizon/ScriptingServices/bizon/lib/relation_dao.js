@@ -3,7 +3,7 @@
 "use strict";
 
 var listJoins = function(settings, daos){
-	var joinKey = 'bor_src_boh_name';
+	var joinKey = 'srcEntityName';
 	var joinId;
 	if(typeof settings === 'string'){
 		joinId = settings;
@@ -23,7 +23,7 @@ var listJoins = function(settings, daos){
 		var stmnt = statements.builder()
 						.select()
 						.from(daos.n.orm.dbName)
-						.left_join( daos.join.orm.dbName, undefined, daos.join.orm.getProperty("bor_target_boh_name").dbName+'='+daos.n.orm.getProperty('boh_name').dbName)
+						.left_join( daos.join.orm.dbName, undefined, daos.join.orm.getProperty("targetEntityName").dbName+'='+daos.n.orm.getProperty('name').dbName)
 						.where(daos.join.orm.getProperty(joinKey).dbName+"=?", [daos.join.orm.getProperty(joinKey)]);
 		
 		var resultSet = statements.execute(stmnt, connection, settings);
@@ -43,40 +43,40 @@ exports.get = function(){
 	var dao = require('daoism/dao').get({
 			"dbName": "BO_RELATION",
 			"properties": [{
-				"name": "bor_id",
+				"name": "id",
 				"dbName": "BOR_ID",
 				"type": "Long",
 				"id": true
 			},{
-				"name": "bor_src_boh_name",
+				"name": "srcEntityName",
 				"dbName": "BOR_SRC_BOH_NAME",
 				"type": "String",
 				"size": 100,
 				"required": true
 			},{
-				"name": "bor_src_type",
+				"name": "srcMultiplicity",
 				"dbName": "BOR_SRC_TYPE",
 				"type": "Short",
 				"required": true
 			},{
-				"name": "bor_target_boh_name",
+				"name": "targetEntityName",
 				"dbName": "BOR_TARGET_BOH_NAME",
 				"type": "String",
 				"size": 100,
 				"required": true
 			},{
-				"name": "bor_target_type",
+				"name": "targetMultiplicity",
 				"dbName": "BOR_TARGET_TYPE",
 				"type": "Short",
 				"required": true
 			},{
-				"name": "bor_name",
+				"name": "name",
 				"dbName": "BOR_NAME",
 				"type": "String",
 				"size": 200,
 				"required": true
 			},{
-				"name": "bor_type",
+				"name": "type",
 				"dbName": "BOR_TYPE",
 				"type": "Short",
 				"required": true

@@ -29,11 +29,11 @@ angular.module('businessObjects')
 	function getInboundRelations(){
 		if(this.selectedEntity){
 			/*Relation.query({
-				targetId: this.selectedEntity.boh_name
+				targetId: this.selectedEntity.name
 			}).$promise
 			.then(function(relations){
 				self.inboundRelations = relations.map(function(relation){
-					masterDataSvc.getByName(relation.bor_src_boh_name, true)
+					masterDataSvc.getByName(relation.srcEntityName, true)
 					.then(function(srcEntity){
 						relation.source = srcEntity;
 						return relation;						
@@ -45,7 +45,7 @@ angular.module('businessObjects')
 			.map(function(rel){
 				var inboundEntity = this.selectedEntity['inbound-entities']
 									.filter(function(inboundEntity){
-										return inboundEntity.boh_name === rel.bor_target_boh_name;
+										return inboundEntity.name === rel.targetEntityName;
 									})[0];
 				rel.source = inboundEntity;
 				return rel;
@@ -56,7 +56,7 @@ angular.module('businessObjects')
 	function getOutboundRelations(){
 		return this.selectedEntity['outbound-relations']
 				.map(function(rel){
-					masterDataSvc.getByName(rel.bor_target_boh_name, true)
+					masterDataSvc.getByName(rel.targetEntityName, true)
 					.then(function(targetEntity){
 						rel.target = targetEntity;
 					});
@@ -83,23 +83,22 @@ angular.module('businessObjects')
 		var modalOptions = {
             closeButtonText: 'Cancel',
             actionButtonText: 'Duplicate entity',
-            headerText: 'Duplicate "' + self.selectedEntity.boh_label + '"?',
+            headerText: 'Duplicate "' + self.selectedEntity.label + '"?',
             bodyText: 'Are you sure you want to duplicate this entity?'
         };
 
         modalService.showModal({}, modalOptions)
         .then(function () {
 			var duplicateItem = angular.copy(self.selectedEntity, {});
-			delete duplicateItem.boh_id;
+			delete duplicateItem.id;
 			duplicateItem.properties = duplicateItem.properties.map(function(item){
-				delete item.boi_id;
-				delete item.bor_id;
-				delete item.boi_boh_name;
+				delete item.id;
+				delete item.entityName;
 				return item;
 			});
 			masterDataSvc.create(undefined, duplicateItem)
 				.then(function(newItem){
-					$stateParams.boId = newItem.boh_id;
+					$stateParams.boId = newItem.id;
 					$log.debug('Buisness Object duplicated successfully');
 					Notifications.createMessageSuccess('Buisness Object duplicated successfully');
 					$state.go($state.current, $stateParams, {reload: true, location:true, inherit: true});
@@ -114,13 +113,13 @@ angular.module('businessObjects')
 		var modalOptions = {
             closeButtonText: 'Cancel',
             actionButtonText: 'Delete entity',
-            headerText: 'Delete "' + self.selectedEntity.boh_label + '"?',
+            headerText: 'Delete "' + self.selectedEntity.label + '"?',
             bodyText: 'Are you sure you want to delete this entity?'
         };
 
         modalService.showModal({}, modalOptions)
         .then(function () {
-			masterDataSvc.remove(self.selectedEntity.boh_id, true)
+			masterDataSvc.remove(self.selectedEntity.id, true)
 			.then(function(){
 				delete $stateParams.boId;			
 				$log.debug('Buisness Object deleted successfully');

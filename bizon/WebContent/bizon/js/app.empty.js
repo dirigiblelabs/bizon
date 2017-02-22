@@ -7,7 +7,7 @@ angular.module('businessObjects')
 	this.createItem = function(){
 		masterDataSvc.create()
 		.then(function(newItem){
-			$stateParams.boId = newItem.boh_id;
+			$stateParams.boId = newItem.id;
 			$stateParams.message = {
 				text: 'New Buisness Object successfully created.',
 				type: 'alert-success'

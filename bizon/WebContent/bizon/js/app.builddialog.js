@@ -84,17 +84,17 @@ angular.module('businessObjects')
 		template.dataStructures = [];
 		for (var i = 0 ; i < entities.length; i ++) {
 			var dataStructure = {
-				'fileName': entities[i].boh_table.toLowerCase() + '.table',
+				'fileName': entities[i].table.toLowerCase() + '.table',
 				'columns': []
 			}
 			for (var j in entities[i].properties) {
 				var nextColumn = entities[i].properties[j];
 				dataStructure.columns.push({
-					'name': nextColumn.boi_name.toUpperCase(),
-		            'type': nextColumn.boi_type.toUpperCase(),
-		            'length': nextColumn.boi_length,
-		            'notNull': !nextColumn.boi_null,
-		            'primaryKey': nextColumn.boi_name === entities[i].boh_id_name,
+					'name': nextColumn.name.toUpperCase(),
+		            'type': nextColumn.type.toUpperCase(),
+		            'length': nextColumn.size,
+		            'notNull': !nextColumn.required,
+		            'primaryKey': nextColumn.name === entities[i].idName,
 		            'defaultValue': ''
 		         });
 			}
@@ -107,16 +107,16 @@ angular.module('businessObjects')
 		template.scriptingServices = [];
 		for (var i = 0 ; i < entities.length; i ++) {
 			var scriptingService = {
-				'fileName': entities[i].boh_svc_name + '.js',
-				'tableName': entities[i].boh_table.toUpperCase(),
+				'fileName': entities[i].svcName + '.js',
+				'tableName': entities[i].table.toUpperCase(),
 				'columns': []
 			};
 			for (var j in entities[i].properties) {
 				var nextColumn = entities[i].properties[j];
 				scriptingService.columns.push({  
-		    		'name': nextColumn.boi_name.toUpperCase(),
-		            'type': nextColumn.boi_type.toUpperCase(),
-		            'key': nextColumn.boi_name === entities[i].boh_id_name
+		    		'name': nextColumn.name.toUpperCase(),
+		            'type': nextColumn.type.toUpperCase(),
+		            'key': nextColumn.name === entities[i].idName
 		         });
 			}
 			template.scriptingServices.push(scriptingService);
@@ -137,18 +137,18 @@ angular.module('businessObjects')
 		template.webContent = [];
 		for (var i = 0 ; i < entities.length; i ++) {
 			var web = {
-				'fileName': entities[i].boh_svc_name + '.html',
-				'pageTitle': entities[i].boh_ui_title,
+				'fileName': entities[i].svcName + '.html',
+				'pageTitle': entities[i].uiTitle,
 				'serviceFileName': '../../js/' + template.packageName + '/' + template.scriptingServices[i].fileName,
 				'columns': []
 			};
 			for (var j in entities[i].properties) {
 				var nextColumn = entities[i].properties[j];
 				web.columns.push({
-					'name': nextColumn.boi_name.toLowerCase(),
-		            'label': nextColumn.boi_label ? nextColumn.boi_label : nextColumn.boi_name,
-		            'widgetType': widgetsMapping[nextColumn.boi_type],
-		            'key': nextColumn.boi_name === entities[i].boh_id_name,
+					'name': nextColumn.name.toLowerCase(),
+		            'label': nextColumn.boi_label ? nextColumn.boi_label : nextColumn.name,
+		            'widgetType': widgetsMapping[nextColumn.type],
+		            'key': nextColumn.name === entities[i].idName,
 		            'visible': true
 		         });
 			}

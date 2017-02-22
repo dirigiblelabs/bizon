@@ -43,8 +43,8 @@
 				<i class="fa fa-th"></i>
 			</div>
 			<div class="object-title">
-				<p class="title" editable-text="detailsEditorVm.entityForEdit.boh_label">{{detailsEditorVm.entityForEdit.boh_label}}</p>
-	    		<p class="subtitle" editable-text="detailsEditorVm.entityForEdit.boh_description">{{detailsEditorVm.entityForEdit.boh_description}}</p>											
+				<p class="title" editable-text="detailsEditorVm.entityForEdit.label">{{detailsEditorVm.entityForEdit.label}}</p>
+	    		<p class="subtitle" editable-text="detailsEditorVm.entityForEdit.description">{{detailsEditorVm.entityForEdit.description}}</p>											
 			</div>
 		</section>				    		
 	</section>	
@@ -76,13 +76,13 @@
 				<div class="items-list">
 					<div ng-hide="detailsEditorVm.entityForEdit.properties.length" class="nodata-text">No Items</div>
 					<div class="list-group">
-					  <a class="list-group-item" ng-repeat="entry in detailsEditorVm.propertyItems|filter:detailsEditorVm.searchText|orderBy:['boi_name']">
+					  <a class="list-group-item" ng-repeat="entry in detailsEditorVm.propertyItems|filter:detailsEditorVm.searchText|orderBy:['name']">
 						<div style="display:inline-block">
 							<div class="list-group-item-heading">
-								<span ng-class="{emphasized: !entry.boi_null}">{{entry.boi_name}}</span><i class="fa fa-asterisk required" aria-hidden="true" ng-if="!entry.boi_null"></i>
-								<span class="optional" ng-if="entry.boi_null">(optional)</span>
+								<span ng-class="{emphasized: !entry.required}">{{entry.name}}</span><i class="fa fa-asterisk required" aria-hidden="true" ng-if="!entry.required"></i>
+								<span class="optional" ng-if="entry.required">(optional)</span>
 							</div>
-							<div class="list-group-item-text">Data Type: <span style="color: gray; font-style: italic">{{entry.boi_type_name}}<span></div>
+							<div class="list-group-item-text">Data Type: <span style="color: gray; font-style: italic">{{entry.typeLabel}}<span></div>
 						</div>
 						<div class="btn-group pull-right">
 		   					<button class="btn btn-primary" ui-sref="list.entity.edit.items({item: entry, entityForEdit:detailsEditorVm.entityForEdit})">
@@ -103,13 +103,13 @@
 				<div class="items-list">
 					<div ng-hide="detailsEditorVm.propertyItems.length" class="nodata-text">No Items</div>				
 					<ul class="list-group" ng-show="detailsEditorVm.propertyItems.length">
-					  <li class="list-group-item" ng-repeat="entry in detailsEditorVm.propertyItems|filter:detailsEditorVm.searchText|orderBy:['bor_name']" ng-click="$event.stopPropagation();" style="outline: none; cursor: auto;">
+					  <li class="list-group-item" ng-repeat="entry in detailsEditorVm.propertyItems|filter:detailsEditorVm.searchText|orderBy:['name']" ng-click="$event.stopPropagation();" style="outline: none; cursor: auto;">
 						<div style="display:inline-block">					  
 							<div class="list-group-item-title">
-								<span class="emphasized">{{entry.bor_name}}</span>
+								<span class="emphasized">{{entry.name}}</span>
 							</div>
 							<div class="list-group-item-text">
-								Relation Type: <span style="color: gray; font-style: italic">{{entry.bor_type===1?'Association':'Composition'}}</span> <!--in <a ng-href="#/{{entry.target.boh_id}}">{{entry.target.boh_label}}</a>-->
+								Relation Type: <span style="color: gray; font-style: italic">{{entry.type===1?'Association':'Composition'}}</span> <!--in <a ng-href="#/{{entry.target.id}}">{{entry.target.label}}</a>-->
 							</div>
 						</div>
 						<div class="btn-group pull-right">
@@ -133,26 +133,26 @@
 					  <div class="panel-heading clearfix">
 					    <h3 class="panel-title pull-left">Data Structure</h3>
 				    	<div class="pull-right">
-							<input type="checkbox" class="checkbox" data-on-text="Enable" data-off-text="Disable" ng-model="detailsEditorVm.entityForEdit.boh_ds_gen_enabled" bootstrap-switch/>						    
+							<input type="checkbox" class="checkbox" data-on-text="Enable" data-off-text="Disable" ng-model="detailsEditorVm.entityForEdit.dsGenEnabled" bootstrap-switch/>						    
 						</div>
 					  </div>
 					  <div class="panel-body">
 						  <div class="form-group" ng-if="detailsEditorVm.filterConfigurationEntries(detailsEditorVm.searchText, 'Database Table Name')">
 						    <label for="table" class="col-sm-3 control-label" required="true">Database Table Name</label>
 						    <div class="col-sm-8">
-						      <input name="table" id="table" class="form-control" placeholder="Type Table Name" ng-model="detailsEditorVm.entityForEdit.boh_table" ng-disabled="!detailsEditorVm.entityForEdit.boh_ds_gen_enabled" minlength="1" required="true">
+						      <input name="table" id="table" class="form-control" placeholder="Type Table Name" ng-model="detailsEditorVm.entityForEdit.table" ng-disabled="!detailsEditorVm.entityForEdit.dsGenEnabled" minlength="1" required="true">
 						    </div>
 						  </div>
 						  <div class="form-group" ng-if="detailsEditorVm.filterConfigurationEntries(detailsEditorVm.searchText, 'Entity Identifier Name')">
 						    <label for="primaryKey" class="col-sm-3 control-label" required="true">Entity Identifier Name</label>
 						    <div class="col-sm-8">
-						      <input name="primaryKey" id="primaryKey" class="form-control" placeholder="Type Identifier Name" ng-model="detailsEditorVm.entityForEdit.boh_id_name" ng-disabled="!detailsEditorVm.entityForEdit.boh_ds_gen_enabled" minlength="1" required="true">
+						      <input name="primaryKey" id="primaryKey" class="form-control" placeholder="Type Identifier Name" ng-model="detailsEditorVm.entityForEdit.idName" ng-disabled="!detailsEditorVm.entityForEdit.dsGenEnabled" minlength="1" required="true">
 						    </div>
 						  </div>
 						  <div class="form-group" ng-if="detailsEditorVm.filterConfigurationEntries(detailsEditorVm.searchText, 'Entity Identifier Data Type')">
 						    <label for="primaryKeyType" class="col-sm-3 control-label" required="true">Entity Identifier Data Type</label>
 						    <div class="col-sm-8">
-			    			  <select name="primaryKeyType" id="primaryKeyType" class="form-control" ng-options="option.val for option in detailsEditorVm.typeOptions track by option.id" ng-model="detailsEditorVm.cfgDataTypeSelectedTypeOption" ng-change="detailsEditorVm.cfgDataTypeSelectionChanged(detailsEditorVm.cfgDataTypeSelectedTypeOption)" ng-disabled="!detailsEditorVm.entityForEdit.boh_ds_gen_enabled" required="true"></select>
+			    			  <select name="primaryKeyType" id="primaryKeyType" class="form-control" ng-options="option.val for option in detailsEditorVm.typeOptions track by option.id" ng-model="detailsEditorVm.cfgDataTypeSelectedTypeOption" ng-change="detailsEditorVm.cfgDataTypeSelectionChanged(detailsEditorVm.cfgDataTypeSelectedTypeOption)" ng-disabled="!detailsEditorVm.entityForEdit.dsGenEnabled" required="true"></select>
 						    </div>
 						  </div>
 					  </div>
@@ -162,14 +162,14 @@
 					  <div class="panel-heading clearfix">
 					    <h3 class="panel-title pull-left">Service</h3>
 				    	<div class="pull-right">
-							<input type="checkbox" class="checkbox" data-on-text="Enable" data-off-text="Disable" ng-model="detailsEditorVm.entityForEdit.boh_svc_gen_enabled" bootstrap-switch/>						    
+							<input type="checkbox" class="checkbox" data-on-text="Enable" data-off-text="Disable" ng-model="detailsEditorVm.entityForEdit.svcGenEnabled" bootstrap-switch/>						    
 						</div>
 					  </div>						
 					  <div class="panel-body">
 						<div class="form-group" ng-if="detailsEditorVm.filterConfigurationEntries(detailsEditorVm.searchText, 'Service Name')">
 						  <label for="service" class="col-sm-3 control-label" required="true">Service Name</label>
 						  <div class="col-sm-8">
-					     	<input name="svc_name" id="table" class="form-control" placeholder="Type Service Name" ng-model="detailsEditorVm.entityForEdit.boh_svc_name" ng-disabled="!detailsEditorVm.entityForEdit.boh_svc_gen_enabled" minlength="1" required="true">
+					     	<input name="svc_name" id="table" class="form-control" placeholder="Type Service Name" ng-model="detailsEditorVm.entityForEdit.svcName" ng-disabled="!detailsEditorVm.entityForEdit.svcGenEnabled" minlength="1" required="true">
 						  </div>
 						</div>
 					  </div>
@@ -179,14 +179,14 @@
 					  <div class="panel-heading clearfix">
 					    <h3 class="panel-title pull-left">UI</h3>
 				    	<div class="pull-right">
-			 				<input type="checkbox" class="checkbox" data-on-text="Enable" data-off-text="Disable" ng-model="detailsEditorVm.entityForEdit.boh_ui_gen_enabled" bootstrap-switch/>						    
+			 				<input type="checkbox" class="checkbox" data-on-text="Enable" data-off-text="Disable" ng-model="detailsEditorVm.entityForEdit.uiGenEnabled" bootstrap-switch/>						    
 						</div>
 					  </div>												
 					  <div class="panel-body">
 						<div class="form-group" ng-if="detailsEditorVm.filterConfigurationEntries(detailsEditorVm.searchText, 'Page Title')">
 						  <label for="ui-title" class="col-sm-3 control-label" required="true">Page Title</label>
 						  <div class="col-sm-8">
-					     	<input name="ui-title" id="ui-title" class="form-control" placeholder="Type Page Title" ng-model="detailsEditorVm.entityForEdit.boh_ui_title" ng-disabled="!detailsEditorVm.entityForEdit.boh_ui_gen_enabled" minlength="1" required="true">
+					     	<input name="ui-title" id="ui-title" class="form-control" placeholder="Type Page Title" ng-model="detailsEditorVm.entityForEdit.uiTitle" ng-disabled="!detailsEditorVm.entityForEdit.uiGenEnabled" minlength="1" required="true">
 						  </div>
 						</div>
 					  </div>

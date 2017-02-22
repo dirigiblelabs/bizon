@@ -36,7 +36,7 @@
 		  <div class="form-group">
 		    <label for="name" class="col-sm-4 control-label" required="true" readonly>Name</label>
 		    <div class="col-sm-7">
-		      <input name="name" id="name" class="form-control" placeholder="Type Relationship Name" ng-model="relEditorVm.relation.bor_name" minlength="1" required="true">
+		      <input name="name" id="name" class="form-control" placeholder="Type Relationship Name" ng-model="relEditorVm.relation.name" minlength="1" required="true">
 		    </div>
 		  </div>
 		  <div class="form-group">
@@ -49,7 +49,7 @@
 					 typeahead-no-results="relEditorVm.noResults"
 					 typeahead-show-hint = "true"
 					 typeahead-input-formatter = "relEditorVm.changeTarget(a)"
-					 uib-typeahead="target as target.boh_label for target in relEditorVm.matchTargets($viewValue)">
+					 uib-typeahead="target as target.label for target in relEditorVm.matchTargets($viewValue)">
 			    <i ng-show="relEditorVm.loading" class="glyphicon glyphicon-refresh"></i>
 			    <div ng-show="relEditorVm.noResults">
 			      <i class="glyphicon glyphicon-remove" ng-click="relEditorVm.noResults=false"></i> No Results Found
@@ -57,15 +57,15 @@
 		    </div>
 		  </div>
 		  <div class="form-group">
-	  		<label for="boi_null" class="col-sm-4 control-label">Multiplicity</label>
+	  		<label for="required" class="col-sm-4 control-label">Multiplicity</label>
 		    <div class="col-sm-7">
 		    	<rzslider rz-slider-model="relEditorVm.slider.value" rz-slider-options="relEditorVm.slider.options"></rzslider>
 		    </div>
 		  </div>		  
 		  <div class="form-group">
-	  		<label for="boi_null" class="col-sm-4 control-label">Relation Type</label>
+	  		<label for="required" class="col-sm-4 control-label">Relation Type</label>
 		    <div class="col-sm-7">
-		    	<rzslider rz-slider-model="relEditorVm.relation.bor_type" rz-slider-options="relEditorVm.relTypeSlider.options"></rzslider>
+		    	<rzslider rz-slider-model="relEditorVm.relation.type" rz-slider-options="relEditorVm.relTypeSlider.options"></rzslider>
 		    </div>
 		  </div>		  
 		</form>

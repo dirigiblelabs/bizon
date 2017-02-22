@@ -11,47 +11,47 @@
 
 //Prepare a JSON object for insert into DB
 function _createSQLEntity(entity) {
-	if(entity.boh_ds_gen_enabled === 1){
-		if(entity.boh_table !== undefined  && entity.boh_table !== null){
+	if(entity.dsGenEnabled === 1){
+		if(entity.table !== undefined  && entity.table !== null){
 			// Validation rule: up to 128 Characters, Starts with letter only, Can include or end with number, No spaces, case insensitive
-			var isTableNameValid = /^[A-Za-z][A-Za-z0-9]{0,127}$/.test(entity.boh_table);//TODO: validation needs to come from database dialect provider
+			var isTableNameValid = /^[A-Za-z][A-Za-z0-9]{0,127}$/.test(entity.table);//TODO: validation needs to come from database dialect provider
 			if(!isTableNameValid)
-				throw new Error("Illegal arugment: boh_table["+entity.boh_table+"] does not comply with validation rules [128 Characters, Starts with letter only, Can include or end with numbers, No spaces, Case insensitive]");
+				throw new Error("Illegal arugment: table["+entity.table+"] does not comply with validation rules [128 Characters, Starts with letter only, Can include or end with numbers, No spaces, Case insensitive]");
 		} else {
 			var regex = new RegExp('[^a-z0-9]*', "ig");
-			var tblName = entity.boh_name.replace(regex, '');
+			var tblName = entity.name.replace(regex, '');
 			if(!/^[a-z]/i.test(tblName)){
 				tblName = 'tbl'+ tblName;
 			}
 			if(tblName.length>124)
 				tblName = tblName.substring(0, 124);
 			tblName += createRadnomAlphanumeric(4);
-			entity.boh_table = tblName;
-			this.$log.info('Generated boh_table['+entity.boh_table+']');
+			entity.table = tblName;
+			this.$log.info('Generated table['+entity.table+']');
 		}
-		if(entity.boh_id_name !== undefined && entity.boh_id_name !== null){
-			var isIdNameValid = /^[a-zA-Z_][a-zA-Z0-9_]{0,255}$/.test(entity.boh_id_name);//TODO: validation needs to come from database dialect provider
+		if(entity.idName !== undefined && entity.idName !== null){
+			var isIdNameValid = /^[a-zA-Z_][a-zA-Z0-9_]{0,255}$/.test(entity.idName);//TODO: validation needs to come from database dialect provider
 			if(!isIdNameValid)
-				throw new Error("Illegal arugment: boh_id_name["+entity.boh_id_name+"] does not comply with validation rules");
+				throw new Error("Illegal arugment: idName["+entity.idName+"] does not comply with validation rules");
 		} else {
-			entity.boh_id_name = "id";
-			this.$log.info('Generated boh_id_name['+entity.boh_id_name+']');
+			entity.idName = "id";
+			this.$log.info('Generated idName['+entity.idName+']');
 		}
-		if(entity.boh_id_datatype_code !== undefined && entity.boh_id_datatype_code !== null){
-			/*var isIdDataTypeValid = !isNaN(entity.boh_id_datatype_code) && [0,1,2,3,4,5,6,7,8,9].indexOf(entity.boh_id_datatype_code);//TODO: extenralize valid codes
+		if(entity.idType !== undefined && entity.idType !== null){
+			/*var isIdDataTypeValid = !isNaN(entity.idType) && [0,1,2,3,4,5,6,7,8,9].indexOf(entity.idType);//TODO: extenralize valid codes
 			if(!isIdDataTypeValid)
-				throw new Error("Illegal arugment: boh_id_datatype_code["+entity.boh_id_datatype_code+"] does not comply with validation rules");*/
+				throw new Error("Illegal arugment: idType["+entity.idType+"] does not comply with validation rules");*/
 		} else {
-			entity.boh_id_datatype_code = "INTEGER";
+			entity.idType = "INTEGER";
 		}
 	}
-	if(entity.boh_svc_gen_enabled === 1){
-		if(entity.boh_svc_name !== undefined && entity.boh_svc_name !== null){
-			var isSvcNameValid = /^(?=[\S])[^\\ \/ : * ? " < > | ]{0,255}$/.test(entity.boh_svc_name);//TODO add inner whitespaces to validaiton here too
-			if(!isSvcNameValid || /\s/g.test(entity.boh_svc_name))
-				throw new Error("Illegal arugment: boh_svc_name["+entity.boh_svc_name+"] does not comply with validation rules");
+	if(entity.svcGenEnabled === 1){
+		if(entity.svcName !== undefined && entity.svcName !== null){
+			var isSvcNameValid = /^(?=[\S])[^\\ \/ : * ? " < > | ]{0,255}$/.test(entity.svcName);//TODO add inner whitespaces to validaiton here too
+			if(!isSvcNameValid || /\s/g.test(entity.svcName))
+				throw new Error("Illegal arugment: svcName["+entity.svcName+"] does not comply with validation rules");
 		} else {
-			var svcName = entity.boh_label;
+			var svcName = entity.label;
 			var invalidSvcNameCharactersMatcher = new RegExp('[\\ \/ : * ? " < > | \s]', "g");
 			svcName = svcName.replace(invalidSvcNameCharactersMatcher , '');
 			if(!/^[a-z]/i.test(svcName)){
@@ -60,17 +60,17 @@ function _createSQLEntity(entity) {
 			if(svcName.length>251)
 				svcName = svcName.substring(0, 251);			
 			svcName += createRadnomAlphanumeric(4);
-			entity.boh_svc_name = svcName;
-			this.$log.info('Generated boh_svc_name['+entity.boh_svc_name+']');
+			entity.svcName = svcName;
+			this.$log.info('Denerated svcName['+entity.svcName+']');
 		}
 	} 
-	if(entity.boh_ui_gen_enabled === 1){
-		if(entity.boh_ui_title !== undefined && entity.boh_ui_title !== null){
-			if(entity.boh_ui_title.length>255)
-				throw new Error("Illegal arugment: bo_ui_title["+entity.boh_ui_title+"] does not comply with validation rules. Longer than 255 characters.");
+	if(entity.uiGenEnabled === 1){
+		if(entity.uiTitle !== undefined && entity.uiTitle !== null){
+			if(entity.uiTitle.length>255)
+				throw new Error("Illegal arugment: bo_ui_title["+entity.uiTitle+"] does not comply with validation rules. Longer than 255 characters.");
 		} else {
-			entity.boh_ui_title = entity.boh_label;
-			this.$log.info('Autoassigned boh_ui_title['+entity.boh_ui_title+']');			
+			entity.uiTitle = entity.label;
+			this.$log.info('Autoassigned uiTitle['+entity.uiTitle+']');			
 		}
 	}	
 	this.$log.info("Transformation to DB JSON object finished: " +entity);
@@ -90,42 +90,47 @@ exports.get = function(){
 	var dao = require('daoism/dao').get({
 			"dbName": "BO_HEADER",
 			"properties": [{
-				"name": "boh_id",
+				"name": "id",
 				"dbName": "BOH_ID",
 				"type": "Long",
 				"id": true
 			},{
-				"name": "boh_name",
+				"name": "name",
 				"dbName": "BOH_NAME",
 				"type": "String",
 				"size": 100,
 			},{
-				"name": "boh_label",
+				"name": "label",
 				"dbName": "BOH_LABEL",
 				"type": "String",
 				"size": 250,
 			},{
-				"name": "boh_table",
+				"name": "description",
+				"dbName": "BOH_DESCRIPTION",
+				"type": "String",
+				"size": 1000,
+			},{
+				"name": "table",
 				"dbName": "BOH_TABLE",
 				"type": "String",
 				"size": 128,
 			},{
-				"name": "boh_id_name",
+				"name": "idName",
 				"dbName": "BOH_ID_NAME",
 				"type": "String",
 				"size": 250,
 			},{
-				"name": "boh_id_datatype_code",
+				"name": "idType",
 				"dbName": "BOH_ID_DATATYPE_CODE",
 				"type": "String",
 				"size": 250
 			},{
-				"name": "boh_svc_name",
+				"name": "svcName",
 				"dbName": "BOH_SVC_NAME",
 				"type": "String",
 				"size": 250,
 			},{
-				"name": "boh_ui_gen_enabled",
+				"name": "uiGenEnabled",
 				"dbName": "BOH_UI_GEN_ENABLED",
 				"type": "Short",
 				"dbValue": function(value){
@@ -141,7 +146,7 @@ exports.get = function(){
 					return val;
 				}
 			},{
-				"name": "boh_svc_gen_enabled",
+				"name": "svcGenEnabled",
 				"dbName": "BOH_SVC_GEN_ENABLED",
 				"type": "Short",
 				"dbValue": function(value){
@@ -157,7 +162,7 @@ exports.get = function(){
 					return val;
 				}
 			},{
-				"name": "boh_ds_gen_enabled",
+				"name": "dsGenEnabled",
 				"dbName": "BOH_DS_GEN_ENABLED",
 				"type": "Short",
 				"dbValue": function(value){
@@ -173,33 +178,33 @@ exports.get = function(){
 					return val;
 				}
 			},{
-				"name": "boh_ui_title",
+				"name": "uiTitle",
 				"dbName": "BOH_UI_TITLE",
 				"type": "String",
 				"size": 250,
 			}],
 			"associationSets": {
 				"properties": {
-					"joinKey": "boi_boh_name",
-					"key": "boh_name",
+					"joinKey": "entityName",
+					"key": "name",
 					"dao": require("bizon/lib/item_dao").get,
 					"associationType": "one-to-many"
 				},
 				"outbound-relations": {
-					"key": "boh_name",
-					"joinKey": "bor_src_boh_name",
+					"key": "name",
+					"joinKey": "srcEntityName",
 					"dao": require("bizon/lib/relation_dao").get,
 					"associationType": "one-to-many"
 				},
 				"inbound-relations": {
-					"key": "boh_name",
-					"joinKey": "bor_target_boh_name",
+					"key": "name",
+					"joinKey": "targetEntityName",
 					"dao": require("bizon/lib/relation_dao").get,
 					"associationType": "one-to-many"
 				},
 				"inbound-entities": {
-					"key": "boh_name",
-					"joinKey": "bor_src_boh_name",
+					"key": "name",
+					"joinKey": "srcEntityName",
 					"daoJoin": require("bizon/lib/relation_dao").get,
 					"associationType": "many-to-many"
 				}

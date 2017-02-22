@@ -38,7 +38,7 @@
                         "type": "boolean"
                     },
                     {
-                        "name": "boh_id",
+                        "name": "id",
                         "in": "query",
                         "description": "Identifier of the 'bo_header' object. It can be specified also as last segment in path. If both are present, the query parameter wins.",
                         "required": false,
@@ -188,16 +188,19 @@
         "bo_header": {
 	        "type":"object",
 	        "properties": {
-        		"boh_id": {
+        		"id": {
 	            	"type": "integer"
 	    		},
-        		"boh_description": {
+        		"label": {
 	            	"type": "string"
 	    		},
-        		"boh_label": {
+	    		"description": {
 	            	"type": "string"
 	    		},
-                "boh_name": {
+	    		"table": {
+	            	"type": "string"
+	    		},	    		
+                "name": {
 	            	"type": "string"
 	    		}
 	        }

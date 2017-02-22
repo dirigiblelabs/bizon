@@ -63,7 +63,7 @@ angular.module('businessObjects')
 		var modalOptions = {
             closeButtonText: 'Cancel',
             actionButtonText: 'Delete',
-            headerText: 'Delete property "' + (item.boi_name||item.bor_name) + '"?',
+            headerText: 'Delete property "' + (item.name||item.name) + '"?',
             bodyText: 'Are you sure you want to delete this property?'
         };
         
@@ -77,10 +77,10 @@ angular.module('businessObjects')
 			}
 			self.entityForEdit.properties = self.entityForEdit.properties.map(
 				function(currItem){
-					if(item.boi_id===undefined && item.bor_id===undefined && currItem === item){
+					if(item.id===undefined && currItem === item){
 						return;
 					}
-					if((currItem.boi_id && currItem.boi_id === item.boi_id) || (currItem.bor_id && currItem.bor_id === item.bor_id)){
+					if((currItem.id && currItem.id === item.id) || (currItem.id && currItem.id === item.id)){
 						currItem.action = 'remove';
 					}
 					return currItem;
@@ -93,14 +93,14 @@ angular.module('businessObjects')
 		var modalOptions = {
             closeButtonText: 'Cancel',
             actionButtonText: 'OK',
-            headerText: 'Changes will be lost. Cancel editing "' + self.entityForEdit.boh_label + '"?',
+            headerText: 'Changes will be lost. Cancel editing "' + self.entityForEdit.label + '"?',
             bodyText: 'Are you sure you want to cancel your changes?'
         };
 
         modalService.showModal({}, modalOptions)
         .then(function () {
 			delete $stateParams.entityForEdit;			
-		    $state.go('list.entity', {boId:self.entityForEdit.boh_id});
+		    $state.go('list.entity', {boId:self.entityForEdit.id});
         });
 	};
 	
@@ -109,7 +109,7 @@ angular.module('businessObjects')
 	    .then(function(){
 			$log.debug('Buisness Object updated successfully');
 			Notifications.createMessageSuccess('Buisness Object updated successfully.');
-			$state.go('list.entity', {boId: self.entityForEdit.boh_id}, {reload:true});
+			$state.go('list.entity', {boId: self.entityForEdit.id}, {reload:true});
     	})
     	.catch(function(reason){
     		var message = masterDataSvc.serviceErrorMessageFormatter('Updating Buisness Object failed', reason);
@@ -127,14 +127,14 @@ angular.module('businessObjects')
 	
 	//FIXME
 	this.cfgDataTypeSelectedTypeOption = this.typeOptions.find(function(opt){
-			return true;//opt.val.toLowerCase() === self.entityForEdit.boh_id_datatype_code.toLowerCase();
+			return true;//opt.val.toLowerCase() === self.entityForEdit.idType.toLowerCase();
 		});
 	
 	this.cfgDataTypeSelectionChanged = function(option){
 		this.cfgDataTypeSelectedTypeOption = this.typeOptions.find(function(opt){
 			return opt.id === option.id;
 		});
-		this.entityForEdit.boh_id_datatype_code = this.cfgDataTypeSelectedTypeOption.val;
+		this.entityForEdit.idType = this.cfgDataTypeSelectedTypeOption.val;
 	};
 			
 }]);

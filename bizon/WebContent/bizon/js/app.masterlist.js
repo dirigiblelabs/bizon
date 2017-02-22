@@ -12,7 +12,7 @@ angular.module('businessObjects')
 	
 	this.querySettings = {
 		$limit: 100,
-		$sort: 'boh_label',
+		$sort: 'label',
 		$order: 'asc'
 	};
 	
@@ -26,9 +26,9 @@ angular.module('businessObjects')
 	this.createItem = function(){
 		masterDataSvc.create()
 		.then(function(newItem){
-			$stateParams.boId = newItem.boh_id;
+			$stateParams.boId = newItem.id;
 			$stateParams.selectedEntity = newItem;
-			$log.debug('Business Object with id '+newItem.boh_id+' created successfully');
+			$log.debug('Business Object with id '+newItem.id+' created successfully');
 			Notifications.createMessageSuccess('Business Object created successfully');
 			masterDataSvc.selection = [newItem];
 			self.items = masterDataSvc.getLoadedData();
@@ -47,14 +47,14 @@ angular.module('businessObjects')
 		var modalOptions = {
             closeButtonText: 'Cancel',
             actionButtonText: 'Delete entity',
-            headerText: 'Delete "' + entity.boh_label + '"?',
+            headerText: 'Delete "' + entity.label + '"?',
             bodyText: 'Are you sure you want to delete this entity?'
         };
 
         modalService.showModal({}, modalOptions)
         .then(function () {
 			self.busy = true;
-			masterDataSvc.remove(entity.boh_id, true)
+			masterDataSvc.remove(entity.id, true)
 			.then(function(){
 				delete $stateParams.boId;
 				delete $state.params.boId;
@@ -147,7 +147,7 @@ angular.module('businessObjects')
 					} else {
 						postNext.apply(self);
 						if(masterDataSvc.getLoadedData().length>0){
-		              		$state.go('list.entity', {boId: masterDataSvc.getLoadedData()[0].boh_id});
+		              		$state.go('list.entity', {boId: masterDataSvc.getLoadedData()[0].id});
 		              	}
 		              	self.busy = false;
 					}
