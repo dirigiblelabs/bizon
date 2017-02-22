@@ -2,7 +2,7 @@
 "use strict";
 
 angular.module('businessObjects')
-.controller('BuildDialogCtrl', ['masterDataSvc', 'BuildService', '$scope', '$log', '$stateParams', '$window', function(masterDataSvc, BuildService, $scope, $log, $stateParams, $window) {
+.controller('BuildDialogCtrl', ['masterDataSvc', 'BuildService', 'BuildTemplatesService', '$scope', '$log', '$stateParams', '$window', function(masterDataSvc, BuildService, BuildTemplatesService, $scope, $log, $stateParams, $window) {
 
 	this.cfg = {};
 	this.slider = {
@@ -17,7 +17,7 @@ angular.module('businessObjects')
 	};
 	var self = this;
 	
-	BuildService.listTemplates().$promise
+	BuildTemplatesService.listTemplates().$promise
 		.then(function(templates){
 			self.templates = templates;
 			self.cfg.templates = {};
@@ -94,7 +94,7 @@ angular.module('businessObjects')
 		            'type': nextColumn.boi_type.toUpperCase(),
 		            'length': nextColumn.boi_length,
 		            'notNull': !nextColumn.boi_null,
-		            'key': nextColumn.boi_name === entities[i].boh_id_name,
+		            'primaryKey': nextColumn.boi_name === entities[i].boh_id_name,
 		            'defaultValue': ''
 		         });
 			}

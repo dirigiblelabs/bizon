@@ -23,11 +23,6 @@
             "type": "git",
             "url": "https://github.com/dirigiblelabs/arestme.git",
             "branch": "master"
-    	}, {
-            "guid": "bizon_generator",
-            "type": "git",
-            "url": "https://github.com/ThuF/bizon_generator.git",
-            "branch": "master"
     	}
 	]
 }
