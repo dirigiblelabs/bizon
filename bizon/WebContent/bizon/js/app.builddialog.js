@@ -93,9 +93,9 @@ angular.module('businessObjects')
 					'name': nextColumn.name.toUpperCase(),
 		            'type': nextColumn.type.toUpperCase(),
 		            'length': nextColumn.size,
-		            'notNull': !nextColumn.required,
-		            'primaryKey': nextColumn.name === entities[i].idName,
-		            'defaultValue': ''
+		            'notNull': nextColumn.required,
+		            'primaryKey': nextColumn.pk,
+		            'defaultValue': ''//nextColumn.defaultValue,
 		         });
 			}
 			template.dataStructures.push(dataStructure);

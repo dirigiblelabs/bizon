@@ -36,6 +36,16 @@ exports.get = function(){
 				"size": 250,
 				"required": true
 			},{
+				"name": "pk",
+				"dbName": "BOI_PK",
+				"type": "Short",
+				"dbValue": function(value){
+					return value === null || value === true ? 1 : 0;
+				},
+				"value": function(dbValue){
+					return dbValue < 1 ?  false : true;
+				}				
+			},{
 				"name": "typeLabel",
 				"dbName": "BOI_TYPE_NAME",
 				"type": "String",

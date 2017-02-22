@@ -7,8 +7,14 @@ angular.module('businessObjects')
 	this.selectedEntity = selectedEntity;
 	var self = this;
 	
+	this.pk = this.selectedEntity.properties.filter(function(prop){
+			return prop.pk;
+		})[0];
+	
 	this.showProperties = function(){
-		this.propertyItems = this.selectedEntity.properties;
+		this.propertyItems = this.selectedEntity.properties.filter(function(prop){
+			return !prop.pk;
+		});
 	};
 	
 	function showDetails(item){

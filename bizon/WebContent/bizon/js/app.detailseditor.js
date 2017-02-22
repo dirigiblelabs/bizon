@@ -8,12 +8,16 @@ angular.module('businessObjects')
 	var self = this;
 	var TABS = Object.freeze({PROP_TAB:0, REL_TAB:1, CONF_TAB:2});
 	
+	this.pk = this.entityForEdit.properties.filter(function(prop){
+			return prop.pk;
+		})[0];
+	
 	this.showProperties = function(){
 		this.searchText = undefined;	
 		this.tab = TABS.PROP_TAB;
 		if(this.entityForEdit.properties){
 			this.propertyItems = this.entityForEdit.properties.filter(function(v){
-				if(v.action!=='remove'){
+				if(v.pk!==true && v.action!=='remove'){
 					return true;
 				}
 				return false;
@@ -134,7 +138,7 @@ angular.module('businessObjects')
 		this.cfgDataTypeSelectedTypeOption = this.typeOptions.find(function(opt){
 			return opt.id === option.id;
 		});
-		this.entityForEdit.idType = this.cfgDataTypeSelectedTypeOption.val;
+		this.pk.type = this.cfgDataTypeSelectedTypeOption.val;
 	};
 			
 }]);
