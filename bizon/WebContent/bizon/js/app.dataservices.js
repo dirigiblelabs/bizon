@@ -72,20 +72,23 @@
 					"boi_null": true,
 				};
 		return res;
-	}])	
-	.service('BuildService', ['$resource', function($resource) {
-	  	return $resource('../../js/bizon/svc/v1/build_svc.js/:path', {}, {
-	  		build: {
-	  			method: 'POST',
-	  			isArray: false
-  			},
+	}])
+	.service('BuildTemplatesService', ['$resource', function($resource) {
+	  	return $resource('../../js/bizon/svc/v1/build/templates.js', {}, {
   			listTemplates: {
 	  			method: 'GET',
-	  			params: {path: 'templates'},
 	  			isArray: false
   			}
 	  	});
-	}])	
+	}])
+	.service('BuildService', ['$resource', function($resource) {
+	  	return $resource('../../js/bizon/svc/v1/build/service.js', {}, {
+	  		build: {
+	  			method: 'POST',
+	  			isArray: false
+  			}
+	  	});
+	}])
 	.service('Relation', ['$resource', 'ResourceSvcConfiguration', function($resource, ResourceSvcConfiguration) {
 	  	return $resource('../../js/bizon/svc/v1/relation.js/:boId', { boId:'@id' }, ResourceSvcConfiguration.cfg);
 	}])		
