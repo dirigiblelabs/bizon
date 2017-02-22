@@ -19,7 +19,7 @@ function _createSQLEntity(entity) {
 				throw new Error("Illegal arugment: boh_table["+entity.boh_table+"] does not comply with validation rules [128 Characters, Starts with letter only, Can include or end with numbers, No spaces, Case insensitive]");
 		} else {
 			var regex = new RegExp('[^a-z0-9]*', "ig");
-			var tblName = entity.boh_label.replace(regex, '');
+			var tblName = entity.boh_name.replace(regex, '');
 			if(!/^[a-z]/i.test(tblName)){
 				tblName = 'tbl'+ tblName;
 			}
@@ -90,10 +90,15 @@ exports.get = function(){
 	var dao = require('daoism/dao').get({
 			"dbName": "BO_HEADER",
 			"properties": [{
-				"name": "boh_name",
-				"dbName": "BOH_NAME",
+				"name": "boh_id",
+				"dbName": "BOH_ID",
 				"type": "Long",
 				"id": true
+			},{
+				"name": "boh_name",
+				"dbName": "BOH_NAME",
+				"type": "String",
+				"size": 100,
 			},{
 				"name": "boh_label",
 				"dbName": "BOH_LABEL",
@@ -176,20 +181,24 @@ exports.get = function(){
 			"associationSets": {
 				"properties": {
 					"joinKey": "boi_boh_name",
+					"key": "boh_name",
 					"dao": require("bizon/lib/item_dao").get,
 					"associationType": "one-to-many"
 				},
 				"outbound-relations": {
+					"key": "boh_name",
 					"joinKey": "bor_src_boh_name",
 					"dao": require("bizon/lib/relation_dao").get,
 					"associationType": "one-to-many"
 				},
 				"inbound-relations": {
+					"key": "boh_name",
 					"joinKey": "bor_target_boh_name",
 					"dao": require("bizon/lib/relation_dao").get,
 					"associationType": "one-to-many"
 				},
 				"inbound-entities": {
+					"key": "boh_name",
 					"joinKey": "bor_src_boh_name",
 					"daoJoin": require("bizon/lib/relation_dao").get,
 					"associationType": "many-to-many"

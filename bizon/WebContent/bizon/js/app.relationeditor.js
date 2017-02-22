@@ -106,11 +106,11 @@ angular.module('businessObjects')
   			this.relation.bor_target_boh_name = this.relation.target.boh_name;
 		if(isNewProperty){      	
 		  this.relation.action = 'save';
-		  selectedEntity['inbound-relations'].push(this.relation); 
+		  selectedEntity['outbound-relations'].push(this.relation); 
 		} else {
 			if(this.relation.action!=='save')
 				this.relation.action = 'update';
-			selectedEntity['inbound-relations'] = selectedEntity['inbound-relations']
+			selectedEntity['outbound-relations'] = selectedEntity['outbound-relations']
 										.map(function(rel){
 											if(rel.bor_id === self.relation.bor_id){
 												return self.relation;

@@ -14,7 +14,8 @@ exports.get = function(){
 			},{
 				"name": "boi_boh_name",
 				"dbName": "BOI_BOH_NAME",
-				"type": "Long",
+				"type": "String",
+				"size": 100,
 				"required": true
 			},{
 				"name": "boi_name",

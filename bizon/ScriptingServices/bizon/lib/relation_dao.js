@@ -23,7 +23,7 @@ var listJoins = function(settings, daos){
 		var stmnt = statements.builder()
 						.select()
 						.from(daos.n.orm.dbName)
-						.left_join( daos.join.orm.dbName, undefined, daos.join.orm.getProperty("bor_target_boh_name").dbName+'='+daos.n.orm.getPrimaryKey().dbName)
+						.left_join( daos.join.orm.dbName, undefined, daos.join.orm.getProperty("bor_target_boh_name").dbName+'='+daos.n.orm.getProperty('boh_name').dbName)
 						.where(daos.join.orm.getProperty(joinKey).dbName+"=?", [daos.join.orm.getProperty(joinKey)]);
 		
 		var resultSet = statements.execute(stmnt, connection, settings);
@@ -50,7 +50,8 @@ exports.get = function(){
 			},{
 				"name": "bor_src_boh_name",
 				"dbName": "BOR_SRC_BOH_NAME",
-				"type": "Long",
+				"type": "String",
+				"size": 100,
 				"required": true
 			},{
 				"name": "bor_src_type",
@@ -60,7 +61,8 @@ exports.get = function(){
 			},{
 				"name": "bor_target_boh_name",
 				"dbName": "BOR_TARGET_BOH_NAME",
-				"type": "Long",
+				"type": "String",
+				"size": 100,
 				"required": true
 			},{
 				"name": "bor_target_type",

@@ -100,7 +100,7 @@ angular.module('businessObjects')
         modalService.showModal({}, modalOptions)
         .then(function () {
 			delete $stateParams.entityForEdit;			
-		    $state.go('list.entity', {boId:self.entityForEdit.boh_name});
+		    $state.go('list.entity', {boId:self.entityForEdit.boh_id});
         });
 	};
 	
@@ -109,7 +109,7 @@ angular.module('businessObjects')
 	    .then(function(){
 			$log.debug('Buisness Object updated successfully');
 			Notifications.createMessageSuccess('Buisness Object updated successfully.');
-			$state.go('list.entity', {boId: self.entityForEdit.boh_name}, {reload:true});
+			$state.go('list.entity', {boId: self.entityForEdit.boh_id}, {reload:true});
     	})
     	.catch(function(reason){
     		var message = masterDataSvc.serviceErrorMessageFormatter('Updating Buisness Object failed', reason);

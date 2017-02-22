@@ -13,8 +13,8 @@
       ,
       {
         "name":"BOI_BOH_NAME",
-        "type":"BIGINT",
-        "length":"0",
+        "type":"VARCHAR",
+        "length":"100",
         "notNull":"true",
         "primaryKey":"false",
         "defaultValue":""

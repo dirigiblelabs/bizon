@@ -26,9 +26,9 @@ angular.module('businessObjects')
 	this.createItem = function(){
 		masterDataSvc.create()
 		.then(function(newItem){
-			$stateParams.boId = newItem.boh_name;
+			$stateParams.boId = newItem.boh_id;
 			$stateParams.selectedEntity = newItem;
-			$log.debug('Business Object with id '+newItem.boh_name+' created successfully');
+			$log.debug('Business Object with id '+newItem.boh_id+' created successfully');
 			Notifications.createMessageSuccess('Business Object created successfully');
 			masterDataSvc.selection = [newItem];
 			self.items = masterDataSvc.getLoadedData();
@@ -54,7 +54,7 @@ angular.module('businessObjects')
         modalService.showModal({}, modalOptions)
         .then(function () {
 			self.busy = true;
-			masterDataSvc.remove(entity.boh_name, true)
+			masterDataSvc.remove(entity.boh_id, true)
 			.then(function(){
 				delete $stateParams.boId;
 				delete $state.params.boId;
@@ -147,7 +147,7 @@ angular.module('businessObjects')
 					} else {
 						postNext.apply(self);
 						if(masterDataSvc.getLoadedData().length>0){
-		              		$state.go('list.entity', {boId: masterDataSvc.getLoadedData()[0].boh_name});
+		              		$state.go('list.entity', {boId: masterDataSvc.getLoadedData()[0].boh_id});
 		              	}
 		              	self.busy = false;
 					}

@@ -13,7 +13,7 @@
 		                	var location = res.headers('Location');
 		                	if(location){
 		                		var id = location.substring(location.lastIndexOf('/')+1);
-		                		angular.extend(res.resource, { "boh_name": id });
+		                		angular.extend(res.resource, { "boh_id": id });
 	                		} else {
 	                			$log.error('Cannot infer id after save operation. HTTP Response Header "Location" is missing: ' + location);
 	            			}
@@ -131,21 +131,11 @@
 		/* make sure that sort and order properties of settings have not changed when paging and after the first page has been loaded. purge and start over again otehrwise */
 		function query(settings){
 			this.querySettings = settings;
-			settings.$expand = (settings && settings.$expand!==undefined) || 'properties,inbound-relations,outbound-relations,inbound-entities'; 
+			if(settings && !settings.$expand)
+				settings.$expand = 'properties,inbound-relations,outbound-relations,inbound-entities';
 			var deferred = $q.defer();
 			Entity.query(settings).$promise
 			.then(function(data){
-				if(data)
-					data = data.map(function(entity){
-						if(entity.properties){
-							entity.properties = entity.properties.map(function(item){
-								if(!item.boi_type)
-									item.boi_type = 'Relationship';
-								return item;
-							});
-						}
-						return entity;
-					});
 				if(self.querySettings.limit){
 					if(!self.querySettings.$offset)
 						self.batchLoadedMasterData = data;//invalidate cached data
@@ -176,7 +166,7 @@
 		*/
 		this.get = function(id, lookupRemotelyOnDemand){
 			var itemHit = this.batchLoadedMasterData.filter(function(item){
-					if(item.boh_name == id ){
+					if(item.boh_id == id ){
 						return true;
 					}
 					return false;
@@ -291,7 +281,7 @@
 			var entity = template;
 			if(!entity){
 				entity = this.masterDataTemplateObject = createMasterDataTemplateObject();
-				entity.boh_table += createRandomAlphanumeric();
+				entity.boh_name += createRandomAlphanumeric();
 				entity.properties.map(function(prop){
 					prop.boi_boh_name = entity.boh_name;
 					return prop;
@@ -307,6 +297,7 @@
 		};
 		
 		this.update = function(header){
+			// push upsert/remove requests for dependencies
 			if(header.properties){
 				var props = header.properties.filter(function(item){
 					if(!item.action){
@@ -325,7 +316,7 @@
 	        		}
 	        		return $promise;
 		    	});
-				var rels = header["inbound-relations"].filter(function(item){
+				var rels = header["outbound-relations"].filter(function(item){
 					if(!item.action){
 						return false;
 					}
@@ -343,8 +334,8 @@
 	        		return $promise;
 		    	}));
 			}
-
-			promises.unshift(Entity.update({boId: header.boh_name}, header).$promise);
+			//finally, push request for update for the header too
+			promises.unshift(Entity.update({boId: header.boh_id}, header).$promise);
 			//promises.push(refresh.apply(self));
 	    	return $q.all(promises).then(function(){
 	    		refresh.apply(self);

@@ -13,8 +13,8 @@
       ,
       {
         "name":"BOR_SRC_BOH_NAME",
-        "type":"BIGINT",
-        "length":"0",
+        "type":"VARCHAR",
+        "length":"100",
         "notNull":"true",
         "primaryKey":"false",
         "defaultValue":""
@@ -31,8 +31,8 @@
       ,
       {
         "name":"BOR_TARGET_BOH_NAME",
-        "type":"BIGINT",
-        "length":"0",
+        "type":"VARCHAR",
+        "length":"100",
         "notNull":"true",
         "primaryKey":"false",
         "defaultValue":""

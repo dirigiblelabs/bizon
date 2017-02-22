@@ -45,6 +45,7 @@
 			<table class="table table-condensed">
 				<thead>
 					<tr>
+						<th>BOH_ID</th>
 						<th>BOH_NAME</th>						
 						<th>BOH_LABEL</th>
 						<th>BOH_TABLE</th>
@@ -54,6 +55,7 @@
 				<tbody>
 					<tr class="selected-{{entry._selected_}}" ng-repeat="entry in data"
 						ng-click="showInfoForEntry(entry)">
+						<td>{{entry.boh_id}}</td>												
 						<td>{{entry.boh_name}}</td>						
 						<td>{{entry.boh_label}}</td>
 						<td>{{entry.boh_table}}</td>
@@ -84,6 +86,11 @@
 			<div>
 				<!-- input form -->
 				<div>
+					<label>BOH_ID</label>
+					<input type="text" class="form-control" 
+						ng-model="selectedEntry.boh_id"
+						ng-readonly="operation == 'show'" required="required">
+					<br>				
 					<label>BOH_NAME</label>
 					<input type="text" class="form-control" 
 						ng-model="selectedEntry.boh_name"
@@ -221,7 +228,7 @@
                     
 			function newEntry(entry){
 				delete $scope.selectedEntry._selected_;
-				$http.post(url+'/'+entry.boh_name, entry)
+				$http.post(url+'/'+entry.boh_id, entry)
 				.success(function(){
 					refreshData();
 					$scope.selectedEntry = null;
@@ -235,7 +242,7 @@
 			
 			function updateEntry(entry){
 				delete $scope.selectedEntry._selected_;
-				$http.put(url+'/'+entry.boh_name, entry)
+				$http.put(url+'/'+entry.boh_id, entry)
 					.success(function(){
 						refreshData();
 	                    $scope.operation = 'show';
@@ -248,7 +255,7 @@
 
 			function deleteEntry(entry){
 				var primaryKey;
-				primaryKey = "boh_name";
+				primaryKey = "boh_id";
 				var deleteUrl = url+'/'+entry[primaryKey];
 				$http.delete(deleteUrl)
 				.success(function(){
