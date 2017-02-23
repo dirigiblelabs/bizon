@@ -49,7 +49,7 @@ exports.get = function(){
 				"id": true
 			},{
 				"name": "srcEntityName",
-				"dbName": "BOR_SRC_BOH_NAME",
+				"dbName": "BOR_SRC_BOE_NAME",
 				"type": "String",
 				"size": 100,
 				"required": true
@@ -60,7 +60,7 @@ exports.get = function(){
 				"required": true
 			},{
 				"name": "targetEntityName",
-				"dbName": "BOR_TARGET_BOH_NAME",
+				"dbName": "BOR_TARGET_BOE_NAME",
 				"type": "String",
 				"size": 100,
 				"required": true

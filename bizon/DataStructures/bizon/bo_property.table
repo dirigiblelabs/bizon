@@ -1,17 +1,18 @@
 {
-  "tableName":"BO_HEADER",
+  "tableName":"BO_PROPERTY",
   "columns":
     [
       {
-        "name":"BOH_ID",
+        "name":"BOP_ID",
         "type":"BIGINT",
         "length":"0",
         "notNull":"true",
         "primaryKey":"true",
         "defaultValue":""
-      },
+      }
+      ,
       {
-        "name":"BOH_NAME",
+        "name":"BOP_BOH_NAME",
         "type":"VARCHAR",
         "length":"100",
         "notNull":"true",
@@ -20,7 +21,7 @@
       }
       ,
       {
-        "name":"BOH_LABEL",
+        "name":"BOP_NAME",
         "type":"VARCHAR",
         "length":"255",
         "notNull":"true",
@@ -29,81 +30,63 @@
       }
       ,
       {
-        "name":"BOH_TABLE",
+        "name":"BOP_COLUMN",
         "type":"VARCHAR",
-        "length":"128",
+        "length":"255",
+        "notNull":"true",
+        "primaryKey":"false",
+        "defaultValue":""
+      }
+      ,
+      {
+        "name":"BOP_TYPE_NAME",
+        "type":"VARCHAR",
+        "length":"255",
+        "notNull":"true",
+        "primaryKey":"false",
+        "defaultValue":""
+      }      
+      ,
+      {
+        "name":"BOP_TYPE",
+        "type":"VARCHAR",
+        "length":"255",
+        "notNull":"true",
+        "primaryKey":"false",
+        "defaultValue":""
+      }
+      ,
+      {
+        "name":"BOP_LENGTH",
+        "type":"INTEGER",
+        "length":"0",
         "notNull":"false",
         "primaryKey":"false",
         "defaultValue":""
       }
       ,
       {
-        "name":"BOH_DS_GEN_ENABLED",
+        "name":"BOP_NULL",
         "type":"SMALLINT",
         "length":"0",
         "notNull":"false",
         "primaryKey":"false",
-        "defaultValue":"1"
+        "defaultValue":"0"
       }
       ,
       {
-        "name":"BOH_ID_NAME",
-        "type":"VARCHAR",
-        "length":"255",
+        "name":"BOP_PK",
+        "type":"SMALLINT",
+        "length":"0",
         "notNull":"false",
         "primaryKey":"false",
-        "defaultValue":""
+        "defaultValue":"0"
       }
       ,
       {
-        "name":"BOH_ID_DATATYPE_CODE",
+        "name":"BOP_DEFAULT",
         "type":"VARCHAR",
         "length":"255",
-        "notNull":"false",
-        "primaryKey":"false",
-        "defaultValue":""
-      }     
-      ,
-      {
-        "name":"BOH_SVC_NAME",
-        "type":"VARCHAR",
-        "length":"255",
-        "notNull":"false",
-        "primaryKey":"false",
-        "defaultValue":""
-      }     
-      ,
-      {
-        "name":"BOH_SVC_GEN_ENABLED",
-        "type":"SMALLINT",
-        "length":"0",
-        "notNull":"false",
-        "primaryKey":"false",
-        "defaultValue":"1"
-      }            
-      ,
-      {
-        "name":"BOH_UI_GEN_ENABLED",
-        "type":"SMALLINT",
-        "length":"0",
-        "notNull":"false",
-        "primaryKey":"false",
-        "defaultValue":"1"
-      }            
-      ,      
-      {
-        "name":"BOH_UI_TITLE",
-        "type":"VARCHAR",
-        "length":"255",
-        "notNull":"false",
-        "primaryKey":"false",
-        "defaultValue":""
-      }            
-      ,
-      {
-        "name":"BOH_DESCRIPTION",
-        "type":"VARCHAR",
-        "length":"2000",
         "notNull":"false",
         "primaryKey":"false",
         "defaultValue":""

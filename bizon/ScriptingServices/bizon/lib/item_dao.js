@@ -5,39 +5,39 @@
 
 exports.get = function(){
 	return require('daoism/dao').get({
-			"dbName": "BO_ITEM",
+			"dbName": "BO_PROPERTY",
 			"properties": [{
 				"name": "id",
-				"dbName": "BOI_ID",
+				"dbName": "BOP_ID",
 				"type": "Long",
 				"id": true
 			},{
 				"name": "entityName",
-				"dbName": "BOI_BOH_NAME",
+				"dbName": "BOP_BOH_NAME",
 				"type": "String",
 				"size": 100,
 				"required": true
 			},{
 				"name": "name",
-				"dbName": "BOI_NAME",
+				"dbName": "BOP_NAME",
 				"type": "String",
 				"size": 250,
 				"required": true
 			},{
 				"name": "column",
-				"dbName": "BOI_COLUMN",
+				"dbName": "BOP_COLUMN",
 				"type": "String",
 				"size": 250,
 				"required": true
 			},{
 				"name": "type",
-				"dbName": "BOI_TYPE",
+				"dbName": "BOP_TYPE",
 				"type": "String",
 				"size": 250,
 				"required": true
 			},{
 				"name": "pk",
-				"dbName": "BOI_PK",
+				"dbName": "BOP_PK",
 				"type": "Short",
 				"dbValue": function(value){
 					return value === null || value === true ? 1 : 0;
@@ -47,13 +47,13 @@ exports.get = function(){
 				}				
 			},{
 				"name": "typeLabel",
-				"dbName": "BOI_TYPE_NAME",
+				"dbName": "BOP_TYPE_NAME",
 				"type": "String",
 				"size": 250,
 				"required": true
 			},{
 				"name": "size",
-				"dbName": "BOI_LENGTH",
+				"dbName": "BOP_LENGTH",
 				"type": "Int",
 				"dbValue": function(value){
 					return value === undefined ? 0 : value;
@@ -63,7 +63,7 @@ exports.get = function(){
 				}			
 			},{
 				"name": "required",
-				"dbName": "BOI_NULL",
+				"dbName": "BOP_NULL",
 				"type": "Short",
 				"dbValue": function(value){
 					return value === null || value === true ? 1 : 0;
@@ -73,7 +73,7 @@ exports.get = function(){
 				}				
 			},{
 				"name": "defaultValue",
-				"dbName": "BOI_DEFAULT",
+				"dbName": "BOP_DEFAULT",
 				"type": "String",
 				"size": 250
 			}]

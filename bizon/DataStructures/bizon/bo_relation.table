@@ -12,7 +12,7 @@
       }
       ,
       {
-        "name":"BOR_SRC_BOH_NAME",
+        "name":"BOR_SRC_BOE_NAME",
         "type":"VARCHAR",
         "length":"100",
         "notNull":"true",
@@ -30,7 +30,7 @@
       }
       ,
       {
-        "name":"BOR_TARGET_BOH_NAME",
+        "name":"BOR_TARGET_BOE_NAME",
         "type":"VARCHAR",
         "length":"100",
         "notNull":"true",

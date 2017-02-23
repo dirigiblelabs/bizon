@@ -92,7 +92,7 @@ function _createSQLEntity(entity, dbEntity) {
 	if(dbEntity.uiGenEnabled === 1){
 		if(dbEntity.uiTitle !== undefined && dbEntity.uiTitle !== null){
 			if(dbEntity.uiTitle.length>255)
-				throw new Error("Illegal arugment: bo_ui_title["+dbEntity.uiTitle+"] does not comply with validation rules. Longer than 255 characters.");
+				throw new Error("Illegal arugment: uiTitle["+dbEntity.uiTitle+"] does not comply with validation rules. Longer than 255 characters.");
 		} else {
 			dbEntity.uiTitle = dbEntity.label;
 			this.$log.info('Autoassigned uiTitle['+dbEntity.uiTitle+']');			
@@ -113,40 +113,40 @@ function createRadnomAlphanumeric(length){
 exports.get = function(){
 
 	var dao = require('daoism/dao').get({
-			"dbName": "BO_HEADER",
+			"dbName": "BO_ENTITY",
 			"properties": [{
 				"name": "id",
-				"dbName": "BOH_ID",
+				"dbName": "BOE_ID",
 				"type": "Long",
 				"id": true
 			},{
 				"name": "name",
-				"dbName": "BOH_NAME",
+				"dbName": "BOE_NAME",
 				"type": "String",
 				"size": 100,
 			},{
 				"name": "label",
-				"dbName": "BOH_LABEL",
+				"dbName": "BOE_LABEL",
 				"type": "String",
 				"size": 250,
 			},{
 				"name": "description",
-				"dbName": "BOH_DESCRIPTION",
+				"dbName": "BOE_DESCRIPTION",
 				"type": "String",
 				"size": 1000,
 			},{
 				"name": "table",
-				"dbName": "BOH_TABLE",
+				"dbName": "BOE_TABLE",
 				"type": "String",
 				"size": 128,
 			},{
 				"name": "svcName",
-				"dbName": "BOH_SVC_NAME",
+				"dbName": "BOE_SVC_NAME",
 				"type": "String",
 				"size": 250,
 			},{
 				"name": "uiGenEnabled",
-				"dbName": "BOH_UI_GEN_ENABLED",
+				"dbName": "BOE_UI_GEN_ENABLED",
 				"type": "Short",
 				"dbValue": function(value){
 					var dbVal = 0;
@@ -162,7 +162,7 @@ exports.get = function(){
 				}
 			},{
 				"name": "svcGenEnabled",
-				"dbName": "BOH_SVC_GEN_ENABLED",
+				"dbName": "BOE_SVC_GEN_ENABLED",
 				"type": "Short",
 				"dbValue": function(value){
 					var dbVal = 0;
@@ -178,7 +178,7 @@ exports.get = function(){
 				}
 			},{
 				"name": "dsGenEnabled",
-				"dbName": "BOH_DS_GEN_ENABLED",
+				"dbName": "BOE_DS_GEN_ENABLED",
 				"type": "Short",
 				"dbValue": function(value){
 					var dbVal = 0;
@@ -194,7 +194,7 @@ exports.get = function(){
 				}
 			},{
 				"name": "uiTitle",
-				"dbName": "BOH_UI_TITLE",
+				"dbName": "BOE_UI_TITLE",
 				"type": "String",
 				"size": 250,
 			}],

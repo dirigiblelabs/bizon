@@ -1,18 +1,17 @@
 {
-  "tableName":"BO_ITEM",
+  "tableName":"BO_ENTITY",
   "columns":
     [
       {
-        "name":"BOI_ID",
+        "name":"BOE_ID",
         "type":"BIGINT",
         "length":"0",
         "notNull":"true",
         "primaryKey":"true",
         "defaultValue":""
-      }
-      ,
+      },
       {
-        "name":"BOI_BOH_NAME",
+        "name":"BOE_NAME",
         "type":"VARCHAR",
         "length":"100",
         "notNull":"true",
@@ -21,7 +20,7 @@
       }
       ,
       {
-        "name":"BOI_NAME",
+        "name":"BOE_LABEL",
         "type":"VARCHAR",
         "length":"255",
         "notNull":"true",
@@ -30,63 +29,63 @@
       }
       ,
       {
-        "name":"BOI_COLUMN",
+        "name":"BOE_TABLE",
         "type":"VARCHAR",
-        "length":"255",
-        "notNull":"true",
-        "primaryKey":"false",
-        "defaultValue":""
-      }
-      ,
-      {
-        "name":"BOI_TYPE_NAME",
-        "type":"VARCHAR",
-        "length":"255",
-        "notNull":"true",
-        "primaryKey":"false",
-        "defaultValue":""
-      }      
-      ,
-      {
-        "name":"BOI_TYPE",
-        "type":"VARCHAR",
-        "length":"255",
-        "notNull":"true",
-        "primaryKey":"false",
-        "defaultValue":""
-      }
-      ,
-      {
-        "name":"BOI_LENGTH",
-        "type":"INTEGER",
-        "length":"0",
+        "length":"128",
         "notNull":"false",
         "primaryKey":"false",
         "defaultValue":""
       }
       ,
       {
-        "name":"BOI_NULL",
+        "name":"BOE_DS_GEN_ENABLED",
         "type":"SMALLINT",
         "length":"0",
         "notNull":"false",
         "primaryKey":"false",
-        "defaultValue":"0"
-      }
+        "defaultValue":"1"
+      }     
       ,
       {
-        "name":"BOI_PK",
+        "name":"BOE_SVC_NAME",
+        "type":"VARCHAR",
+        "length":"255",
+        "notNull":"false",
+        "primaryKey":"false",
+        "defaultValue":""
+      }     
+      ,
+      {
+        "name":"BOE_SVC_GEN_ENABLED",
         "type":"SMALLINT",
         "length":"0",
         "notNull":"false",
         "primaryKey":"false",
-        "defaultValue":"0"
-      }
+        "defaultValue":"1"
+      }            
       ,
       {
-        "name":"BOI_DEFAULT",
+        "name":"BOE_UI_GEN_ENABLED",
+        "type":"SMALLINT",
+        "length":"0",
+        "notNull":"false",
+        "primaryKey":"false",
+        "defaultValue":"1"
+      }            
+      ,      
+      {
+        "name":"BOE_UI_TITLE",
         "type":"VARCHAR",
         "length":"255",
+        "notNull":"false",
+        "primaryKey":"false",
+        "defaultValue":""
+      }            
+      ,
+      {
+        "name":"BOE_DESCRIPTION",
+        "type":"VARCHAR",
+        "length":"2000",
         "notNull":"false",
         "primaryKey":"false",
         "defaultValue":""

@@ -92,7 +92,7 @@ angular.module('businessObjects')
 				dataStructure.columns.push({
 					'name': nextColumn.name.toUpperCase(),
 		            'type': nextColumn.type.toUpperCase(),
-		            'length': nextColumn.size,
+		            'length': nextColumn.size===undefined ? 0 : nextColumn.size,
 		            'notNull': nextColumn.required,
 		            'primaryKey': nextColumn.pk,
 		            'defaultValue': nextColumn.defaultValue || '',
