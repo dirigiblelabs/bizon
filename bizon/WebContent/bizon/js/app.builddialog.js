@@ -95,7 +95,7 @@ angular.module('businessObjects')
 		            'length': nextColumn.size,
 		            'notNull': nextColumn.required,
 		            'primaryKey': nextColumn.pk,
-		            'defaultValue': ''//nextColumn.defaultValue,
+		            'defaultValue': nextColumn.defaultValue || '',
 		         });
 			}
 			template.dataStructures.push(dataStructure);
@@ -116,7 +116,7 @@ angular.module('businessObjects')
 				scriptingService.columns.push({  
 		    		'name': nextColumn.name.toUpperCase(),
 		            'type': nextColumn.type.toUpperCase(),
-		            'key': nextColumn.name === entities[i].idName
+		            'key' : nextColumn.pk,
 		         });
 			}
 			template.scriptingServices.push(scriptingService);
@@ -148,7 +148,7 @@ angular.module('businessObjects')
 					'name': nextColumn.name.toLowerCase(),
 		            'label': nextColumn.boi_label ? nextColumn.boi_label : nextColumn.name,
 		            'widgetType': widgetsMapping[nextColumn.type],
-		            'key': nextColumn.name === entities[i].idName,
+		            'key': nextColumn.pk,
 		            'visible': true
 		         });
 			}
