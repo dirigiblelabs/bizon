@@ -36,7 +36,6 @@
 	  	var res = $resource('../../js/bizon/svc/v1/header.js/:boId', { boId:'@id' }, cfg);
 
 		res.newObjectTemplate = {
-				"name":"BizEntity",
 				"label":"Business Object Name",
 				"description":"Description for business object",
 				"dsGenEnabled": true,
@@ -284,7 +283,7 @@
 			var entity = template;
 			if(!entity){
 				entity = this.masterDataTemplateObject = createMasterDataTemplateObject();
-				entity.name += createRandomAlphanumeric();
+				entity.name = createRandomAlphanumeric();
 				entity.properties.map(function(prop){
 					prop.entityName = entity.name;
 					return prop;
@@ -385,7 +384,7 @@
 		
 		this.exportData = function(){
 			$log.info('Exporting data');
-			return Entity.query({$expand:''}).$promise;
+			return Entity.query({$expand:'properties,inbound-relations'}).$promise;
 		};
 		
 		this.importData = function(data){
