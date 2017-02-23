@@ -3,7 +3,7 @@
 "use strict";
 
 
-var headerDAO = require("bizon/lib/header_dao").get();
+var headerDAO = require("bizon/lib/entity_dao").get();
 var DataService = require("arestme/data_service").DataService;
 
 var svc = new DataService(headerDAO);

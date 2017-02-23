@@ -89,7 +89,7 @@ function createRadnomAlphanumeric(length){
     return ("0000" + (Math.random()*Math.pow(36,power) << 0).toString(36)).slice(sliceIndex);
 }
 
-var orm = {
+const orm = {
 			"dbName": "BO_ENTITY",
 			"properties": [{
 				"name": "id",
@@ -207,6 +207,7 @@ var orm = {
 		};
 
 exports.get = function(){
+
 	var dao = require('daoism/dao').get(orm, "BIZ_HeaderDAO");
 		
 	var originalFunc = require('daoism/dao').DAO.prototype.createSQLEntity;
