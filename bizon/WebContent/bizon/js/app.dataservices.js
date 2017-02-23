@@ -344,10 +344,8 @@
 	    	});
 		};	
 		
-		this.remove = function(headerId, cascaded){
+		this.remove = function(headerId){
 			var reqParams = {};
-			if(cascaded)
-				reqParams.cascaded = cascaded;
 			if(headerId !== undefined){
 				if(headerId.constructor === Array){
 					reqParams = headerId;
@@ -384,7 +382,7 @@
 		
 		this.exportData = function(){
 			$log.info('Exporting data');
-			return Entity.query({$expand:'properties,inbound-relations'}).$promise;
+			return Entity.query({$expand:'properties,inbound-relations'}).$promise;//TODO: remove ids
 		};
 		
 		this.importData = function(data){

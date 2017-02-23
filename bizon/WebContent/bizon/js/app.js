@@ -195,10 +195,10 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		  		});
 		    }]
 		  })
-		  .state("list.entity.import", {
+		  .state("list.import", {
 		  	onEnter: ['$state', '$stateParams', '$uibModal', function($state, $stateParams, $modal) {
 		    	function goBack() {
-	        		$state.go("list.entity", {boId: $stateParams.boId}, {reload:true});
+	        		$state.go("list", {}, {reload:true});
 		        }
 		        var modalInstance = $modal.open({
 		        	animation: true,
@@ -206,8 +206,8 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		            controller: 'ImportCtrl',
 		            controllerAs: 'importVm'
 		        });
-				modalInstance.result.then(goBack, goBack);		        
-		      	$state.go('list.entity');
+				modalInstance.result.then(goBack, goBack);
+		      	//$state.go('list.entity');
 		    }]
 		  }) 
 		  .state("list.entity.settings", {

@@ -5,69 +5,60 @@
 
 var headerDAO = require("bizon/lib/header_dao").get();
 var DataService = require("arestme/data_service").DataService;
-new DataService(headerDAO).service();
 
-/*var importData = function(ctx, io){
+var svc = new DataService(headerDAO);
+//add upload handler to this data service
+var HttpController = require("arestme/http").HttpController;
+HttpController.prototype.addResourceHandler.call(svc, "", "post", function(ctx, io){
 	var upload = require('net/http/upload');
-	if(upload.isMultipartContent()){
-		try{
-			var files = upload.parseRequest();
-			var json = [];
-			var self = this;
-			files.forEach(function(file) {
-				var uploadStatus = {
-					"file": file.name,
-				};
-				var content = String.fromCharCode.apply(null, file.data);		
+	try{
+		var filesUpload = upload.parseRequest();
+		var json = [];
+		if(filesUpload!==null && filesUpload !==undefined){
+			if(filesUpload.constructor!==Array)
+				filesUpload = [filesUpload];
+			var i=1;
+			filesUpload.forEach(function(file) {
+				var content, objectsForImport;
+				this.logger.info('Processing file upload['+(i++)+'] of ' + filesUpload.length +': '+ file.name);
 				try {
-					var objectsForImport = JSON.parse(content);
-					for(var i=0; i< objectsForImport.length; i++){
-						this.logger.info('Inserting object ' + objectsForImport[i].label);
-						objectsForImport[i][self.dao.getPrimaryKey()] = self.dao.insert(objectsForImport[i], true);
-					}
-					uploadStatus.status="ok";
-				} catch (err) {
-					this.logger.error(1, err.message);
-					uploadStatus.status="error";
-					uploadStatus.details = err.message;
-					throw err;
-				} finally {
-					json.push(uploadStatus);
+					content = String.fromCharCode.apply(null, file.loadData());
+					objectsForImport = JSON.parse(content);
+				} catch (err){
+					this.sendError(io.response.BAD_REQUEST, err.message);
 				}
-			});
-			io.response.println(JSON.stringify(json));
-			io.response.setStatus(io.response.OK);
-		} catch(err){
-			var errorCode = io.response.INTERNAL_SERVER_ERROR;
-			this.logger.error(errorCode, err.message, err.errContext);
-	    	this.sendError(io, errorCode, errorCode, err.message, err.errContext);
-	    	throw err;
-		} finally {
-			io.response.flush();
-			io.response.close();
-		}		
-		//log it's not multipart} else {
-	}
-};
-
-var deleteData = function(cascaded, io){
-	this.logger.info('Deleting multiple objects');
+				var ids = this.handlersProvider.dao.insert(objectsForImport, true);
+				json = json.concat(ids);
+			}.bind(this));				
+		}
+		io.response.println(JSON.stringify(json, null, 2));
+		io.response.setStatus(io.response.OK);		
+	} catch(err){
+		this.logger.error(err.message, err);
+    	this.sendError(io.response.INTERNAL_SERVER_ERROR, err.message);
+    	throw err;
+	} 
+}.bind(svc), ['multipart/form-data']);
+HttpController.prototype.addResourceHandler.call(svc, "", "delete", function(ctx, io){
+	this.logger.info('Deleting multiple ' + this.handlersProvider.dao.orm.dbName + ' entities');
 	try{
 		var input = io.request.readInputText();
-		this.logger.info('Deleting entities '+ (input || 'all'));
-		var ids = null;
-		if(input){
-			ids = JSON.parse(input);
+		if(input && input.length>0){
+			var ids;
+			try {
+				ids = JSON.parse(input);
+			} catch (err){
+				this.sendError(io.response.BAD_REQUEST, err.message);
+			}
+			this.handlersProvider.dao.remove(ids);
+		} else {
+			this.handlersProvider.dao.remove();
 		}
-    	this.dao.remove(ids, cascaded);
 		io.response.setStatus(io.response.NO_CONTENT);
 	} catch(err){
-		var errorCode = io.response.INTERNAL_SERVER_ERROR;
-		this.logger.error(errorCode, err.message, err.errContext);
-    	this.sendError(io, errorCode, errorCode, err.message, err.errContext);
+		this.logger.error(err.message, err);
+    	this.sendError(io.response.INTERNAL_SERVER_ERROR, err.message);
     	throw err;
-	} finally {
-		io.response.flush();
-		io.response.close();
-	}
-};*/
+	}  
+}.bind(svc));
+svc.service();

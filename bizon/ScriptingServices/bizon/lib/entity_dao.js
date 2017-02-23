@@ -3,12 +3,6 @@
 (function(){
 "use strict";
 
-/*var parseIntStrict = function (value) {
-  if(/^(\-|\+)?([0-9]+|Infinity)$/.test(value))
-    return Number(value);
-  return NaN;
-};*/
-
 //Prepare a JSON object for insert into DB
 function _createSQLEntity(entity, dbEntity) {
 	if(dbEntity.dsGenEnabled === 1){
@@ -54,21 +48,6 @@ function _createSQLEntity(entity, dbEntity) {
 			});
 			this.$log.info('Generated PK property [id]');
 		}
-		/*if(entity.idName !== undefined && entity.idName !== null){
-			var isIdNameValid = /^[a-zA-Z_][a-zA-Z0-9_]{0,255}$/.test(entity.idName);//TODO: validation needs to come from database dialect provider
-			if(!isIdNameValid)
-				throw new Error("Illegal arugment: idName["+entity.idName+"] does not comply with validation rules");
-		} else {
-			entity.idName = "id";
-			this.$log.info('Generated idName['+entity.idName+']');
-		}*/
-		/*if(entity.idType !== undefined && entity.idType !== null){*/
-			/*var isIdDataTypeValid = !isNaN(entity.idType) && [0,1,2,3,4,5,6,7,8,9].indexOf(entity.idType);//TODO: extenralize valid codes
-			if(!isIdDataTypeValid)
-				throw new Error("Illegal arugment: idType["+entity.idType+"] does not comply with validation rules");*/
-		/*} else {
-			entity.idType = "INTEGER";
-		}*/
 	}
 	if(dbEntity.svcGenEnabled === 1){
 		if(dbEntity.svcName !== undefined && dbEntity.svcName !== null){
@@ -110,9 +89,7 @@ function createRadnomAlphanumeric(length){
     return ("0000" + (Math.random()*Math.pow(36,power) << 0).toString(36)).slice(sliceIndex);
 }
 
-exports.get = function(){
-
-	var dao = require('daoism/dao').get({
+var orm = {
 			"dbName": "BO_ENTITY",
 			"properties": [{
 				"name": "id",
@@ -123,6 +100,8 @@ exports.get = function(){
 				"name": "name",
 				"dbName": "BOE_NAME",
 				"type": "String",
+				"required": true,
+				"unique": true,
 				"size": 100,
 				"allowedOps": ['insert']
 			},{
@@ -225,7 +204,10 @@ exports.get = function(){
 					"associationType": "many-to-many"
 				}
 			}
-		}, "BIZ_HeaderDAO");
+		};
+
+exports.get = function(){
+	var dao = require('daoism/dao').get(orm, "BIZ_HeaderDAO");
 		
 	var originalFunc = require('daoism/dao').DAO.prototype.createSQLEntity;
 	dao.createSQLEntity = function(entity){

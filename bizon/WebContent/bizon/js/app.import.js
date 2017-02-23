@@ -21,7 +21,7 @@ angular.module('businessObjects')
 	};
 
     var uploader = this.uploader = new FileUploader({
-        url: '../../js/bizon/bo_header.js'
+        url: '../../js/bizon/svc/v1/entities.js'
     });
 
     // UPLOADER FILTERS
