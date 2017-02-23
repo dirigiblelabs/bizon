@@ -33,7 +33,7 @@
 /*		cfg.count = {method:'GET', params:{count:true}, isArray:false, ignoreLoadingBar: true};*/
 		cfg.getByName = {method:'GET', isArray:false, ignoreLoadingBar: false};
 		
-	  	var res = $resource('../../js/bizon/svc/v1/header.js/:boId', { boId:'@id' }, cfg);
+	  	var res = $resource('../../js/bizon/svc/v1/entities.js/:boId', { boId:'@id' }, cfg);
 
 		res.newObjectTemplate = {
 				"label":"Business Object Name",
@@ -46,11 +46,11 @@
 		return res;
 	}])
 	.service('EntityCount', ['$resource', function($resource) {
-	  	return $resource('../../js/bizon/svc/v1/header.js/count', {}, 
+	  	return $resource('../../js/bizon/svc/v1/entities.js/count', {}, 
 	  			{get: {method:'GET', params:{}, isArray:false, ignoreLoadingBar: true}});
 	}])	
 	.service('EntityQueryByName', ['$resource', function($resource) {
-	  	return $resource('../../js/bizon/svc/v1/header.js', {}, {
+	  	return $resource('../../js/bizon/svc/v1/entities.js', {}, {
 	  		queryByName: {
 	  			method:'GET', 
 	  			isArray:true, 
@@ -60,7 +60,7 @@
 	}])	
 	.service('Item', ['$resource', 'ResourceSvcConfiguration', function($resource, ResourceSvcConfiguration) {
 	
-	  	var res = $resource('../../js/bizon/svc/v1/item.js/:boId', { boId:'@id' }, ResourceSvcConfiguration.cfg);
+	  	var res = $resource('../../js/bizon/svc/v1/properties.js/:boId', { boId:'@id' }, ResourceSvcConfiguration.cfg);
 		
 		res.newObjectTemplate = {
 					"name":"Item",

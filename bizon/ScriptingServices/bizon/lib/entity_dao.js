@@ -124,6 +124,7 @@ exports.get = function(){
 				"dbName": "BOE_NAME",
 				"type": "String",
 				"size": 100,
+				"allowedOps": ['insert']
 			},{
 				"name": "label",
 				"dbName": "BOE_LABEL",
@@ -202,7 +203,7 @@ exports.get = function(){
 				"properties": {
 					"joinKey": "entityName",
 					"key": "name",
-					"dao": require("bizon/lib/item_dao").get,
+					"dao": require("bizon/lib/property_dao").get,
 					"associationType": "one-to-many"
 				},
 				"outbound-relations": {
