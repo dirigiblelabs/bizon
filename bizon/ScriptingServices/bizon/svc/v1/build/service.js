@@ -1,38 +1,23 @@
 /* globals $ */
 /* eslint-env node, dirigible */
 
-var request = require('net/http/request');
-var response = require('net/http/response');
 var dataStructuresUtils = require('bizon/lib/generator/utils/dataStructuresUtils');
 var scriptingServicesUtils = require('bizon/lib/generator/utils/scriptingServicesUtils');
 var webContentUtils = require('bizon/lib/generator/utils/webContentUtils');
 
-handleRequest(request, response);
+require('arestme/http').get()
+.addResourceHandler('', 'post', function(ctx, io){
 
-function handleRequest(httpRequest, httpResponse, xss) {
+	this.logger.info('Application generation requested');
+	var template = null;
 	try {
-		dispatchRequest(httpRequest, httpResponse, xss);
+		template = JSON.parse(io.request.readInputText());
 	} catch (e) {
-		console.error(e);
-		sendResponse(httpResponse, httpResponse.BAD_REQUEST, 'text/plain', e);
+		this.logger.error(e.message, e);
+		this.sendError(400, 'Invalid request payload: ' + e.message);
+		return;
 	}
-}
 
-function dispatchRequest(httpRequest, httpResponse) {
-	response.setContentType('application/json; charset=UTF-8');
-	response.setCharacterEncoding('UTF-8');
-
-	switch (httpRequest.getMethod()) {
-		case 'POST': 
-			handlePostRequest(httpRequest, httpResponse);
-			break;
-		default:
-			handleNotAllowedRequest(httpResponse);
-	}
-}
-
-function handlePostRequest(httpRequest, httpResponse) {
-	var template = getRequestBody(httpRequest);
 	var projectName = template.projectName;
 	var packageName = template.packageName;
 	
@@ -57,25 +42,7 @@ function handlePostRequest(httpRequest, httpResponse) {
 		webContentUtils.generate(projectName, packageName, webContentFileName, webContentPageTitle, webContentServiceFileName, webContentColumns);
 	}
 	
-	sendResponse(httpResponse, httpResponse.CREATED);
-}
-
-function handleNotAllowedRequest(httpResponse) {
-	sendResponse(httpResponse, httpResponse.METHOD_NOT_ALLOWED);
-}
-
-function getRequestBody(httpRequest) {
-	try {
-		return JSON.parse(httpRequest.readInputText());
-	} catch (e) {
-		return null;
-	}
-}
-
-function sendResponse(response, status, contentType, content) {
-	response.setStatus(status);
-	response.setContentType(contentType);
-	response.println(content);
-	response.flush();
-	response.close();	
-}
+	this.logger.info('Application generation finished');
+	
+	io.response.setStatus(io.response.CREATED);
+}).service();
