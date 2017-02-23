@@ -89,7 +89,7 @@
 	  	});
 	}])
 	.service('Relation', ['$resource', 'ResourceSvcConfiguration', function($resource, ResourceSvcConfiguration) {
-	  	return $resource('../../js/bizon/svc/v1/relation.js/:boId', { boId:'@id' }, ResourceSvcConfiguration.cfg);
+	  	return $resource('../../js/bizon/svc/v1/relations.js/:boId', { boId:'@id' }, ResourceSvcConfiguration.cfg);
 	}])		
 	.service('masterDataSvc', ['Entity', 'Item', 'Relation', 'EntityCount', 'EntityQueryByName', '$q', '$log', function(Entity, Item, Relation, EntityCount, EntityQueryByName, $q, $log) {
 
