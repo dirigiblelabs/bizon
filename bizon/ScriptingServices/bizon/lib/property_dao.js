@@ -77,7 +77,7 @@ exports.get = function(){
 				"type": "String",
 				"size": 250
 			}]
-		}, "BIZ_ItemDAO");
+		}, "BIZ_PropertyDAO");
 };
 
 })();

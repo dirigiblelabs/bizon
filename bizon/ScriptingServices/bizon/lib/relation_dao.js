@@ -10,7 +10,7 @@ var listJoins = function(settings, daos){
 	} else if(typeof settings === 'object'){
 		joinId = settings[joinKey];
 	}
-	this.$log.info('Finding '+daos.n.orm.dbName+' entities related to '+daos.m.orm.dbName+'['+joinId+']');
+	this.$log.info('Finding '+daos.targetDao.orm.dbName+' entities related to '+daos.sourceDao.orm.dbName+'['+joinId+']');
 
 	if(joinId === undefined || joinId === null){
 		throw new Error('Illegal argument for id parameter:' + joinId);
@@ -22,17 +22,17 @@ var listJoins = function(settings, daos){
 		var statements = require('daoism/statements').get();
 		var stmnt = statements.builder()
 						.select()
-						.from(daos.n.orm.dbName)
-						.left_join( daos.join.orm.dbName, undefined, daos.join.orm.getProperty("targetEntityName").dbName+'='+daos.n.orm.getProperty('name').dbName)
-						.where(daos.join.orm.getProperty(joinKey).dbName+"=?", [daos.join.orm.getProperty(joinKey)]);
+						.from(daos.targetDao.orm.dbName)
+						.left_join( daos.joinDao.orm.dbName, undefined, daos.joinDao.orm.getProperty("targetEntityName").dbName+'='+daos.targetDao.orm.getProperty('name').dbName)
+						.where(daos.joinDao.orm.getProperty(joinKey).dbName+"=?", [daos.joinDao.orm.getProperty(joinKey)]);
 		
 		var resultSet = statements.execute(stmnt, connection, settings);
 		var entities = [];
         while (resultSet.next()) {
-        	var entity = daos.m.createEntity(resultSet);
+        	var entity = daos.sourceDao.createEntity(resultSet);
         	entities.push(entity);
         }
-        this.$log.info(entities.length+' '+daos.n.orm.dbName+' entities related to '+daos.m.orm.dbName+'[' + joinKey+ '] found');
+        this.$log.info(entities.length+' '+daos.targetDao.orm.dbName+' entities related to '+daos.sourceDao.orm.dbName+'[' + joinId+ '] found');
         return entities;
     } finally {
         connection.close();

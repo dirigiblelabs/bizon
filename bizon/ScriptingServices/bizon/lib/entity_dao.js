@@ -178,37 +178,38 @@ const orm = {
 				"type": "String",
 				"size": 250,
 			}],
-			"associationSets": {
-				"properties": {
+			"associations": [
+				{ 
+					"name": "properties",
 					"joinKey": "entityName",
 					"key": "name",
-					"dao": require("bizon/lib/property_dao").get,
-					"associationType": "one-to-many"
-				},
-				"outbound-relations": {
-					"key": "name",
+					"targetDao": require("bizon/lib/property_dao").get,
+					"type": "one-to-many"
+				},{ 
+					"name": "outbound-relations",
 					"joinKey": "srcEntityName",
-					"dao": require("bizon/lib/relation_dao").get,
-					"associationType": "one-to-many"
-				},
-				"inbound-relations": {
 					"key": "name",
+					"targetDao": require("bizon/lib/relation_dao").get,
+					"type": "one-to-many"
+				},{ 
+					"name": "inbound-relations",
 					"joinKey": "targetEntityName",
-					"dao": require("bizon/lib/relation_dao").get,
-					"associationType": "one-to-many"
-				},
-				"inbound-entities": {
 					"key": "name",
+					"targetDao": require("bizon/lib/relation_dao").get,
+					"type": "one-to-many"
+				},{ 
+					"name": "inbound-entities",
 					"joinKey": "srcEntityName",
-					"daoJoin": require("bizon/lib/relation_dao").get,
-					"associationType": "many-to-many"
+					"key": "name",
+					"joinDao": require("bizon/lib/relation_dao").get,
+					"type": "many-to-many"
 				}
-			}
+			]
 		};
 
 exports.get = function(){
 
-	var dao = require('daoism/dao').get(orm, "BIZ_HeaderDAO");
+	var dao = require('daoism/dao').get(orm, "BIZ_EntityDAO");
 		
 	var originalFunc = require('daoism/dao').DAO.prototype.createSQLEntity;
 	dao.createSQLEntity = function(entity){
