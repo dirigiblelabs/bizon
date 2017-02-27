@@ -31,7 +31,8 @@ require('arestme/http').get()
 		var scriptingServicesFileName = template.scriptingServices[i].fileName;
 		var scriptingServicesTableName = template.scriptingServices[i].tableName;
 		var scriptingServicesColumns = template.scriptingServices[i].columns;
-		scriptingServicesUtils.generate(projectName, packageName, scriptingServicesFileName, scriptingServicesTableName, scriptingServicesColumns);
+		var scriptingServicesAssociations = template.scriptingServices[i].associations;
+		scriptingServicesUtils.generate(projectName, packageName, scriptingServicesFileName, scriptingServicesTableName, scriptingServicesColumns, scriptingServicesAssociations);
 	}
 
 	for (var i = 0 ; i < template.webContent.length; i ++) {

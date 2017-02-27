@@ -85,7 +85,7 @@ angular.module('businessObjects')
 		for (var i = 0 ; i < entities.length; i ++) {
 			var dataStructure = {
 				'fileName': entities[i].table.toLowerCase() + '.table',
-				'columns': []
+				'columns': [],
 			}
 			for (var j in entities[i].properties) {
 				var nextColumn = entities[i].properties[j];
@@ -111,13 +111,49 @@ angular.module('businessObjects')
 				'tableName': entities[i].table.toUpperCase(),
 				'columns': []
 			};
+			var pkName;
 			for (var j in entities[i].properties) {
 				var nextColumn = entities[i].properties[j];
+				if(nextColumn.pk)
+					pkName = nextColumn.name;
 				scriptingService.columns.push({  
 		    		'name': nextColumn.name.toUpperCase(),
 		            'type': nextColumn.type.toUpperCase(),
 		            'key' : nextColumn.pk,
 		         });
+			}
+			for (var j in entities[i]['inbound-entities']) {
+				if(!scriptingService.associations)
+					scriptingService.associations = []
+				var relatedEntity = entities[i]['inbound-entities'][j];
+				var relation = entities[i]['outbound-relations']
+								.filter(function(rel){
+									return relatedEntity.name === rel.targetEntityName;
+								})[0];
+				var relType;
+				if(relation.srcMultiplicity === relation.targetMultiplicity === 2)
+					relType = 'many-to-many';
+				else
+					relType = 'one-to-many';
+				var def = {
+					'multiplicity': relType,
+					'name': relation.name
+				};
+				//TODO: !!!!
+				if(relType==='one-to-many'){
+					def['dao'] = relatedEntity.svcName;
+					def['key'] = pkName;
+					def['joinKey'] = relatedEntity.id;
+				}
+				/*if(relType==='many-to-many'){
+					def['daoJoin'] = relatedEntity.svcName;
+					if(relatedEntity.daoN){
+						def['daoN'] = relatedEntity.daoN;
+					}
+					def['key'] = entities[i].id;
+					def['joinKey'] = relatedEntity.joinKey;
+				}*/
+				scriptingService.associations.push(def);
 			}
 			template.scriptingServices.push(scriptingService);
 		}

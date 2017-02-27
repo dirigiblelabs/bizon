@@ -2,7 +2,7 @@
     "guid": "bizon",
     "repository": {
         "type": "git",
-        "branch": "master",
+        "branch": "associations",
         "url": "https://github.com/dirigiblelabs/bizon.git"},
     "licenses": [{
         "name": "Eclipse Public License - v 1.0",

@@ -17,7 +17,7 @@ angular.module('businessObjects')
 		this.tab = TABS.PROP_TAB;
 		if(this.entityForEdit.properties){
 			this.propertyItems = this.entityForEdit.properties.filter(function(v){
-				if(v.pk!==true && v.action!=='remove'){
+				if(v.action!=='remove'){
 					return true;
 				}
 				return false;
@@ -127,10 +127,10 @@ angular.module('businessObjects')
 		return !expression || cfgEntry.indexOf(expression)>-1;
 	};
 
-	this.typeOptions = [{id:0, val:'INTEGER'},{id:1, val:'VARCHAR'},{id:2, val:'BIGINT'}];
+//	this.typeOptions = [{id:0, val:'INTEGER'},{id:1, val:'VARCHAR'},{id:2, val:'BIGINT'}];
 	
 	//FIXME
-	this.cfgDataTypeSelectedTypeOption = this.typeOptions.find(function(opt){
+/*	this.cfgDataTypeSelectedTypeOption = this.typeOptions.find(function(opt){
 			return true;//opt.val.toLowerCase() === self.entityForEdit.idType.toLowerCase();
 		});
 	
@@ -139,7 +139,7 @@ angular.module('businessObjects')
 			return opt.id === option.id;
 		});
 		this.pk.type = this.cfgDataTypeSelectedTypeOption.val;
-	};
+	};*/
 			
 }]);
 })(angular);

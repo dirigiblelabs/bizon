@@ -12,9 +12,7 @@ angular.module('businessObjects')
 		})[0];
 	
 	this.showProperties = function(){
-		this.propertyItems = this.selectedEntity.properties.filter(function(prop){
-			return !prop.pk;
-		});
+		this.propertyItems = this.selectedEntity.properties;
 	};
 	
 	function showDetails(item){
