@@ -50,7 +50,7 @@
 <!--<div class="detail col-xs-8 col-md-10">-->
 <div class="detail col-xs-12 col-md-12">
 		
-	<header class="header">
+	<header class="header navbar-inverse">
       <div class="btn-group pull-right">
    		<button class="btn btn-success" ng-click="detailsEditorVm.saveItem()">
 		  <i class="fa fa-check" aria-hidden="true"></i>
@@ -61,7 +61,7 @@
       </div>
     </header>
 			
-	<section class="object-header fluid-container">
+	<section class="object-header fluid-container alert-info">
 		<section>
 			<div class="object-image">
 				<i class="fa fa-th"></i>
@@ -100,7 +100,7 @@
 				<div class="items-list">
 					<div ng-hide="detailsEditorVm.entityForEdit.properties.length" class="nodata-text">No Properties</div>
 					<div class="list-group" ng-if="detailsEditorVm.propertyItems.length>0">
-					  <a class="list-group-item property-item" ng-repeat="entry in detailsEditorVm.propertyItems|filter:detailsEditorVm.searchText|orderBy:['-pk','-required','name']">
+					  <a class="list-group-item property-item" ng-repeat="entry in detailsEditorVm.propertyItems|filter:detailsEditorVm.searchText|orderBy:['name']">
 					  	<div class="prop-{{entry.pk?'id':(entry.required?'required':'optional')}}">
 							<div class="list-group-item-title">
 								<span ng-class="{emphasized: (entry.required || entry.pk)}">{{entry.name}}</span>

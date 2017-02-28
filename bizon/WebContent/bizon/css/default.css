@@ -20,11 +20,7 @@
 	  height: 100%;
 	}
 	
-	body{
-	  background-color: #ddd;
-	  background-image: linear-gradient( #fff, #eee );
-	}
-
+	
 	/*Add an overlay to the screen when using the loading bar*/
 	#loading-bar {
 	  pointer-events: all;
@@ -42,7 +38,6 @@
 	}
 	
 	.page {
-	  background: #fff;
 	  position: relative;
 	  display: flex;
 	  flex-direction: column;
@@ -50,18 +45,16 @@
 	}
 	
 	.page-title {
-	  margin: 2rem 0rem 4rem 0rem;
-	  border-bottom: 2px solid #eee;
 	  flex: 0 3 auto;
 	  overflow: hidden;
 	  min-width:0px;
 	  min-height: 4rem;
+	  margin-bottom: 1em;
 	}
 	
 	.page-title>h1{
 	  margin: 0 auto;
 	  padding: 0;
-	  color:#333;
 	  line-height: 4rem;
 	}
 	
@@ -72,10 +65,8 @@
 	  flex-direction: row;
       align-items: stretch;
 	  position: relative;
-	  border: 1px solid #ddd;
-	  border-radius: 5px 5px 0 0;
+	  border: 1px solid #aaa;
 	  border-bottom: 0;
-/*	  min-height:100%;*/
 	  height:100%;	  
 	}
 	
@@ -91,9 +82,8 @@
 	  flex: 1 auto;
 	  order: 1;
 	  overflow: hidden;
-	  padding-left: 0;
-	  border-right: 1px solid #ddd;
-	  border-top-left-radius: 4px;
+	  padding-left: 0 !important;
+	  border-right: 1px solid #aaa;
 	  height: 100%;
 	} 
 	
@@ -113,8 +103,8 @@
 	  background-color: #f5f5f5;
 	  margin: auto !important; 
 	  text-align: center;
-	  border-top: 1px solid #ddd;
-	  border-bottom: 1px solid #ddd;
+	  border-top: 1px solid #aaa;
+	  border-bottom: 1px solid #aaa;
 	}
 	
 	.nav.ghost-list-item-active>li{
@@ -141,6 +131,7 @@
 	.master .nav>li>a {
 	  padding-left: 5px !important;
 	  padding-right: 10px !important;
+	  border-radius: 0px !important;
 	}
 	
 	.nav-pills>li>a{
@@ -148,7 +139,7 @@
 	}
 	
 	.nav-stacked>li+li{
-	  margin-top: 0;
+	  margin-top: 0 !important;
 	  border-top: 1px solid #d0d0d0;
 	}
 	
@@ -232,7 +223,6 @@
 	  top: 0;
 	  width: 100%;
 	  padding-left: 10px;
-	  background-color: #363637;
 	  height: 4em;
 	}
 	
@@ -252,17 +242,16 @@
 	[ui-view="detail"] {
 	  flex: 1 80%;
 	  order: 2;
+	  padding-left: 0 !important;
 	  flex-wrap: nowrap;
-	  border-top-right-radius: 4px;
 	  height: 100%;
-	  min-height: 100%;	  
+	  min-height: 100%;
 	}
 	
 	.detail {
-	  padding-left: 0;
+	  padding-left: 0 !important;
 	  width: 100%;
 	  height: 100%;
-	  border-top-right-radius: 4px;
 	}
 	
 	/*layout details content*/
@@ -274,9 +263,8 @@
 	.detail .header {
 	  order: 1;
 	  flex: 1 0 auto;
-	  max-height: 5.6rem; /* max-height = content max height */	  
-	  position: relative; 
-	  border-top-right-radius: 4px;
+	  max-height: 4em; /* max-height = content max height */	  
+	  position: relative;
 	}
 
 	.detail .object-header {
@@ -286,8 +274,7 @@
 	  display: flex;
 	  width: 100%;
 	  padding: 2rem 1rem 1rem 1rem;
-	  background-color: #f2f8fc;
-      border-bottom: 1px solid #ddd;
+      border-bottom: 1px solid #aaa;
 	}
 	
 	.detail .object-header section, .detail .object-header .object-title {
@@ -321,8 +308,7 @@
 	    -moz-border-radius: 4rem;
 	    -webkit-border-radius: 4rem;
 	    border-radius: 4rem;
-	    border: 5px solid #888;
-	    background-color: #fff;
+	    border: 5px solid #aaa;
 	}
 	
 	.detail .object-header .object-image, 
@@ -341,7 +327,6 @@
 		margin: 0;
 	    line-height: 1.5rem;
 	    font-size: 1.5rem;
-	    color: #777;
 	}
 	
 	.detail .object-header .object-attributes {
@@ -361,7 +346,6 @@
       -webkit-border-radius: 1.5rem;
       border-radius: 1.5rem;
       border: 1px solid #888;
-      background-color: #fff;
 	}
 	
 	.editable-click { 

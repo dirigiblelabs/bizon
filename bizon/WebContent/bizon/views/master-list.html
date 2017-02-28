@@ -6,17 +6,17 @@
 </style>
 <section>
 
-	<header class="header text-center">
+	<header class="header text-center navbar-inverse">
 	
 	  <div class="btn-group pull-left">
 	  	<button popover-placement="right-top" uib-popover-template="masterVm.filterPopover.templateUrl" popover-title="Search" type="button" class="btn btn-primary" filter-popover>
-	  		<i class="glyphicon glyphicon-filter" aria-hidden="true"></i>
+	  		<i class="fa fa-filter" aria-hidden="true"></i>
 	  	</button>
       </div>
       <span style="display: inline-block; margin: 1.8rem auto; color: white">{{masterVm.items.length}} / {{masterVm.count}}</span>{{masterVm.searchText}}
       <div class="btn-group pull-right">
 		<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-		    <i class="glyphicon glyphicon-menu-hamburger" aria-hidden="true"></i>
+		    <i class="fa fa-bars" aria-hidden="true"></i>
 		</button>
 		<ul class="dropdown-menu">
 		  <li><a href ng-click="masterVm.createItem()"><i class="fa fa-plus"></i> New object</a></li>
