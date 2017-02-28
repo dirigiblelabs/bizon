@@ -44,7 +44,7 @@ function _createSQLEntity(entity, dbEntity) {
 				"required": true,
 				"column": "ID",
 				"type": "BIGINT",
-				"typeLabel": "Number"				
+				"typeLabel": "Integer Number"				
 			});
 			this.$log.info('Generated PK property [id]');
 		}

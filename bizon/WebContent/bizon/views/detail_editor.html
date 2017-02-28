@@ -22,6 +22,30 @@
 	    box-shadow: 0px 0px 20px 2px rgba(0,0,0,0.75);
 	    z-index: 1000;
 	}
+	.items-list .list-group-item.property-item {
+		display: flex;
+		padding-top: 0;
+		padding-bottom: 0;
+		padding-left: 0;
+		width:100%
+	}
+	.items-list .list-group-item.property-item>div:first-of-type {
+	  flex: 1 0 auto;
+	  padding-top: 10px;
+      padding-bottom: 10px;
+      padding-left: 15px;
+      border-left-width: 4px;
+      border-left-style: solid;  
+	}
+	.items-list .list-group-item.property-item>div.prop-id {
+	  border-left-color: #ccc
+	}
+	.items-list .list-group-item.property-item>div.prop-required {
+	  border-left-color: #46b8da;
+	}
+	.items-list .list-group-item.property-item>div.prop-optional {
+	  border-left-color: #428bca;
+	}	
 </style>
 <!--<div class="detail col-xs-8 col-md-10">-->
 <div class="detail col-xs-12 col-md-12">
@@ -74,24 +98,26 @@
 			<div class="tab-pane fade in active" role="tabpanel" id="properties">
 				
 				<div class="items-list">
-					<div ng-hide="detailsEditorVm.entityForEdit.properties.length" class="nodata-text">No Items</div>
-					<div class="list-group">
-					  <a class="list-group-item" ng-repeat="entry in detailsEditorVm.propertyItems|filter:detailsEditorVm.searchText|orderBy:['name']">
-						<div style="display:inline-block">
-							<div class="list-group-item-heading">
-								<span ng-class="{emphasized: !entry.required}">{{entry.name}}</span><i class="fa fa-asterisk required" aria-hidden="true" ng-if="!entry.required"></i>
-								<span class="optional" ng-if="entry.required">(optional)</span>
+					<div ng-hide="detailsEditorVm.entityForEdit.properties.length" class="nodata-text">No Properties</div>
+					<div class="list-group" ng-if="detailsEditorVm.propertyItems.length>0">
+					  <a class="list-group-item property-item" ng-repeat="entry in detailsEditorVm.propertyItems|filter:detailsEditorVm.searchText|orderBy:['name']">
+					  	<div class="prop-{{entry.pk?'id':(entry.required?'required':'optional')}}">
+							<div class="list-group-item-title">
+								<span ng-class="{emphasized: (entry.required || entry.pk)}">{{entry.name}}</span>
+								<i ng-if="entry.required && !entry.pk" class="fa fa-asterisk required" aria-hidden="true"></i>
+								<i ng-if="entry.pk" class="fa fa-key" aria-hidden="true"></i>
+								<span ng-if="!entry.required && !entry.pk" class="optional">(optional)</span>
 							</div>
 							<div class="list-group-item-text">Data Type: <span style="color: gray; font-style: italic">{{entry.typeLabel}}<span></div>
 						</div>
-						<div class="btn-group pull-right">
+						<div class="btn-group" style="align-self: center;">
 		   					<button class="btn btn-primary" ui-sref="list.entity.edit.items({item: entry, entityForEdit:detailsEditorVm.entityForEdit})">
 							  <i class="fa fa-pencil" aria-hidden="true"></i>
 							</button>
-							<button class="btn btn-danger" ng-click="detailsEditorVm.deleteProperty(entry)" ng-if="!entry.pk">
+							<button ng-disabled="entry.pk" class="btn btn-danger" ng-click="detailsEditorVm.deleteProperty(entry)">
 							  <i class="glyphicon glyphicon-remove" aria-hidden="true"></i>
 							</button>
-						</div>
+						</div>						
 					  </a>
 					</div>
 				</div>
