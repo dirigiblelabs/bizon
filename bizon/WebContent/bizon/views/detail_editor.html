@@ -100,7 +100,7 @@
 				<div class="items-list">
 					<div ng-hide="detailsEditorVm.entityForEdit.properties.length" class="nodata-text">No Properties</div>
 					<div class="list-group" ng-if="detailsEditorVm.propertyItems.length>0">
-					  <a class="list-group-item property-item" ng-repeat="entry in detailsEditorVm.propertyItems|filter:detailsEditorVm.searchText|orderBy:['name']">
+					  <a class="list-group-item property-item" ng-repeat="entry in detailsEditorVm.propertyItems|filter:detailsEditorVm.searchText|orderBy:['-pk','-required','name']">
 					  	<div class="prop-{{entry.pk?'id':(entry.required?'required':'optional')}}">
 							<div class="list-group-item-title">
 								<span ng-class="{emphasized: (entry.required || entry.pk)}">{{entry.name}}</span>
