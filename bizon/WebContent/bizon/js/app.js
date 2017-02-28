@@ -105,7 +105,7 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		    onEnter: ['$state', '$uibModal', 'entityForEdit', 'item', function($state, $modal, entityForEdit, item) {
 		    	
 		    	function goBack(_selectedEntity) {
-		    		if(_selectedEntity)
+		    		if(_selectedEntity!== 'escape key press')
 		        		$state.go("list.entity.edit", {entityForEdit: _selectedEntity}, {reload:true});
 		        	else
 		        		$state.go("list.entity.edit");
@@ -144,7 +144,7 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		    onEnter: ['$state', '$uibModal', 'entityForEdit', 'relation', function($state, $modal, entityForEdit, relation) {
 		    	
 		    	function goBack(_selectedEntity) {
-		    		if(_selectedEntity)
+		    		if(_selectedEntity!== 'escape key press')
 		        		$state.go("list.entity.edit", {entityForEdit: _selectedEntity}, {reload:true});
 		        	else
 		        		$state.go("list.entity.edit");

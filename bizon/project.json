@@ -2,7 +2,7 @@
     "guid": "bizon",
     "repository": {
         "type": "git",
-        "branch": "demojam2017",
+        "branch": "master",
         "url": "https://github.com/dirigiblelabs/bizon.git"
     },
     "licenses": [{

@@ -126,20 +126,6 @@ angular.module('businessObjects')
 	this.filterConfigurationEntries = function(expression, cfgEntry){
 		return !expression || cfgEntry.indexOf(expression)>-1;
 	};
-
-//	this.typeOptions = [{id:0, val:'INTEGER'},{id:1, val:'VARCHAR'},{id:2, val:'BIGINT'}];
-	
-	//FIXME
-/*	this.cfgDataTypeSelectedTypeOption = this.typeOptions.find(function(opt){
-			return true;//opt.val.toLowerCase() === self.entityForEdit.idType.toLowerCase();
-		});
-	
-	this.cfgDataTypeSelectionChanged = function(option){
-		this.cfgDataTypeSelectedTypeOption = this.typeOptions.find(function(opt){
-			return opt.id === option.id;
-		});
-		this.pk.type = this.cfgDataTypeSelectedTypeOption.val;
-	};*/
 			
 }]);
 })(angular);
