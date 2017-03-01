@@ -60,7 +60,7 @@
 		  <div class="form-group">
 	  		<label for="required" class="col-sm-2 control-label">Optional</label>
 		    <div class="col-sm-10">
-		      	<input name="required" id="required" type="checkbox" class="checkbox form-control" data-on-text="No" data-off-text="Yes" ng-model="propsEditorVm.item.required" bootstrap-switch/>
+		      	<input name="required" id="required" type="checkbox" class="checkbox form-control" data-on-text="No" data-off-text="Yes" ng-model="propsEditorVm.item.required" bootstrap-switch ng-disabled="propsEditorVm.item.pk"/>
 		      	 <p class="help-block">Set to 'Yes' if this property value may be optionally set or to 'No' if it is mandatory</p>
 		    </div>
 		  </div>		  

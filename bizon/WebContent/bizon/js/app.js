@@ -252,6 +252,14 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
                             element.bootstrapSwitch('state', false, true);
                         }
                     });
+                    
+                    scope.$watch(attrs.ngDisabled, function(newValue, oldValue) {
+                        if (newValue) {
+                            element.bootstrapSwitch('disabled', true);
+                        } else {
+                            element.bootstrapSwitch('disabled', false);
+                        }
+                    });
                 }
             };
         }
