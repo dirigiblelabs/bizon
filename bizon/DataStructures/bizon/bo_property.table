@@ -30,6 +30,15 @@
       }
       ,
       {
+        "name":"BOP_LABEL",
+        "type":"VARCHAR",
+        "length":"255",
+        "notNull":"false",
+        "primaryKey":"false",
+        "defaultValue":""
+      }      
+      ,
+      {
         "name":"BOP_COLUMN",
         "type":"VARCHAR",
         "length":"255",

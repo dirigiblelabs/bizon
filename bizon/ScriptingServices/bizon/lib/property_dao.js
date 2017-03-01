@@ -24,6 +24,11 @@ exports.get = function(){
 				"size": 250,
 				"required": true
 			},{
+				"name": "label",
+				"dbName": "BOP_LABEL",
+				"type": "String",
+				"size": 250
+			},{
 				"name": "column",
 				"dbName": "BOP_COLUMN",
 				"type": "String",

@@ -63,7 +63,8 @@
 	  	var res = $resource('../../js/bizon/svc/v1/properties.js/:boId', { boId:'@id' }, ResourceSvcConfiguration.cfg);
 		
 		res.newObjectTemplate = {
-					"name":"Item",
+					"name":"item",
+					"label":"Item",
 					"column":"Item",
 					"typeLabel": "Text",					
 					"type": "VARCHAR",
@@ -106,7 +107,8 @@
 			obj.properties = [];
 			for(var i = 0; i < 3; i++){
 				var item = angular.copy(Item.newObjectTemplate);
-				item.name += ' ' +i;
+				item.name += i;
+				item.label += ' '+i;
 				item.column += i;
 				item.entityName = obj.name;
 				obj.properties.push(item);
