@@ -43,6 +43,7 @@ function _createSQLEntity(entity, dbEntity) {
 				"pk": true,
 				"required": true,
 				"column": "ID",
+				"label": "ID",
 				"type": "BIGINT",
 				"typeLabel": "Integer Number"				
 			});
