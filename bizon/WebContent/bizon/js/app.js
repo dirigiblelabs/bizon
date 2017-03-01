@@ -105,10 +105,8 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		    onEnter: ['$state', '$uibModal', 'entityForEdit', 'item', function($state, $modal, entityForEdit, item) {
 		    	
 		    	function goBack(_selectedEntity) {
-		    		if(_selectedEntity!== 'escape key press')
+		    		if(_selectedEntity)
 		        		$state.go("list.entity.edit", {entityForEdit: _selectedEntity}, {reload:true});
-		        	else
-		        		$state.go("list.entity.edit");
 		        }
 		    	
 		        var modalInstance = $modal.open({
@@ -125,7 +123,11 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		            controller: 'PropertyEditorCtrl',
 		            controllerAs: 'propsEditorVm'
 		        });
-		        modalInstance.result.then(goBack, goBack);
+		        modalInstance.result
+		        	.then(goBack)
+		        	.catch(function(reason){
+		        		$state.go("list.entity.edit");
+		        	});
 		    }]
 		  })
 		.state("list.entity.edit.relations", {
@@ -144,10 +146,8 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		    onEnter: ['$state', '$uibModal', 'entityForEdit', 'relation', function($state, $modal, entityForEdit, relation) {
 		    	
 		    	function goBack(_selectedEntity) {
-		    		if(_selectedEntity!== 'escape key press')
+		    		if(_selectedEntity)
 		        		$state.go("list.entity.edit", {entityForEdit: _selectedEntity}, {reload:true});
-		        	else
-		        		$state.go("list.entity.edit");
 		        }
 		    	
 		        var modalInstance = $modal.open({
@@ -164,7 +164,11 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		            controller: 'RelationEditorCtrl',
 		            controllerAs: 'relEditorVm'
 		        });
-		        modalInstance.result.then(goBack, goBack);
+		        modalInstance.result
+		        	.then(goBack)
+					.catch(function(reason){
+		        		$state.go("list.entity.edit");
+		        	});		        	
 		    }]
 		  })		  
 		  .state("list.entity.build", {
