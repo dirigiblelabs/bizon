@@ -29,20 +29,32 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		          }
 		      }
 		    })
+		.state('list.notification', {
+	    	params: {
+	    		message: undefined
+	    	},
+	    	views: {
+	          'notifications@': {
+	              templateUrl: 'views/notifications.html',
+	              controller: 'NotificationsCtrl',
+	              controllerAs: 'messagesVm'
+	          }
+	    	}
+	    })		    
 		.state('list.empty', {
-		      views: {
-			      'detail@': {
-					  templateUrl: "views/empty.html",
-					  controller: 'EmptyCtrl',
-		              controllerAs: 'emptyVm'
-			      },
-			      'templateLib@list.empty': {
-					templateUrl: 'views/templates.html',
-					controller: 'TemplatesCtrl',
-					controllerAs: 'tmplVm'
-			      }
+		    views: {
+		      'detail@': {
+				  templateUrl: "views/empty.html",
+				  controller: 'EmptyCtrl',
+	              controllerAs: 'emptyVm'
+		      },
+		      'templateLib@list.empty': {
+				templateUrl: 'views/templates.html',
+				controller: 'TemplatesCtrl',
+				controllerAs: 'tmplVm'
 		      }
-		   })		   
+	    	}
+	    })		   
 		.state('list.empty.tmplfamiliy', {
 			params: {
 				tmplFamily:undefined
@@ -172,17 +184,23 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		    }]
 		  })		  
 		  .state("list.entity.build", {
-		    onEnter: ['$state', '$uibModal', function($state, $modal) {	
-		    	function goBack() {
-	        		$state.go("list.entity");
-		        }		    		    
+		  	onEnter: ['$state', 'Notifications', '$uibModal', function($state, Notifications, $modal) {	
 		        var modalInstance = $modal.open({
 		        	animation: true,
 		            templateUrl: "views/buildDialog.html",
 		            controller: 'BuildDialogCtrl',
 		            controllerAs: 'builderVm'
 		        });
-		        modalInstance.result.then(goBack, goBack);
+		        modalInstance.result
+		        	.then(function() {
+		    			Notifications.createMessageSuccess('App build finished successfully');
+		        	})
+		        	.catch(function(reason){
+		        		Notifications.createMessageError('App build failed: ' + reason);
+		        	})
+		        	.finally(function(){
+		        		$state.go('list.notification', {}, {reload:true});
+		        	});
 		    }]
 		  })
 		  .state("list.entity.export", {

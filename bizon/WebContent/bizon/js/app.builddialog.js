@@ -55,13 +55,17 @@ angular.module('businessObjects')
 			var addWebContent = self.slider.value === 3;
 
 			var buildTemplate = getBuildTemplate(self.cfg, entities, addDataStructures, addScriptingServices, addWebContent);
-			BuildService.build(buildTemplate);
-		} catch(err){
-			$log.debug('The requested application path ' + $window.location.href + " is not valid.");
-			$stateParams.message = {
-				text: $window.location.href + ' is not valid application path. Check the URL and try again.',
-				type: 'alert-danger'
-			};
+			BuildService.build(buildTemplate).$promise
+			.then(function(){
+				$log.info('App build finished successfully');
+			})
+			.catch(function(err){
+				$log.error('App build failed: ' + err.message + '\r\n' + err.stack);
+				$stateParams.message = {
+					text: 'Build request for app failed: ' + err.message,
+					type: 'alert-danger'
+				};
+			});
 		}finally{
 			$scope.$close();
 		}
