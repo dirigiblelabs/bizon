@@ -385,11 +385,7 @@
 		this.exportData = function(){
 			$log.info('Exporting data');
 			return Entity.query({$expand:'properties,inbound-relations'}).$promise;//TODO: remove ids
-		};
-		
-		this.importData = function(data){
-			$log.info('Data imported');
-		};
+		};		
 				
 	}]);
 })(angular);

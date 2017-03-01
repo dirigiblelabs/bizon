@@ -49,6 +49,27 @@ angular.module('businessObjects')
 		this.searchText = undefined;
 	};
 	
+	this.entityLabelChanged = function(){
+		if(selectedEntity.label!==this.entityForEdit.label){
+			//update items depending on entity label
+			this.entityForEdit.uiTitle = this.entityForEdit.label;
+			try{
+				this.entityForEdit.table = this.entityForEdit.label.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+				if(this.entityForEdit.table.length>124)
+					this.entityForEdit.table= this.entityForEdit.table.substring(0, 124);
+				//TODO: still there is a chance for table name duplicated. Need to check if there is already a duplicate table name and use random alphanumeric appended at the end to ensure unique name.
+			} catch(err){
+				return 'error';
+			}			
+			try{
+				this.entityForEdit.svcName = this.entityForEdit.label.replace(/[^A-Za-z0-9]/g, '').toLowerCase();
+			} catch(err){
+				return 'error';
+			}
+		}
+		//return "success";
+	};
+	
 	this.openPropertyEditor = function(item){
 		if(this.tab === TABS.PROP_TAB){
 			$state.go('list.entity.edit.items', {
