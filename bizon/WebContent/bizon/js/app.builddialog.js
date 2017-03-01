@@ -6,6 +6,7 @@ angular.module('businessObjects')
 
 	this.cfg = {};
 	this.slider = {
+	  value: 3,
 	  options: {
 	  	showTicksValues: true,
 	    stepsArray: [
@@ -16,6 +17,10 @@ angular.module('businessObjects')
 	  }
 	};
 	var self = this;
+
+	$scope.$$postDigest(function() {
+	    $scope.$broadcast('rzSliderForceRender');
+	});
 	
 	BuildTemplatesService.listTemplates().$promise
 		.then(function(templates){
@@ -182,7 +187,7 @@ angular.module('businessObjects')
 				var nextColumn = entities[i].properties[j];
 				web.columns.push({
 					'name': nextColumn.name.toLowerCase(),
-		            'label': nextColumn.boi_label ? nextColumn.boi_label : nextColumn.name,
+		            'label': nextColumn.label ? nextColumn.label : nextColumn.name,
 		            'widgetType': widgetsMapping[nextColumn.type],
 		            'key': nextColumn.pk,
 		            'visible': true
