@@ -129,7 +129,7 @@
 				<div class="items-list">
 					<div ng-hide="detailsEditorVm.propertyItems.length" class="nodata-text">No Items</div>				
 					<ul class="list-group" ng-show="detailsEditorVm.propertyItems.length">
-					  <li class="list-group-item" ng-repeat="entry in detailsEditorVm.propertyItems|filter:detailsEditorVm.searchText|orderBy:['name']" ng-click="$event.stopPropagation();" style="outline: none; cursor: auto;">
+					  <li class="list-group-item" ng-repeat="entry in detailsEditorVm.propertyItems|filter:detailsEditorVm.searchText|orderBy:['-pk','-required','name']" ng-click="$event.stopPropagation();" style="outline: none; cursor: auto;">
 						<div style="display:inline-block">					  
 							<div class="list-group-item-title">
 								<span class="emphasized">{{entry.name}}</span>
