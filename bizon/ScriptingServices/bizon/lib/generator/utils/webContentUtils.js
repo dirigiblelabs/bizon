@@ -13,4 +13,12 @@ function addWebContentForEntityParameters(template, pageTitle, serviceFileName, 
 	template.templateParameters.pageTitle = pageTitle;
 	template.templateParameters.serviceFileName = serviceFileName;
 	template.templateParameters.tableColumns = tableColumns;
+	//sort by order property (if any) before passing to UI templates
+	template.templateParameters.tableColumns
+		.sort(function(next, prev){
+			if(prev.order!==undefined && next.order!==undefined){
+				return prev.order - next.order;
+			}
+			return 0;
+		});
 }

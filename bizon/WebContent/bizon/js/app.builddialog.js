@@ -201,7 +201,8 @@ angular.module('businessObjects')
 		            'label': nextColumn.label ? nextColumn.label : nextColumn.name,
 		            'widgetType': widgetsMapping[nextColumn.type],
 		            'key': nextColumn.pk,
-		            'visible': true
+		            'visible': true,
+		            'order': nextColumn.order
 		         });
 			}
 			template.webContent.push(web);
