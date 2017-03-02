@@ -2,7 +2,7 @@
 "use strict";
 
 angular.module('businessObjects')
-.controller('BuildDialogCtrl', ['masterDataSvc', 'BuildService', 'BuildTemplatesService', '$scope', '$log', '$stateParams', '$window', function(masterDataSvc, BuildService, BuildTemplatesService, $scope, $log, $stateParams, $window) {
+.controller('BuildDialogCtrl', ['masterDataSvc', 'BuildService', 'PublishService', 'BuildTemplatesService', '$scope', '$log', '$stateParams', '$window', function(masterDataSvc, BuildService, PublishService, BuildTemplatesService, $scope, $log, $stateParams, $window) {
 
 	this.cfg = {
 		publishAfterBuild: true
@@ -62,6 +62,13 @@ angular.module('businessObjects')
 				$log.info('App build finished successfully');
 				if(self.cfg.publishAfterBuild){
 					//publish
+					PublishService.publish().$promise
+					.then(function(){
+						$log.error('projet '+self.cfg.projectName+' published');
+					})
+					.catch(function(err){
+						$log.error('publish failed: ' + err.message);
+					});
 				}
 			})
 			.catch(function(err){

@@ -89,6 +89,14 @@
   			}
 	  	});
 	}])
+	.service('PublishService', ['$resource', function($resource) {
+	  	return $resource('../../js-secured/registry/api/develop/publish.js', {}, {
+	  		publish: {
+	  			method: 'POST',
+	  			isArray: false
+  			}
+	  	});
+	}])	
 	.service('Relation', ['$resource', 'ResourceSvcConfiguration', function($resource, ResourceSvcConfiguration) {
 	  	return $resource('../../js/bizon/svc/v1/relations.js/:boId', { boId:'@id' }, ResourceSvcConfiguration.cfg);
 	}])		
