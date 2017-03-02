@@ -77,6 +77,10 @@ exports.get = function(){
 					return dbValue < 1 ?  false : true;
 				}				
 			},{
+				"name": "order",
+				"dbName": "BOP_ORDER",
+				"type": "Short"
+			},{
 				"name": "defaultValue",
 				"dbName": "BOP_DEFAULT",
 				"type": "String",

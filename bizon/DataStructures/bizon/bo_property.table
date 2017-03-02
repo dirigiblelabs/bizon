@@ -93,6 +93,15 @@
       }
       ,
       {
+        "name":"BOP_ORDER",
+        "type":"SMALLINT",
+        "length":"0",
+        "notNull":"false",
+        "primaryKey":"false",
+        "defaultValue":"0"
+      }
+      ,
+      {
         "name":"BOP_DEFAULT",
         "type":"VARCHAR",
         "length":"255",
