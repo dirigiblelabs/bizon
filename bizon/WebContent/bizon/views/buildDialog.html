@@ -73,6 +73,15 @@
 				  </div>	            	
         	</div>
 		  </div> 
+		  
+		  <div class="form-group">
+	  		<label for="publish" class="col-sm-2 control-label">Publish</label>
+		    <div class="col-sm-10">
+		      	<input name="publish" id="publish" type="checkbox" class="checkbox form-control" data-on-text="Yes" data-off-text="No" ng-model="builderVm.cfg.publishAfterBuild" bootstrap-switch/>
+		      	 <p class="help-block">Set to 'Yes' to trigger publish after successfull app generation or 'No' otherwise</p>
+		    </div>
+		  </div>		 		  
+		  
 		</form>
 	</div>
 	

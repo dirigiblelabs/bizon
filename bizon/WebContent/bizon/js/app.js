@@ -195,9 +195,6 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		        	.then(function() {
 		    			Notifications.createMessageSuccess('App build finished successfully');
 		        	})
-		        	.catch(function(reason){
-		        		Notifications.createMessageError('App build failed: ' + reason);
-		        	})
 		        	.finally(function(){
 		        		$state.go('list.notification', {}, {reload:true});
 		        	});

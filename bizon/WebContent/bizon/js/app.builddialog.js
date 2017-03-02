@@ -4,7 +4,9 @@
 angular.module('businessObjects')
 .controller('BuildDialogCtrl', ['masterDataSvc', 'BuildService', 'BuildTemplatesService', '$scope', '$log', '$stateParams', '$window', function(masterDataSvc, BuildService, BuildTemplatesService, $scope, $log, $stateParams, $window) {
 
-	this.cfg = {};
+	this.cfg = {
+		publishAfterBuild: true
+	};
 	this.slider = {
 	  value: 3,
 	  options: {
@@ -58,13 +60,18 @@ angular.module('businessObjects')
 			BuildService.build(buildTemplate).$promise
 			.then(function(){
 				$log.info('App build finished successfully');
+				if(self.cfg.publishAfterBuild){
+					//publish
+				}
 			})
 			.catch(function(err){
-				$log.error('App build failed: ' + err.message + '\r\n' + err.stack);
-				$stateParams.message = {
-					text: 'Build request for app failed: ' + err.message,
-					type: 'alert-danger'
-				};
+				if(err){
+					$log.error('App build failed: ' + err.message + '\r\n' + err.stack);
+					$stateParams.message = {
+						text: 'Build request for app failed: ' + err.message,
+						type: 'alert-danger'
+					};				
+				}
 			});
 		}finally{
 			$scope.$close();
