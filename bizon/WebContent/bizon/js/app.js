@@ -292,7 +292,7 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
                 	var formValidationOptions = {
 						errorClass: 'has-error',
 				     	validClass : 'has-success',
-				     	ignore: 'input[style*="position: absolute"]',
+				     	ignore: 'input[style*="position: absolute"],.form-validation-ignore',
 				 		highlight: function (element, errorClass, validClass) {
 				            angular.element(element).closest('.form-group').removeClass('has-success').addClass('has-error');
 				            if($validator.numberOfInvalids()>0)
