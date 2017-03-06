@@ -15,6 +15,16 @@ function addEntityServiceParameters(template, entityName, tableName, tableType, 
 	template.templateParameters.tableName = tableName;
 	template.templateParameters.tableType = tableType;
 	template.templateParameters.tableColumns = tableColumns;
+	
+	//sort by order property (if any) before passing to Scripting Services templates
+	template.templateParameters.tableColumns
+		.sort(function(next, prev){
+			if(prev.order!==undefined && next.order!==undefined){
+				return prev.order - next.order;
+			}
+			return 0;
+		});	
+	
 	template.templateParameters.associations = associations;
 	
 	template.templateParameters.ONE_TO_MANY = 'one-to-many',

@@ -119,6 +119,7 @@ angular.module('businessObjects')
 		            'notNull': nextColumn.required,
 		            'primaryKey': nextColumn.pk,
 		            'defaultValue': nextColumn.defaultValue || '',
+		            'order': nextColumn.order
 		         });
 			}
 			template.dataStructures.push(dataStructure);
@@ -143,6 +144,7 @@ angular.module('businessObjects')
 		    		'name': nextColumn.name.toUpperCase(),
 		            'type': nextColumn.type.toUpperCase(),
 		            'key' : nextColumn.pk,
+		            'order': nextColumn.order
 		         });
 			}
 			for (var j in entities[i]['inbound-entities']) {
