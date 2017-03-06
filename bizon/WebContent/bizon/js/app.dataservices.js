@@ -68,7 +68,7 @@
 					"column":"Item",
 					"typeLabel": "Text",					
 					"type": "VARCHAR",
-					"size": 100,					
+					"size": 100,			
 					"required": true,
 				};
 		return res;
@@ -118,6 +118,7 @@
 				item.name += i;
 				item.label += ' '+i;
 				item.column += i;
+				item.order = i+1;
 				item.entityName = obj.name;
 				obj.properties.push(item);
 			}

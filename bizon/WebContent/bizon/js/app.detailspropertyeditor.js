@@ -77,6 +77,13 @@ angular.module('businessObjects')
 		if(isNewProperty) {
 			this.item = angular.copy(Item.newObjectTemplate);
 			this.item.entityName = selectedEntity.name;
+			if(selectedEntity.properties){
+				var orders = selectedEntity.properties.map(function (property) {
+			    	return property.order || 0;
+			  	});
+			    var maxOrder = Math.max.apply(Math, orders);
+			    this.item.order = maxOrder+1;
+			}
 		}
 		this.selectedTypeOption = this.typeOptions.find(function(typeOption){
 					return typeOption.val === self.item.typeLabel;

@@ -122,6 +122,13 @@ angular.module('businessObjects')
 		            'order': nextColumn.order
 		         });
 			}
+			//sort asc by property.order
+			dataStructure.columns.sort(function(next, prev){
+				if(prev.order!==undefined && next.order!==undefined){
+					return next.order - prev.order;
+				}
+				return 0;
+			});
 			template.dataStructures.push(dataStructure);
 		}
 	}
@@ -147,6 +154,13 @@ angular.module('businessObjects')
 		            'order': nextColumn.order
 		         });
 			}
+			//sort asc by property.order
+			scriptingService.columns.sort(function(next, prev){
+				if(prev.order!==undefined && next.order!==undefined){
+					return next.order - prev.order;
+				}
+				return 0;
+			});
 			for (var j in entities[i]['inbound-entities']) {
 				if(!scriptingService.associations)
 					scriptingService.associations = []
@@ -214,6 +228,13 @@ angular.module('businessObjects')
 		            'order': nextColumn.order
 		         });
 			}
+			//sort asc by property.order
+			web.columns.sort(function(next, prev){
+				if(prev.order!==undefined && next.order!==undefined){
+					return next.order - prev.order;
+				}
+				return 0;
+			});
 			template.webContent.push(web);
 		}
 	}
