@@ -283,6 +283,18 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
             };
         }
     ])
+    .directive('formFocus', ['$timeout', 
+     	function($timeout) {
+	     	 return {
+	                restrict: 'A',
+	                link: function(scope, element, attrs) {
+	                	$timeout(function(){
+							element.focus().select();
+			        	});
+	                }
+		 	}
+ 		}
+     ])
 	.directive('formValidation', ['$timeout',
         function($timeout) {
             return {
