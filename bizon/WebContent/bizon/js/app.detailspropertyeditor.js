@@ -2,8 +2,9 @@
 "use strict";
 
 angular.module('businessObjects')
-.controller('PropertyEditorCtrl', ['$scope', 'Item', 'selectedEntity', 'item', function($scope, Item, selectedEntity, item) {
+.controller('PropertyEditorCtrl', ['Settings', '$scope', 'Item', 'selectedEntity', 'item', function(Settings, $scope, Item, selectedEntity, item) {
 	
+	this.app = Settings;
 	this.item = item;
 	var isNewProperty = item === undefined ? true : false;
 							

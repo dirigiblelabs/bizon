@@ -2,10 +2,13 @@
 "use strict";
 
 angular.module('businessObjects')
-.controller('BuildDialogCtrl', ['masterDataSvc', 'BuildService', 'PublishService', 'BuildTemplatesService', '$scope', '$log', '$stateParams', '$window', function(masterDataSvc, BuildService, PublishService, BuildTemplatesService, $scope, $log, $stateParams, $window) {
+.controller('BuildDialogCtrl', ['Settings', 'masterDataSvc', 'BuildService', 'PublishService', '$scope', '$log', '$stateParams', '$window', function(Settings, masterDataSvc, BuildService, PublishService, $scope, $log, $stateParams, $window) {
 
+	this.app = Settings;
 	this.cfg = {
-		publishAfterBuild: true
+		publishAfterBuild: Settings.publishAfterBuild,
+		projectName: Settings.projectName,
+		packageName: Settings.packageName
 	};
 	this.slider = {
 	  value: 3,
@@ -24,30 +27,30 @@ angular.module('businessObjects')
 	    $scope.$broadcast('rzSliderForceRender');
 	});
 	
-	BuildTemplatesService.listTemplates().$promise
-		.then(function(templates){
-			self.templates = templates;
-			self.cfg.templates = {};
-			//set default templates
-			if(templates.ds){
-				self.cfg.templates.ds = templates.ds.find(function(tmpl){
-					return tmpl.name === 'ds_table';
-				});
-			}
-			if(templates.svc){
-				self.cfg.templates.svc = templates.svc.find(function(tmpl){
-					return tmpl.name === 'svc_js_crud';
-				});
-			}
-			if(templates.ds){
-				self.cfg.templates.ui = templates.ui.find(function(tmpl){
-					return tmpl.name === 'ui_list_and_manage';
-				});
-			}			
-		})
-		.catch(function(response){
-			$log.error(response);
-		});
+	Settings.getTemplates()
+	.then(function(templates){
+		self.templates = templates;
+		self.cfg.templates = {};
+		//set default templates
+		if(templates.ds){
+			self.cfg.templates.ds = templates.ds.find(function(tmpl){
+				return tmpl.name === 'ds_table';
+			});
+		}
+		if(templates.svc){
+			self.cfg.templates.svc = templates.svc.find(function(tmpl){
+				return tmpl.name === 'svc_js_crud';
+			});
+		}
+		if(templates.ds){
+			self.cfg.templates.ui = templates.ui.find(function(tmpl){
+				return tmpl.name === 'ui_list_and_manage';
+			});
+		}			
+	})
+	.catch(function(response){
+		$log.error(response);
+	});
 
 	this.build = function(){
 		var entities = masterDataSvc.getLoadedData();

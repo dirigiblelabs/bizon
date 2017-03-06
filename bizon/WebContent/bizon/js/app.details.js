@@ -2,9 +2,10 @@
 "use strict";
 
 angular.module('businessObjects')
-.controller('DetailsCtrl', ['masterDataSvc', 'modalService', 'Notifications', 'selectedEntity', '$log', '$state', '$stateParams', 'Relation', function (masterDataSvc, modalService, Notifications, selectedEntity, $log, $state, $stateParams, Relation) {
+.controller('DetailsCtrl', ['masterDataSvc', 'modalService', 'Notifications', 'selectedEntity', '$log', '$state', '$stateParams', 'Relation','Settings', function (masterDataSvc, modalService, Notifications, selectedEntity, $log, $state, $stateParams, Relation, Settings) {
 	
 	this.selectedEntity = selectedEntity;
+	this.app = Settings;
 	var self = this;
 	
 	this.pk = this.selectedEntity.properties.filter(function(prop){

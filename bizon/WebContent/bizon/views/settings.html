@@ -12,21 +12,66 @@
 	</div>
 	
 	<div class="modal-body">
-		<p style="color:red">Under Construction!</p>
 		<form class="form-horizontal" form-validation>
-		  <div class="form-group">
-		    <label for="project" class="col-sm-2 control-label" required="true">Project Name</label>
+		   <div class="form-group">
+	  		<label for="mode" class="col-sm-2 control-label">Mode</label>
 		    <div class="col-sm-10">
-		      <input name="project" id="project" class="form-control" placeholder="Type Project Name" ng-model="settingsVm.cfg.projectName" minlength="1" required="true">
+		      	<input name="mode" id="mode" type="checkbox" class="checkbox form-control" data-on-text="Expert" data-off-text="Simple" ng-model="settingsVm.cfg['expert-mode']" bootstrap-switch/>
+		      	 <p class="help-block">Set to 'Expert' to for technical view or to 'Simple' for business-oriented view</p>
+		    </div>
+		  </div>		
+		  <div class="form-group">
+		    <label for="project" class="col-sm-2 control-label" required="true">Project</label>
+		    <div class="col-sm-10">
+		      <input name="project" id="project" class="form-control form-validation-ignore" placeholder="Type Project Name" ng-model="settingsVm.cfg.projectName" minlength="1">
+		      <p class="help-block">Default project name to use for new apps</p>
 		    </div>
 		  </div>
 		  <div class="form-group">
 		    <label for="package" class="col-sm-2 control-label" required="true">Package</label>
 		    <div class="col-sm-10">
-		      <input name="package" id="package" class="form-control" placeholder="Type Package Name" ng-model="settingsVm.cfg.packageName" minlength="1" required="true">
+		      <input name="package" id="package" class="form-control form-validation-ignore" placeholder="Type Package Name" ng-model="settingsVm.cfg.packageName" minlength="1">
+		      <p class="help-block">Default package name to use for new apps</p>
 		    </div>
 		  </div>
-		  
+		  <div class="form-group">
+	  		<label for="publish" class="col-sm-2 control-label">Publish</label>
+		    <div class="col-sm-10">
+		      	<input name="publish" id="publish" type="checkbox" class="checkbox form-control" data-on-text="Yes" data-off-text="No" ng-model="settingsVm.cfg.publishAfterBuild" bootstrap-switch/>
+		      	 <p class="help-block">Set to 'Yes' to trigger publish after successfull app generation or 'No' otherwise</p>
+		    </div>
+		  </div>			  
+		  <div class="panel panel-default" style="margin-top:1rem">
+			<div class="panel-heading">
+                <h4 class="panel-title">
+                	Templates
+	                <button style="border:0;background:transparent;outline:none;" data-toggle="collapse" data-target="#templates" class="pull-right" ng-click="builderVm.templatesOpen=!builderVm.templatesOpen"><i class="glyphicon" ng-class="{'glyphicon-chevron-down': builderVm.templatesOpen, 'glyphicon-chevron-right': !builderVm.templatesOpen}"></i></button>                
+                </h4>
+            </div>			  
+			<div id="templates" class="panel-body collapse">
+			  <div class="form-group">
+				    <label for="ds_tpl" class="col-sm-2 control-label" required="true">Data</label>
+				    <div class="col-sm-10">
+			        	<select id="ds_tpl" class="form-control" ng-model="settingsVm.cfg.templates.ds" ng-options="option.label for option in settingsVm.cfg.templates.ds track by option.id"></select>
+				    	<span ng-bind="settingsVm.cfg.templates.ds.description" style="color:#a9a9a9"/>
+				    </div>
+			  </div>
+			  <div class="form-group">
+				    <label for="svc_tpl" class="col-sm-2 control-label" required="true">Service</label>
+				    <div class="col-sm-10">
+			        	<select id="svc_tpl" class="form-control" ng-model="settingsVm.cfg.templates.svc" ng-options="option.label for option in settingsVm.cfg.templates.svc track by option.id"></select>
+				    	<span ng-bind="settingsVm.cfg.templates.svc.description" style="color:#a9a9a9"/>
+				    </div>
+			  </div>
+				  <div class="form-group">		    
+				    <label for="ui_tpl" class="col-sm-2 control-label" required="true">UI</label>
+				    <div class="col-sm-10">
+			        	<select id="ui_tpl" class="form-control" ng-model="settingsVm.cfg.templates.ui" ng-options="option.label for option in settingsVm.cfg.templates.ui track by option.id"></select>
+				    	<span ng-bind="settingsVm.cfg.templates.ui.description" style="color:#a9a9a9"/>
+				    </div>    
+			  </div>	            	
+		    </div>
+		  </div>
 		</form>
 	</div>
 	

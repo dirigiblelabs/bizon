@@ -2,7 +2,12 @@
 "use strict";
 
 angular.module('businessObjects')
-.controller('SettingsCtrl', ['$scope', 'masterDataSvc', '$log', function($scope, masterDataSvc, $log) {
+.controller('SettingsCtrl', ['$scope', 'Settings', '$log', function($scope, Settings, $log) {
+	
+	this.cfg = Settings;
+	this.cfg.templates = Settings.getTemplates().then(function(templatesData){
+		this.cfg.templates = templatesData;
+	}.bind(this));
 	
 	this.save = function(){
 		$log.info('settings saved');

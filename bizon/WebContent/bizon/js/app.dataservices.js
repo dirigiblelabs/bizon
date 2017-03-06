@@ -396,5 +396,14 @@
 			return Entity.query({$expand:'properties,inbound-relations'}).$promise;//TODO: remove ids
 		};		
 				
+	}])
+	.service('Settings', ['BuildTemplatesService', function(BuildTemplatesService) {
+		return {
+			"expert-mode": false,
+			"publishAfterBuild": true,
+			"getTemplates": function(){
+				return BuildTemplatesService.listTemplates().$promise;
+			}
+		};
 	}]);
 })(angular);

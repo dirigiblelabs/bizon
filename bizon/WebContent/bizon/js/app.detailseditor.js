@@ -2,8 +2,9 @@
 "use strict";
 
 angular.module('businessObjects')
-.controller('EditCtrl', ['masterDataSvc', 'modalService', 'Notifications', 'selectedEntity', '$log', '$state', '$stateParams', function (masterDataSvc, modalService, Notifications, selectedEntity, $log, $state, $stateParams) {
+.controller('EditCtrl', ['Settings', 'masterDataSvc', 'modalService', 'Notifications', 'selectedEntity', '$log', '$state', '$stateParams', function(Settings, masterDataSvc, modalService, Notifications, selectedEntity, $log, $state, $stateParams) {
 
+	this.app = Settings;
 	this.entityForEdit = $stateParams.entityForEdit || JSON.parse(JSON.stringify(selectedEntity));
 	var self = this;
 	var TABS = Object.freeze({PROP_TAB:0, REL_TAB:1, CONF_TAB:2});

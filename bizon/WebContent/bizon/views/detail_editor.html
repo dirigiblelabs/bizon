@@ -83,7 +83,7 @@
 				<div class="items-list">
 					<div ng-hide="detailsEditorVm.entityForEdit.properties.length" class="nodata-text">No Properties</div>
 					<div class="list-group" ng-if="detailsEditorVm.propertyItems.length>0">
-					  <a class="list-group-item property-item" ng-repeat="entry in detailsEditorVm.propertyItems|filter:detailsEditorVm.searchText|orderBy:['-pk','-required','name']">
+					  <a class="list-group-item property-item" ng-repeat="entry in detailsEditorVm.propertyItems|filter:detailsEditorVm.searchText|orderBy:['-pk','-required','name']" ng-if="detailsEditorVm.app['expert-mode'] || !entry.pk">
 					  	<div class="prop-{{entry.pk?'id':(entry.required?'required':'optional')}}">
 							<div class="list-group-item-title">
 								<span ng-class="{emphasized: (entry.required || entry.pk)}">{{entry.label || entry.name}}</span>
@@ -91,7 +91,7 @@
 								<i ng-if="entry.pk" class="fa fa-key" aria-hidden="true"></i>
 								<span ng-if="!entry.required && !entry.pk" class="optional">(optional)</span>
 							</div>
-							<div class="list-group-item-text">Data Type: <span style="color: gray; font-style: italic">{{entry.typeLabel}}<span></div>
+							<div class="list-group-item-text">Data Type: <span style="color: gray; font-style: italic">{{detailsEditorVm.app['expert-mode']===true?entry.type:entry.typeLabel}}<span></div>
 						</div>
 						<div class="btn-group" style="align-self: center;">
 		   					<button class="btn btn-primary" ui-sref="list.entity.edit.items({item: entry, entityForEdit:detailsEditorVm.entityForEdit})">

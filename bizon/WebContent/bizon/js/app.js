@@ -230,9 +230,9 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		    }]
 		  }) 
 		  .state("list.entity.settings", {
-		    onEnter: ['$state', '$uibModal', function($state, $modal) {
+		    onEnter: ['$state', 'selectedEntity', '$uibModal', function($state, selectedEntity, $modal) {
 		    	function goBack() {
-	        		$state.go("list.entity");
+	        		$state.go("list.entity", {boId: selectedEntity.id}, {reload:true});
 		        }		    
 		        var modalInstance = $modal.open({
 		        	animation: true,
@@ -240,7 +240,7 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		            controller: 'SettingsCtrl',
 		            controllerAs: 'settingsVm'
 		        });
-				modalInstance.result.then(goBack, goBack);		        
+				modalInstance.result.then(goBack, goBack);
 		    }]
 		  });
 		  
