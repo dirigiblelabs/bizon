@@ -95,6 +95,10 @@ angular.module('businessObjects')
     };
 
     this.ok = function() {
+	  this.item.name = this.item.label.replace(/[^A-Za-z0-9]/g, '').toLowerCase();
+	  this.item.column = this.item.label.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+	  if(this.item.column.length>255)
+		this.item.column = this.item.column.substring(0, 255);
       if(isNewProperty){
       	this.item.action = 'save';
       	selectedEntity.properties.push(this.item);
