@@ -11,9 +11,9 @@ angular.module('businessObjects')
 	this.typeOptions = [{
 							id: '0',
 							val: 'Text',
-							variants:[{value: 1, legend: 'Small', typemap: "CHAR"},
-								      {value: 2, legend: 'Normal', typemap: "VARCHAR"},
-								      {value: 3, legend: 'Huge', typemap: "LONGVARCHAR"}]
+							variants:[{value: 1, legend: 'Small', typemap: "VARCHAR", size: 40},
+								      {value: 2, legend: 'Normal', typemap: "VARCHAR", size: 255},
+								      {value: 3, legend: 'Huge', typemap: "VARCHAR", size: 10000}]
 						},{
 							id: '1',
 							val: 'Integer Number',
@@ -66,6 +66,10 @@ angular.module('businessObjects')
 		if(this.selectedTypeOption.variants){
 			this.typeVariantsSlider.options.stepsArray = this.selectedTypeOption.variants;
 			this.item.type = this.selectedTypeOption.variants[0].typemap;
+			if(this.selectedTypeOption.variants[0].size !== undefined)
+				this.item.size = this.selectedTypeOption.variants[0].size;
+			else
+				this.item.size = 0;
 		} else {
 			this.item.type = this.selectedTypeOption.typemap;
 		}
@@ -92,7 +96,9 @@ angular.module('businessObjects')
 		if(this.selectedTypeOption.variants){
 			this.typeVariantsSlider.options.stepsArray = this.selectedTypeOption.variants;
 			this.selectedTypeOption.variant = this.selectedTypeOption.variants.find(function(variant){
-					return variant.typemap === self.item.type;
+					var typeMatch = variant.typemap === self.item.type;
+					var sizeMatch = variant.size!==undefined?(variant.size>=self.item.size):true;
+					return typeMatch && sizeMatch;
 				});
 			this.typeVariantsSlider.value = this.selectedTypeOption.variant.value;
 		}
@@ -128,7 +134,11 @@ angular.module('businessObjects')
     	self.selectedTypeOption.variant = self.selectedTypeOption.variants.find(function(variant){
 	    		return variant.value === modelValue;
 	    	});
-    	self.item.type = self.selectedTypeOption.variant.typemap;    	
+    	self.item.type = self.selectedTypeOption.variant.typemap;
+		if(self.selectedTypeOption.variant.size !== undefined)
+			self.item.size = self.selectedTypeOption.variant.size;
+		else
+			self.item.size = 0;
     }
         
 }]);

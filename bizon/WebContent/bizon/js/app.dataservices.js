@@ -68,7 +68,7 @@
 					"column":"Item",
 					"typeLabel": "Text",					
 					"type": "VARCHAR",
-					"size": 100,			
+					"size": 40,
 					"required": true,
 				};
 		return res;

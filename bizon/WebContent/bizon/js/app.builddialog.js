@@ -225,7 +225,7 @@ angular.module('businessObjects')
 				web.columns.push({
 					'name': nextColumn.name.toLowerCase(),
 		            'label': nextColumn.label ? nextColumn.label : nextColumn.name,
-		            'widgetType': widgetsMapping[nextColumn.type],
+		            'widgetType': nextColumn.type==='VARCHAR'? (nextColumn.size<=40?'text':'textarea'): widgetsMapping[nextColumn.type],
 		            'key': nextColumn.pk,
 		            'visible': true,
 		            'order': nextColumn.order

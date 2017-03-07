@@ -1,0 +1,6 @@
+<a style="margin-left:15px;margin-right:15px; text-decoration:none;outline:none" ui-sref="list.empty"><i class="fa fa-home"></i></a>				
+<a class="btn btn-primary" ui-sref="list.entity.build" ng-if="!toolbarVm.empty"><i class="fa fa-wrench"></i> Cook an app!</a>
+<a class="btn btn-primary" ui-sref="list.entity.export" ng-if="!toolbarVm.empty"><i class="fa fa-download""></i> Export</a>
+<a class="btn btn-primary" ng-click="toolbarVm.newModel()" ng-if="toolbarVm.empty"><i class="fa fa-plus"></i> New Model</a>
+<a class="btn btn-primary" ui-sref="list.import"><i class="fa fa-upload"></i> Import</a>
+<a class="btn btn-primary" href ui-sref="list.entity.settings"><i class="fa fa-cog"></i> Settings</a>								

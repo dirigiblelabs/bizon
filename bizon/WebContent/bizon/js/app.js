@@ -26,6 +26,11 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		              templateUrl: 'views/notifications.html',
 		              controller: 'NotificationsCtrl',
 		              controllerAs: 'messagesVm'
+		          },
+		          'toolbar': {
+		          	  templateUrl: 'views/toolbar.html',
+		              controller: 'ToolbarCtrl',
+		              controllerAs: 'toolbarVm'
 		          }
 		      }
 		    })
@@ -297,14 +302,19 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
      ])
 	.directive('formValidation', ['$timeout',
         function($timeout) {
+        
+        	angular.element.validator.addMethod( "alphanumeric", function( value, element, regex) {
+				return this.optional( element ) || new RegExp(regex, 'gi').test(value);
+			}, "Valid input consits of letters, numbers, and underscores only");
+			
             return {
                 restrict: 'A',
-                link: function(scope, element, attrs) {
+                link: function(scope, formElement, attrs) {
                 	var $validator;
                 	var formValidationOptions = {
 						errorClass: 'has-error',
 				     	validClass : 'has-success',
-				     	ignore: 'input[style*="position: absolute"],.form-validation-ignore',
+				     	ignore: 'input[style*="position: absolute"],.form-validation-ignore,.form-control[novalidate]',
 				 		highlight: function (element, errorClass, validClass) {
 				            angular.element(element).closest('.form-group').removeClass('has-success').addClass('has-error');
 				            if($validator.numberOfInvalids()>0)
@@ -315,12 +325,13 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 					        	if($validator.numberOfInvalids()<1)
 						        	angular.element('.modal-footer .btn.btn-success').removeClass('disabled');
 					        },
-						success: "has-success"	    
+						success: "has-success"
 					};			
 					$timeout(function(){
-						$validator = angular.element(element).validate(formValidationOptions);
-			//			validator.form();//This doesn't work as expected
-						angular.element('.form-control[required]', angular.element(element)).each(function(i){
+						$validator = angular.element(formElement).validate(formValidationOptions);
+						//validator.form();//This doesn't work as expected so we need to iterate and validate each element separately
+						angular.element('.form-control:not([no-validate])', angular.element(formElement))
+						.each(function(){
 			        		$validator.element(this);
 			        	});
 		        	});
