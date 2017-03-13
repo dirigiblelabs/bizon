@@ -3,7 +3,7 @@
 
 angular.module('businessObjects')
 .controller('ToolbarCtrl', ['masterDataSvc', '$state', '$stateParams', '$log', function(masterDataSvc, $state, $stateParams, $log) {
-	this.empty = masterDataSvc.getLoadedData()===undefined || masterDataSvc.getLoadedData().length===0;
+	this.data = masterDataSvc['$count'];
 	
 	this.newModel = function(){
 		masterDataSvc.create()

@@ -6,6 +6,20 @@
 	
 		return {
 			cfg: {
+			    query : {
+					method: 'GET',
+			        interceptor: {
+						response: function(res) {
+		                	var _count= res.headers('X-dservice-list-count');
+		                	if(_count!==undefined){
+		                		_count = parseInt(_count, 10);
+		                		res.resource.$count = _count;
+	                		}
+	                        return res.resource;
+		                }
+		            }, 
+		            isArray: true
+			    },
 			    save: {
 			        method: 'POST',
 			        interceptor: {
@@ -127,7 +141,11 @@
 		}
 		
 		this.masterDataTemplateObject = createMasterDataTemplateObject();
-		this.batchLoadedMasterData = [];//data cache
+		this.data = {};
+		this.data['items'] = this.batchLoadedMasterData = [];//data cache
+		this['$count'] = {
+			val: 0
+		};
 		this.querySettings = {
 			$limit: 100,
 			$sort: 'label',
@@ -157,6 +175,7 @@
 				} else {
 					self.batchLoadedMasterData = data;//overwrite
 				}
+				self['$count']['val'] = data.$count;
 				deferred.resolve(data);
 			})
 			.catch(function(error){
@@ -394,7 +413,30 @@
 		this.exportData = function(){
 			$log.info('Exporting data');
 			return Entity.query({$expand:'properties,inbound-relations'}).$promise;//TODO: remove ids
-		};		
+		};
+		
+		
+		return this;
+/*		return {
+			masterDataTemplateObject: this.masterDataTemplateObject,
+			loadedData: this.batchLoadedMasterData,
+			querySettings: this.querySettings,
+			selection: this.selection,
+			getLoadedData: this.getLoadedData,
+			next: this.next,
+			get: this.get,
+			getByName: this.getByName,
+			findByName: this.findByName,
+			hasMore: this.hasMore,
+			_itemsCount: this._itemsCount,
+			count: this.count,
+			select: this.select,
+			create: this.create,
+			update:this.update,
+			remove: this.remove,
+			serviceErrorMessageFormatter: this.serviceErrorMessageFormatter,
+			exportData: this.exportData
+		};*/
 				
 	}])
 	.service('Settings', ['BuildTemplatesService', function(BuildTemplatesService) {
