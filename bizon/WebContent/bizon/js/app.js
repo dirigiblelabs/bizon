@@ -64,14 +64,14 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 			params: {
 				tmplFamily:undefined
 			},
-		      views: {
-			      'templateLib@list.empty': {
+		    views: {
+			    'templateLib@list.empty': {
 					templateUrl: 'views/templateFamily.html',
 					controller: 'TemplatesCtrl',
 					controllerAs: 'tmplVm'
-			      }
-		      }
-		   })		   		   
+			    }
+		    }
+		})		   		   
 		.state('list.entity', {
 			url: "{boId}",
 			resolve: { 
@@ -93,20 +93,21 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		     }
 		   })	
 		.state('list.entity.edit', {
-		      params: {
-		    	entityForEdit: undefined
-		      },
-		      views: {
-		          'master@': {
-		              templateUrl: 'views/none.html'
-		          },
-			      'detail@': {
-					  templateUrl: "views/detail_editor.html",
-					  controller: 'EditCtrl',
-		              controllerAs: 'detailsEditorVm'
-			      }
-		      }
-		    })
+			url: "/edit",
+			params: {
+				entityForEdit: undefined
+			},
+			views: {
+				'master@': {
+				    templateUrl: 'views/none.html'
+				},
+				'detail@': {
+					templateUrl: "views/detail_editor.html",
+					controller: 'EditCtrl',
+				    controllerAs: 'detailsEditorVm'
+				}
+			}
+	    })
 		.state("list.entity.edit.items", {
 			resolve: {
 				entityForEdit: ['$stateParams', function($stateParams){
@@ -234,19 +235,33 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		      	//$state.go('list.entity');
 		    }]
 		  }) 
-		  .state("list.entity.settings", {
-		    onEnter: ['$state', 'selectedEntity', '$uibModal', function($state, selectedEntity, $modal) {
-		    	function goBack() {
-	        		$state.go("list.entity", {boId: selectedEntity.id}, {reload:true});
-		        }		    
+		  .state("list.settings", {
+			  resolve: {
+                "$previousState": ["$state", "$stateParams", function ($state, $stateParams) {
+                    return {
+                    	"state": $state.current,
+                    	"params": $state.params
+                    };
+                }]
+              },
+			  onEnter: ['$state', '$previousState', '$uibModal', function($state, $previousState, $modal) {
 		        var modalInstance = $modal.open({
 		        	animation: true,
 		            templateUrl: "views/settings.html",
 		            controller: 'SettingsCtrl',
 		            controllerAs: 'settingsVm'
 		        });
-				modalInstance.result.then(goBack, goBack);
-		    }]
+				modalInstance.result
+				.finally(function(){
+					if($previousState.state.name === 'list.entity')
+						$state.go('list.entity', $previousState.params);
+					else if($previousState.state.name === 'list.entity.edit')
+						$state.go('list.entity.edit', $previousState.params);
+					else if($previousState.state.name === 'list.empty')
+						$state.go('list.empty', $previousState.params);
+					//$state.go($previousState.state, $previousState.params);
+				}.bind(this));
+			  }]
 		  });
 		  
 		cfpLoadingBarProvider.includeSpinner = false;

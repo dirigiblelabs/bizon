@@ -81,7 +81,7 @@ angular.module('businessObjects')
 	
 	this.startEdit = function() {
 	    $stateParams.entityForEdit = angular.copy(this.selectedEntity);		    
-	    $state.go("list.entity.edit", $stateParams, {location:false});
+	    $state.go("list.entity.edit", $stateParams);
 	};
 	
 	this.duplicateItem = function() {
