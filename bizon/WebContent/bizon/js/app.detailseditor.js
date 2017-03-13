@@ -6,6 +6,29 @@ angular.module('businessObjects')
 
 	this.app = Settings;
 	this.entityForEdit = $stateParams.entityForEdit || JSON.parse(JSON.stringify(selectedEntity));
+
+	this.entityForEdit['outbound-relations'] = this.entityForEdit['outbound-relations']
+												.map(function(rel){
+													rel.source = {
+														label: this.entityForEdit.label,
+														name: this.entityForEdit.name
+													};
+													rel.target = this.entityForEdit['outbound-entities']
+																	.filter(function(entity){
+																		return entity.name === rel.targetEntityName;
+																	})
+																	.map(function(entity){
+																		return {
+																			name: entity.name,
+																			label: entity.label
+																		};
+																	});
+													return rel;
+												}.bind(this));
+	
+	delete this.entityForEdit['inbound-relations'];
+	delete this.entityForEdit['inbound-entities'];
+	
 	var self = this;
 	var TABS = Object.freeze({PROP_TAB:0, REL_TAB:1, CONF_TAB:2});
 	
@@ -17,8 +40,8 @@ angular.module('businessObjects')
 		this.searchText = undefined;	
 		this.tab = TABS.PROP_TAB;
 		if(this.entityForEdit.properties){
-			this.propertyItems = this.entityForEdit.properties.filter(function(v){
-				if(v.action!=='remove'){
+			this.propertyItems = this.entityForEdit.properties.filter(function(prop){
+				if(prop.action!=='remove'){
 					return true;
 				}
 				return false;
@@ -37,12 +60,13 @@ angular.module('businessObjects')
 	this.showRelationships = function(){
 		this.searchText = undefined;
 		this.tab = TABS.REL_TAB;	
-		this.propertyItems = this.entityForEdit['outbound-relations'].filter(function(v){
-			if(v.action!=='remove') {
-				return true;
-			}
-			return false;
-		}, this);
+		this.propertyItems = this.entityForEdit['outbound-relations']
+							.filter(function(rel){
+								if(rel.action!=='remove') {
+									return true;
+								}
+								return false;
+							}, this);
 	};
 	
 	this.showConfig = function(){
@@ -89,7 +113,7 @@ angular.module('businessObjects')
 		var modalOptions = {
             closeButtonText: 'Cancel',
             actionButtonText: 'Delete',
-            headerText: 'Delete property "' + (item.name||item.name) + '"?',
+            headerText: 'Delete property "' + (item.label||item.name) + '"?',
             bodyText: 'Are you sure you want to delete this property?'
         };
         
@@ -102,6 +126,36 @@ angular.module('businessObjects')
 				}
 			}
 			self.entityForEdit.properties = self.entityForEdit.properties.map(
+				function(currItem){
+					if(item.id===undefined && currItem === item){
+						return;
+					}
+					if((currItem.id && currItem.id === item.id) || (currItem.id && currItem.id === item.id)){
+						currItem.action = 'remove';
+					}
+					return currItem;
+				}).filter(function(n){ return n != undefined; });
+        });
+        
+	};
+	
+	this.deleteRelation = function(item){
+		var modalOptions = {
+            closeButtonText: 'Cancel',
+            actionButtonText: 'Delete',
+            headerText: 'Delete relation "' + (item.label||item.name) + '"?',
+            bodyText: 'Are you sure you want to delete this relation?'
+        };
+        
+        modalService.showModal({}, modalOptions)
+        .then(function () {
+			for(var i=0; i< self.propertyItems.length; i++){
+				if(self.propertyItems[i] === item){
+					self.propertyItems.splice(i,1);
+					break;
+				}
+			}
+			self.entityForEdit['outbound-relations'] = self.entityForEdit['outbound-relations'].map(
 				function(currItem){
 					if(item.id===undefined && currItem === item){
 						return;

@@ -163,7 +163,7 @@
 		function query(settings){
 			this.querySettings = settings;
 			if(settings && !settings.$expand)
-				settings.$expand = 'properties,inbound-relations,outbound-relations,inbound-entities';
+				settings.$expand = 'properties,inbound-relations,outbound-relations,inbound-entities,outbound-entities';
 			var deferred = $q.defer();
 			Entity.query(settings).$promise
 			.then(function(data){
@@ -401,10 +401,10 @@
 		};
 		
 		this.serviceErrorMessageFormatter = function(message, errorPayload){
-			if(errorPayload.data.err.code){
+			if(errorPayload.data&& errorPayload.data.err.code){
 				message += ': [' + errorPayload.data.err.code + '] ';
 			}
-			if(errorPayload.data.err.message){
+			if(errorPayload.data && errorPayload.data.err.message){
 				message += ' ' + errorPayload.data.err.message;
 			}
 			return message;

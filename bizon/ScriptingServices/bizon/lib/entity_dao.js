@@ -199,8 +199,14 @@ const orm = {
 					"targetDao": require("bizon/lib/relation_dao").get,
 					"type": "one-to-many"
 				},{ 
-					"name": "inbound-entities",
+					"name": "outbound-entities",
 					"joinKey": "srcEntityName",
+					"key": "name",
+					"joinDao": require("bizon/lib/relation_dao").get,
+					"type": "many-to-many"
+				},{ 
+					"name": "inbound-entities",
+					"joinKey": "targetEntityName",
 					"key": "name",
 					"joinDao": require("bizon/lib/relation_dao").get,
 					"type": "many-to-many"

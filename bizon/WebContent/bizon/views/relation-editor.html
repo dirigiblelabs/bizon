@@ -40,6 +40,12 @@
 		    </div>
 		  </div>
 		  <div class="form-group">
+		    <label for="source" class="col-sm-4 control-label" readonly>Source</label>
+		    <div class="col-sm-7">
+		      <span name="source" class="form-control" ng-bind="relEditorVm.relation.source.label" no-validate></span>
+		    </div>
+		  </div>		  
+		  <div class="form-group">
 		    <label for="item_target_name" class="col-sm-4 control-label" required="true">Target Object</label>
 		    <div class="col-sm-7">
 				<input id="item_target_name" type="text" placeholder="Type to select target object" class="form-control" required="true"

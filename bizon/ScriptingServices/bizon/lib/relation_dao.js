@@ -3,7 +3,7 @@
 "use strict";
 
 var listJoins = function(settings, daos){
-	var joinKey = 'srcEntityName';
+	var joinKey = settings['srcEntityName']===undefined?'targetEntityName':'srcEntityName';
 	var joinId;
 	if(typeof settings === 'string'){
 		joinId = settings;

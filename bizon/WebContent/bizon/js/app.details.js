@@ -24,51 +24,31 @@ angular.module('businessObjects')
 	}
 	
 	showDetails.apply(this, [this.selectedEntity]);
-	
+
 	this.showRelationships = function(){
 		this.searchText = undefined; 
-		this.inboundRelations = getInboundRelations.apply(self);
-		this.outboundRelations = getOutboundRelations.apply(self);
-	};
-	
-	function getInboundRelations(){
 		if(this.selectedEntity){
-			/*Relation.query({
-				targetId: this.selectedEntity.name
-			}).$promise
-			.then(function(relations){
-				self.inboundRelations = relations.map(function(relation){
-					masterDataSvc.getByName(relation.srcEntityName, true)
-					.then(function(srcEntity){
-						relation.source = srcEntity;
-						return relation;						
-					});
-					return relation;					
-				});
-			});*/
-			return this.selectedEntity['inbound-relations']
-			.map(function(rel){
-				var inboundEntity = this.selectedEntity['inbound-entities']
-									.filter(function(inboundEntity){
-										return inboundEntity.name === rel.targetEntityName;
-									})[0];
-				rel.source = inboundEntity;
-				return rel;
-			}.bind(this));
+			this.inboundRelations = this.selectedEntity['inbound-relations']
+										.map(function(rel){
+											rel.source = this.selectedEntity['inbound-entities']
+															.filter(function(entity){
+																return entity.name === rel.targetEntityName;
+															})[0];
+											rel.target = this.selectedEntity;
+											return rel;
+										}.bind(this));
+			this.outboundRelations = this.selectedEntity['outbound-relations'] = this.selectedEntity['outbound-relations']
+										.map(function(rel){
+											rel.source = this.selectedEntity;										
+											rel.target = this.selectedEntity['outbound-entities']
+															.filter(function(entity){
+																return entity.name === rel.targetEntityName;
+															})[0];
+											return rel;
+										}.bind(this));
 		}
-	}
-	
-	function getOutboundRelations(){
-		return this.selectedEntity['outbound-relations']
-				.map(function(rel){
-					masterDataSvc.getByName(rel.targetEntityName, true)
-					.then(function(targetEntity){
-						rel.target = targetEntity;
-					});
-					return rel;
-				});
-	}
-	
+	};
+
 	this.showConfig = function(){
 		this.searchText = undefined;
 	};

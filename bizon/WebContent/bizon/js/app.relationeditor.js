@@ -8,7 +8,7 @@ angular.module('businessObjects')
 	
 	this.loading = false;
 	this.noResults;
-	var MULTIPLICITY_TYPES = Object.freeze({ONE_TO_ONE:1, ONE_TO_MANY:2, MANY_TO_MANY:3});	
+	var MULTIPLICITY_TYPES = Object.freeze({ONE_TO_ONE:1, ONE_TO_MANY:2, MANY_TO_MANY:3, MANY_TO_ONE:4});	
 	this.slider = {
 	  options: {
 	  	showTicksValues: true,
@@ -17,7 +17,8 @@ angular.module('businessObjects')
 	    stepsArray: [
 	      {value: MULTIPLICITY_TYPES.ONE_TO_ONE, legend: 'One-to-One'},
 	      {value: MULTIPLICITY_TYPES.ONE_TO_MANY, legend: 'One-To-Many'},
-	      {value: MULTIPLICITY_TYPES.MANY_TO_MANY, legend: 'Many-to-Many'}
+	      {value: MULTIPLICITY_TYPES.MANY_TO_MANY, legend: 'Many-to-Many'}/*,
+	      {value: MULTIPLICITY_TYPES.MANY_TO_ONE, legend: 'Many-to-One'}*/
 	    ]
 	  }
 	};
@@ -28,7 +29,7 @@ angular.module('businessObjects')
 		floor: 1,
 	    ceil: 3,
 	    stepsArray: [
-	      {value: ASSOCIATION_TYPES.ASSOCIATION, legend: 'Associaiton'},
+	      {value: ASSOCIATION_TYPES.ASSOCIATION, legend: 'Association'},
 	      {value: ASSOCIATION_TYPES.AGGREGATION, legend: 'Aggregation'},
 	      {value: ASSOCIATION_TYPES.COMPOSITION, legend: 'Composition'}
 	    ]
@@ -43,20 +44,24 @@ angular.module('businessObjects')
 	function init(){
 		if(isNewProperty) {
 			this.relation = {
-				type: 'Relationship'
+				srcEntityName: selectedEntity.name,
+				srcEntityLabel: selectedEntity.label,
+				srcMultiplicity: MULTIPLICITY_OPTS.ONE,
+				name: selectedEntity.name +'- '
 			};
-			this.relation.srcEntityName = selectedEntity.name;
-			this.relation.srcMultiplicity = MULTIPLICITY_OPTS.ONE;
-			this.relation.name = selectedEntity.name +'- ';
 		} else {
 			if(this.relation.targetEntityName){
 				masterDataSvc.getByName(this.relation.targetEntityName, true)
 				.then(function(target){
-					self.relation.target = target;
-				});			
+					this.relation.target = target;
+				}.bind(this));
 			}
 			relationToSlider.apply(this, [this.relation, this.slider]);
 		}
+		this.relation.source = {
+			label: selectedEntity.label,
+			name: selectedEntity.name
+		};		
 		$scope.$$postDigest(function () {
 			    $scope.$broadcast('rzSliderForceRender');
 		});	
@@ -131,6 +136,9 @@ angular.module('businessObjects')
   		} else if(sliderValue === MULTIPLICITY_TYPES.MANY_TO_MANY){
   			relation.srcMultiplicity = MULTIPLICITY_OPTS.MANY;
       		relation.targetMultiplicity = MULTIPLICITY_OPTS.MANY;
+  		}  else if(sliderValue === MULTIPLICITY_TYPES.MANY_TO_ONE){
+  			relation.srcMultiplicity = MULTIPLICITY_OPTS.MANY;
+      		relation.targetMultiplicity = MULTIPLICITY_OPTS.ONE;
   		}
     }
     
@@ -141,7 +149,9 @@ angular.module('businessObjects')
   		 	slider.value = MULTIPLICITY_TYPES.ONE_TO_MANY;
   		} else if(relation.srcMultiplicity === MULTIPLICITY_OPTS.MANY && relation.targetMultiplicity === MULTIPLICITY_OPTS.MANY){
   			slider.value = MULTIPLICITY_TYPES.MANY_TO_MANY;
-  		}			
+  		} else if(relation.srcMultiplicity === MULTIPLICITY_OPTS.MANY && relation.targetMultiplicity === MULTIPLICITY_OPTS.ONE){
+  			slider.value = MULTIPLICITY_TYPES.MANY_TO_ONE;
+  		}
     }    
     
     init.apply(this);

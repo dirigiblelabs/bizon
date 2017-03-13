@@ -110,7 +110,7 @@
 			<div class="tab-pane fade" role="tabpanel" id="relations">
 	
 				<div class="items-list">
-					<div ng-hide="detailsEditorVm.propertyItems.length" class="nodata-text">No Items</div>				
+					<div ng-hide="detailsEditorVm.propertyItems.length" class="nodata-text">No Relations</div>				
 					<ul class="list-group" ng-show="detailsEditorVm.propertyItems.length">
 					  <li class="list-group-item" ng-repeat="entry in detailsEditorVm.propertyItems|filter:detailsEditorVm.searchText|orderBy:['-pk','-required','name']" ng-click="$event.stopPropagation();" style="outline: none; cursor: auto;">
 						<div style="display:inline-block">					  
@@ -125,7 +125,7 @@
 		   					<button class="btn btn-primary" ui-sref="list.entity.edit.relations({relation: entry, entityForEdit: detailsEditorVm.entityForEdit})">
 							  <i class="fa fa-pencil" aria-hidden="true"></i>
 							</button>
-							<button class="btn btn-danger" ng-click="detailsEditorVm.deleteProperty(entry)">
+							<button class="btn btn-danger" ng-click="detailsEditorVm.deleteRelation(entry)">
 							  <i class="glyphicon glyphicon-remove" aria-hidden="true"></i>
 							</button>
 						</div>					
