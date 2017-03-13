@@ -52,6 +52,15 @@ angular.module('businessObjects')
 		$log.error(response);
 	});
 
+	this.rememberSettings = function(){
+		if(this.cfg.projectName!==undefined)
+			Settings.projectName = this.cfg.projectName;
+		if(this.cfg.packageName!==undefined)
+			Settings.packageName = this.cfg.packageName;
+		if(this.cfg.publishAfterBuild!==undefined)
+			Settings.publishAfterBuild = this.cfg.publishAfterBuild;						
+	};
+
 	this.build = function(){
 		var entities = masterDataSvc.getLoadedData();
 		try{

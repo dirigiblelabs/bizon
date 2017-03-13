@@ -80,7 +80,15 @@
 		      	<input name="publish" id="publish" type="checkbox" class="checkbox form-control" data-on-text="Yes" data-off-text="No" ng-model="builderVm.cfg.publishAfterBuild" bootstrap-switch novalidate="true"/>
 		      	<p class="help-block">Set to 'Yes' to trigger publish after successfull app generation or 'No' otherwise</p>
 		    </div>
-		  </div>		 		  
+		  </div>
+		  
+		  <div class="form-group">
+	  		<label for="remember" class="col-sm-2 control-label">Remember</label>
+		    <div class="col-sm-10">
+		      	<input name="remember" id="remember" type="checkbox" class="checkbox form-control" data-on-text="Yes" data-off-text="No" ng-model="builderVm.cfg.remember" bootstrap-switch novalidate="true" ng-change="builderVm.rememberSettings()"/>
+		      	<p class="help-block">Set to 'Yes' to save this configuraiton for later or 'No' otherwise</p>
+		    </div>
+		  </div>		  
 		  
 		</form>
 	</div>

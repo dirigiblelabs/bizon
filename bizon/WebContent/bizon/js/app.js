@@ -275,7 +275,6 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
                 require: '?ngModel',
                 link: function(scope, element, attrs, ngModel) {
                     element.bootstrapSwitch();
-
                     element.on('switchChange.bootstrapSwitch', function(event, state) {
                         if (ngModel) {
                             scope.$apply(function() {
