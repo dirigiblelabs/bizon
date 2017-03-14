@@ -48,6 +48,15 @@
       }
       ,
       {
+        "name":"BOR_TARGET_FK_NAME",
+        "type":"VARCHAR",
+        "length":"255",
+        "notNull":"true",
+        "primaryKey":"false",
+        "defaultValue":""
+      }
+      ,
+      {
         "name":"BOR_NAME",
         "type":"VARCHAR",
         "length":"255",

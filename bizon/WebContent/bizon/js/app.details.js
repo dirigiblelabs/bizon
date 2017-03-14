@@ -33,16 +33,41 @@ angular.module('businessObjects')
 											rel.source = this.selectedEntity['inbound-entities']
 															.filter(function(entity){
 																return entity.name === rel.targetEntityName;
+															})
+															.map(function(entity){
+																return {
+																	id: entity.id,
+																	name: entity.name,
+																	label: entity.label,
+																	properties: entity.properties
+																};
 															})[0];
-											rel.target = this.selectedEntity;
+											rel.target = {
+												id: this.selectedEntity.id,
+												name: this.selectedEntity.name,
+												label: this.selectedEntity.label,
+												properties: this.selectedEntity.properties
+											};
 											return rel;
 										}.bind(this));
 			this.outboundRelations = this.selectedEntity['outbound-relations'] = this.selectedEntity['outbound-relations']
 										.map(function(rel){
-											rel.source = this.selectedEntity;										
+											rel.source = {
+												id: this.selectedEntity.id,
+												name: this.selectedEntity.name,
+												label: this.selectedEntity.label,
+												properties: this.selectedEntity.properties
+											};
 											rel.target = this.selectedEntity['outbound-entities']
 															.filter(function(entity){
 																return entity.name === rel.targetEntityName;
+															}).map(function(entity){
+																return {
+																	id: entity.id,
+																	name: entity.name,
+																	label: entity.label,
+																	properties: entity.properties
+																};
 															})[0];
 											return rel;
 										}.bind(this));

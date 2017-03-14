@@ -65,6 +65,12 @@ exports.get = function(){
 				"size": 100,
 				"required": true
 			},{
+				"name": "targetEntityFkName",
+				"dbName": "BOR_TARGET_FK_NAME",
+				"type": "String",
+				"size": 250,
+				"required": true
+			},{
 				"name": "targetMultiplicity",
 				"dbName": "BOR_TARGET_TYPE",
 				"type": "Short",

@@ -93,6 +93,15 @@
       }
       ,
       {
+        "name":"BOP_FK_REL_NAME",
+        "type":"VARCHAR",
+        "length":"255",
+        "notNull":"false",
+        "primaryKey":"false",
+        "defaultValue":""
+      }
+      ,
+      {
         "name":"BOP_ORDER",
         "type":"SMALLINT",
         "length":"0",

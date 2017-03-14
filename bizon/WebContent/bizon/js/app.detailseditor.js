@@ -9,20 +9,34 @@ angular.module('businessObjects')
 
 	this.entityForEdit['outbound-relations'] = this.entityForEdit['outbound-relations']
 												.map(function(rel){
-													rel.source = {
-														label: this.entityForEdit.label,
-														name: this.entityForEdit.name
-													};
-													rel.target = this.entityForEdit['outbound-entities']
-																	.filter(function(entity){
-																		return entity.name === rel.targetEntityName;
-																	})
-																	.map(function(entity){
-																		return {
-																			name: entity.name,
-																			label: entity.label
-																		};
-																	});
+													if(rel.source===undefined){
+														rel.source = {
+															id: this.entityForEdit.id,
+															label: this.entityForEdit.label,
+															name: this.entityForEdit.name,
+															properties: this.entityForEdit.properties
+														};
+													}
+													if(!rel.target || !rel.target.properties){
+														rel.target = this.entityForEdit['outbound-entities']
+																		.filter(function(entity){
+																			return entity.name === rel.targetEntityName;
+																		})
+																		.map(function(entity){
+																			var target = {
+																				id: entity.id,
+																				name: entity.name,
+																				label: entity.label
+																			};
+																			if(target.properties === undefined){
+																				masterDataSvc.getByName(target.name, true)
+																				.then(function(_target){
+																					target.properties = _target.properties;
+																				});																		
+																			}
+																			return target;
+																		})[0];
+													}
 													return rel;
 												}.bind(this));
 	
@@ -32,9 +46,10 @@ angular.module('businessObjects')
 	var self = this;
 	var TABS = Object.freeze({PROP_TAB:0, REL_TAB:1, CONF_TAB:2});
 	
-	this.pk = this.entityForEdit.properties.filter(function(prop){
-			return prop.pk;
-		})[0];
+	this.pk = this.entityForEdit.properties
+				.filter(function(prop){
+					return prop.pk;
+				})[0];
 	
 	this.showProperties = function(){
 		this.searchText = undefined;	
@@ -156,14 +171,19 @@ angular.module('businessObjects')
 				}
 			}
 			self.entityForEdit['outbound-relations'] = self.entityForEdit['outbound-relations'].map(
-				function(currItem){
-					if(item.id===undefined && currItem === item){
+				function(outboundRel){
+					if(item.id===undefined && outboundRel.name === item.name){
 						return;
 					}
-					if((currItem.id && currItem.id === item.id) || (currItem.id && currItem.id === item.id)){
-						currItem.action = 'remove';
+					if((outboundRel.id && outboundRel.id === item.id) || (outboundRel.id && outboundRel.id === item.id)){
+						outboundRel.action = 'remove';
+						outboundRel.target.properties = outboundRel.target.properties.map(function(prop){
+							if(prop.name === outboundRel.targetEntityFkName)
+								prop.action = "remove";
+							return prop;
+						});
 					}
-					return currItem;
+					return outboundRel;
 				}).filter(function(n){ return n != undefined; });
         });
         

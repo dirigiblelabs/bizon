@@ -51,6 +51,11 @@ exports.get = function(){
 					return dbValue < 1 ?  false : true;
 				}				
 			},{
+				"name": "fkInRelationName",
+				"dbName": "BOP_FK_REL_NAME",
+				"type": "String",
+				"size": 250
+			},{
 				"name": "typeLabel",
 				"dbName": "BOP_TYPE_NAME",
 				"type": "String",

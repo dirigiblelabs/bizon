@@ -44,7 +44,16 @@
 		    <div class="col-sm-7">
 		      <span name="source" class="form-control" ng-bind="relEditorVm.relation.source.label" no-validate></span>
 		    </div>
-		  </div>		  
+		  </div>
+		  <div class="form-group" ng-if="relEditorVm.app['expert-mode']">
+	  		<label for="sourceKey" class="col-sm-4 control-label" required="true">Source Key</label>
+		    <div class="col-sm-7">
+		    	<select name="sourceKey" class="form-control" required="true"
+		    			ng-model="relEditorVm.sourceKeyOptions.selection" 
+		    			ng-options="item as item.label for item in relEditorVm.sourceKeyOptions.options track by item.name">
+			    </select>
+		    </div>
+		  </div>
 		  <div class="form-group">
 		    <label for="item_target_name" class="col-sm-4 control-label" required="true">Target Object</label>
 		    <div class="col-sm-7">
@@ -54,7 +63,8 @@
 					 typeahead-loading="relEditorVm.loading" 
 					 typeahead-no-results="relEditorVm.noResults"
 					 typeahead-show-hint = "true"
-					 typeahead-input-formatter = "relEditorVm.changeTarget(a)"
+					 typeahead-input-formatter = "relEditorVm.formatTarget()"
+					 typeahead-on-select = "relEditorVm.changeTarget($item, $model, $label)"
 					 uib-typeahead="target as target.label for target in relEditorVm.matchTargets($viewValue)">
 			    <i ng-show="relEditorVm.loading" class="glyphicon glyphicon-refresh"></i>
 			    <div ng-show="relEditorVm.noResults">
@@ -62,12 +72,22 @@
 			    </div>
 		    </div>
 		  </div>
+		  <div class="form-group" ng-if="relEditorVm.app['expert-mode']">
+	  		<label for="targetKey" class="col-sm-4 control-label" required="true">Target Key</label>
+		    <div class="col-sm-7">
+		    	<input id="targetKey" type="text" placeholder="Type to select target object" class="form-control" required="true" pattern="[a-zA-Z0-9_]{1,100}" data-rule-alphanumeric="^\w+$"
+					 ng-model="relEditorVm.relation.targetEntityFkName" 
+					 ng-model-options="{ debounce: 500, blur: 250 }"
+					 typeahead-show-hint = "true"
+					 uib-typeahead="property as property.label for property in relEditorVm.targetKeyOptions.options">
+		    </div>
+		  </div>		  
 		  <div class="form-group">
 	  		<label for="required" class="col-sm-4 control-label">Multiplicity</label>
 		    <div class="col-sm-7">
 		    	<rzslider rz-slider-model="relEditorVm.slider.value" rz-slider-options="relEditorVm.slider.options"></rzslider>
 		    </div>
-		  </div>		  
+		  </div>
 		  <div class="form-group">
 	  		<label for="required" class="col-sm-4 control-label">Relation Type</label>
 		    <div class="col-sm-7">

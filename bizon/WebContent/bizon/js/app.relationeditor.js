@@ -2,9 +2,18 @@
 "use strict";
 
 angular.module('businessObjects')
-.controller('RelationEditorCtrl', ['$scope', 'masterDataSvc', '$log', 'selectedEntity', 'relation', function($scope, masterDataSvc, $log, selectedEntity, relation) {
-	
+.controller('RelationEditorCtrl', ['$scope', 'masterDataSvc', '$log', 'selectedEntity', 'relation', 'Settings', function($scope, masterDataSvc, $log, selectedEntity, relation, Settings) {
+	this.app = Settings;
 	this.relation = relation;
+	this.selectedEntity = selectedEntity;
+	this.sourceKeyOptions = {
+		options: selectedEntity.properties,
+		selection: selectedEntity.properties
+					 .filter(function(prop){
+						return prop.pk === true; 
+					  })[0]
+	};
+	this.targetKeyOptions = {};
 	
 	this.loading = false;
 	this.noResults;
@@ -50,18 +59,25 @@ angular.module('businessObjects')
 				name: selectedEntity.name +'- '
 			};
 		} else {
-			if(this.relation.targetEntityName){
+			if(this.relation.target===undefined){
 				masterDataSvc.getByName(this.relation.targetEntityName, true)
-				.then(function(target){
-					this.relation.target = target;
+				.then(function(loadedTargetEntity){
+					this.relation.target = {
+						name: loadedTargetEntity.name,
+						label: loadedTargetEntity.label,
+						properties: loadedTargetEntity.properties
+					};
 				}.bind(this));
-			}
+			}		
 			relationToSlider.apply(this, [this.relation, this.slider]);
 		}
-		this.relation.source = {
-			label: selectedEntity.label,
-			name: selectedEntity.name
-		};		
+		if(this.relation.source===undefined){
+			this.relation.source = {
+				label: selectedEntity.label,
+				name: selectedEntity.name,
+				properties: selectedEntity.properties
+			};
+		}
 		$scope.$$postDigest(function () {
 			    $scope.$broadcast('rzSliderForceRender');
 		});	
@@ -85,7 +101,7 @@ angular.module('businessObjects')
 		});
 	};
 	
-	this.changeTarget = function(){
+	this.formatTarget = function(){
 /*		var nameSegments = self.relation.name.split('-');
 		if(self.relation.target){
 			nameSegments[1] = self.relation.target.label;	
@@ -95,6 +111,32 @@ angular.module('businessObjects')
 		self.relation.name = nameSegments.join('-');*/
 		//TODO: implement in case we need some special formatting
 		return (self.relation.target && self.relation.target.label) || '';
+	};
+
+	this.changeTarget = function($item, $model, $label){
+		if(self.relation.target){
+			self.relation.target = masterDataSvc.getLoadedData()
+									.filter(function(entity){
+										return entity.name === this.relation.target.name;
+									}.bind(this)).
+									map(function(entity){
+										return {
+											"id": entity.id,
+											"name": entity.name,
+											"label": entity.label,
+											"properties": entity.properties
+										}
+									})[0];
+			self.targetKeyOptions.options = self.relation.target.properties
+												.filter(function(prop){
+													return prop.type === self.sourceKeyOptions.selection.type && prop.pk === false;
+												});
+			if(self.relation.targetEntityFkName){
+				//TODO: mark for update of the target entity join property
+			} else {
+				self.relation.targetEntityFkName = self.relation.srcEntityName+"_"+self.relation.name;
+			}
+		}
 	};
     
     this.cancel = function() {
@@ -107,21 +149,43 @@ angular.module('businessObjects')
     		return;
     	}
 		sliderValueToRelation.apply(self, [self.slider.value, self.relation]);
-		if(this.relation.target)
+		if(this.relation.target){
   			this.relation.targetEntityName = this.relation.target.name;
-		if(isNewProperty){      	
-		  this.relation.action = 'save';
-		  selectedEntity['outbound-relations'].push(this.relation); 
+  		}
+  		var joinProperty = this.relation.target.properties
+  							.filter(function(prop){
+  								return prop.name === this.relation.targetEntityFkName;
+  							}.bind(this))[0];
+		if(isNewProperty){
+			this.relation.action = 'save';
+			selectedEntity['outbound-relations'].push(this.relation); 
+			if(joinProperty===undefined){
+				joinProperty = {
+					"name": this.relation.targetEntityFkName,
+					"label": this.relation.targetEntityFkName,
+					"column": this.relation.targetEntityFkName,
+					"typeLabel": this.sourceKeyOptions.selection.typeLabel,
+					"type": this.sourceKeyOptions.selection.type,
+					"size": this.sourceKeyOptions.selection.size,
+					"required": true,
+					"fkInRelationName": this.relation.name,
+					"entityName": this.relation.target.name,
+					"action": "save"
+				};
+				this.relation.target.properties.push(joinProperty);
+			}
 		} else {
 			if(this.relation.action!=='save')
 				this.relation.action = 'update';
 			selectedEntity['outbound-relations'] = selectedEntity['outbound-relations']
-										.map(function(rel){
-											if(rel.id === self.relation.id){
-												return self.relation;
-											}
-											return rel;
-										});
+													.map(function(rel){
+														if(rel.id === self.relation.id){
+															return self.relation;
+														}
+														return rel;
+													});
+			if(joinProperty && joinProperty.id!==undefined)
+				joinProperty.action = "update";
 		}
 		$scope.$close(selectedEntity);
     };

@@ -83,8 +83,8 @@
 				<div class="items-list">
 					<div ng-hide="detailsEditorVm.entityForEdit.properties.length" class="nodata-text">No Properties</div>
 					<div class="list-group" ng-if="detailsEditorVm.propertyItems.length>0">
-					  <a class="list-group-item property-item" ng-repeat="entry in detailsEditorVm.propertyItems|filter:detailsEditorVm.searchText|orderBy:['-pk','-required','name']" ng-if="detailsEditorVm.app['expert-mode'] || !entry.pk">
-					  	<div class="prop-{{entry.pk?'id':(entry.required?'required':'optional')}}">
+					  <a class="list-group-item property-item" ng-repeat="entry in detailsEditorVm.propertyItems|filter:detailsEditorVm.searchText|orderBy:['-pk','-required','name']" ng-if="detailsEditorVm.app['expert-mode'] || (!entry.pk && !entry.fkInRelationName)">
+					  	<div class="prop-{{entry.pk || entry.fkInRelationName?'id':(entry.required?'required':'optional')}}">
 							<div class="list-group-item-title">
 								<span ng-class="{emphasized: (entry.required || entry.pk)}">{{entry.label || entry.name}}</span>
 								<i ng-if="entry.required && !entry.pk" class="fa fa-asterisk required" aria-hidden="true"></i>

@@ -348,6 +348,8 @@
 	        		}
 	        		return $promise;
 		    	});
+			}
+			if(header["outbound-relations"]){
 				var rels = header["outbound-relations"].filter(function(item){
 					if(!item.action){
 						return false;
@@ -356,15 +358,34 @@
 				});
 				promises = promises.concat(rels.map(function(item) {
 					var action = item.action;
-					delete item.action;
 					var $promise;
 					if(action === 'remove') {
-			        	$promise = Relation.remove({boId: item.id}).$promise;			        	
+			        	$promise = Relation.remove({boId: item.id}).$promise;
 		        	} else {
-		        		$promise = Relation[action]({boId: item.id}, item).$promise;		        		
+		        		var _itemCopy = JSON.parse(JSON.stringify(item));
+		        		delete _itemCopy.action;
+		        		$promise = Relation[action]({boId: _itemCopy.id}, _itemCopy).$promise;
 	        		}
 	        		return $promise;
 		    	}));
+		    	//update join properties in relations targets, if any
+		    	for(var i=0; i< rels.length; i++){
+		    		var targetEntity = rels[i].target;
+					var relAction = rels[i].action;
+			    	promises = promises.concat(targetEntity.properties.map(function(item) {
+			    		var $promise;
+			    		var action = item.action;
+			    		if(relAction && item.action){
+							delete item.action;
+							if(action === 'remove') {
+					        	$promise = Item.remove({boId: item.id}).$promise;
+				        	} else {
+			        			$promise = Item[action]({boId: item.id}, item).$promise;
+			        		}
+			    		}
+		        		return $promise;
+			    	}));
+		    	}
 			}
 			//finally, push request for update for the header too
 			promises.unshift(Entity.update({boId: header.id}, header).$promise);
