@@ -236,7 +236,7 @@ angular.module('businessObjects')
 				sizeText = "Huge";
 			return sizeText + ' ' + prop.typeLabel;
 		} 
-		return prop.typeLabel;
+		return expertMode===true?prop.type:prop.typeLabel;
 	};
 }]);
 })(angular);

@@ -160,8 +160,8 @@ angular.module('businessObjects')
 			else if(prop.size>255)
 				sizeText = "Huge";
 			return sizeText + ' ' + prop.typeLabel;
-		} 
-		return prop.typeLabel;
+		}
+		return expertMode===true?prop.type:prop.typeLabel;
 	};
 	
 }]);
