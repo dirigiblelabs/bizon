@@ -72,6 +72,25 @@
 			    </div>
 		    </div>
 		  </div>
+		  <div class="form-group" ng-if="relEditorVm.app['expert-mode'] && relEditorVm.slider.value===3">
+	  		<label for="joinTableName" class="col-sm-4 control-label" required="true">Join Table</label>
+		    <div class="col-sm-7">
+		    	<input name="joinTableName" id="joinTableName" class="form-control" placeholder="Type Join Table Name" ng-model="relEditorVm.relation.joinTable" minlength="1" required="true">
+		    </div>
+		  </div>
+		  <div class="form-group" ng-if="relEditorVm.app['expert-mode'] && relEditorVm.slider.value===3">
+	  		<label for="joinTableNameSrcId" class="col-sm-4 control-label" required="true">Join Table Source Key</label>
+		    <div class="col-sm-7">
+		    	<input name="joinTableNameSrcId" id="joinTableNameSrcId" class="form-control" placeholder="Type Join Table Source Foreign Key Name" ng-model="relEditorVm.relation.joinTableSrcKey" minlength="1" required="true">
+		    </div>
+		  </div>
+		  <div class="form-group" ng-if="relEditorVm.app['expert-mode'] && relEditorVm.slider.value===3">
+	  		<label for="joinTableNameTargetId" class="col-sm-4 control-label" required="true">Join Table Target Key</label>
+		    <div class="col-sm-7">
+		    	<input name="joinTableNameTargetId" id="joinTableNameTargetId" class="form-control" placeholder="Type Join Table Target Foreign Key Name" ng-model="relEditorVm.relation.joinTableTargetKey" minlength="1" required="true">
+		    </div>
+		  </div>		  
+		  
 		  <div class="form-group" ng-if="relEditorVm.app['expert-mode']">
 	  		<label for="targetKey" class="col-sm-4 control-label" required="true">Target Key</label>
 		    <div class="col-sm-7">
@@ -81,7 +100,7 @@
 					 typeahead-show-hint = "true"
 					 uib-typeahead="property as property.label for property in relEditorVm.targetKeyOptions.options">
 		    </div>
-		  </div>		  
+		  </div>
 		  <div class="form-group">
 	  		<label for="required" class="col-sm-4 control-label">Multiplicity</label>
 		    <div class="col-sm-7">

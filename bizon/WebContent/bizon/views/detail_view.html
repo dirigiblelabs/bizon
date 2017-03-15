@@ -65,7 +65,16 @@
 								<i ng-if="entry.pk" class="fa fa-key" aria-hidden="true"></i>
 								<span ng-if="!entry.required && !entry.pk" class="optional">(optional)</span>
 							</div>
-							<div class="list-group-item-text" ng-if="entry.type!=='Relationship'">Data Type: <span style="color: gray; font-style: italic">{{detailsVm.app['expert-mode']===true?entry.type:entry.typeLabel}}<span></div>
+							<div class="list-group-item-text">
+								<div>
+									Data Type: <span style="color:gray">{{detailsVm.formatType(entry, detailsVm.app['expert-mode'])}}</span>
+								</div>
+								<div ng-if="detailsVm.app['expert-mode']">
+									<div>Default: <span style="color:gray">{{entry.defaultValue}}</span></div>
+									<div>Column: <span style="color:gray">{{entry.column}}</span></div>	
+									<div>Order: <span style="color:gray">{{entry.order}}</span></div>
+								</div>
+							</div>
 						</div>
 					  </a>
 					</div>
@@ -73,39 +82,46 @@
 			</div>
 			
 			<div class="tab-pane fade" role="tabpanel" id="relations">
-	
-				<div class="items-list">
-					<div class="list-group">
-					  <div class="list-group-item" ng-click="$event.stopPropagation();" style="outline: none; cursor: auto; background-color: #f5f5f5">
-						Outbound relations from <span style="font-style:italic">{{detailsVm.selectedEntity.label}}</span> to other entities <i class="fa fa-arrow-right"></i>
-					  </div>					
-					  <button type="button" class="list-group-item" ng-repeat="entry in detailsVm.outboundRelations|filter:detailsVm.searchText|orderBy:['name']" ng-click="$event.stopPropagation();" style="outline: none; cursor: auto;">
-						<div class="list-group-item-title">
-							<span class="emphasized">{{entry.name}}</span>
-						</div>
-						<div class="list-group-item-text">
-							Relation Type: <span style="color: gray; font-style: italic">{{entry.type===1?'Association':'Composition'}}</span> in <a ng-href="#/{{entry.target.id}}">{{entry.target.label}}</a>
-						</div>						
-					  </button>
-					</div>
-					<div ng-hide="detailsVm.outboundRelations.length>0" class="nodata-text">No Items</div>					
-				</div>
 				<div class="items-list">									
 					<div class="list-group">
 					  <div class="list-group-item" ng-click="$event.stopPropagation();" style="outline: none; cursor: auto; background-color: #f5f5f5">
-						Inbound relations from other entities to <span style="font-style:italic">{{detailsVm.selectedEntity.label}}</span> <i class="fa fa-arrow-left"></i>
+						Outbound relations from <span style="font-style:italic; font-weight: bold">{{detailsVm.selectedEntity.label}}</span> to other entities <i class="fa fa-arrow-right"></i>
 					  </div>										
-					  <button type="button" class="list-group-item" ng-repeat="entry in detailsVm.inboundRelations|filter:detailsVm.searchText|orderBy:['name']" ng-click="$event.stopPropagation();" style="outline: none; cursor: auto;">
+					  <button type="button" class="list-group-item" ng-repeat="entry in detailsVm.inboundRelations|filter:detailsVm.searchText|orderBy:['name']" ng-click="$event.stopPropagation();" style="outline:none;cursor:auto;">
 						<div class="list-group-item-title">
 							<span class="emphasized">{{entry.name}}</span>
 						</div>
-						<div class="list-group-item-text">
-							Relation Type: <span style="color: gray; font-style: italic">{{entry.type==1?'Association':'Composition'}}</span> of <a ng-href="#/{{entry.source.id}}">{{entry.source.label}}</a>
+						<div class="list-group-item-text" style="color:gray" ng-switch on="entry.type">
+							<span ng-bind="entry.targetMultiplicity==1?'One':'Many'"/></span> <span style="font-weight:bold" ng-bind="entry.target.label"/><span style="font-weight:bold" ng-if="detailsVm.app['expert-mode']">[{{detailsVm.targetEntityFkName}}]</span> <span ng-bind="entry.targetMultiplicity==1?'entity':'entities'"></span>
+							<span ng-switch-when="1"> association from </span>
+							<span ng-switch-when="2"> composition in </span>
+							<span ng-switch-when="3"> aggregation in </span>
+							<span ng-bind="entry.srcMultiplicity==1?'one':'many'"/></span> <a style="font-weight:bold" ng-href="#/{{entry.source.id}}">{{entry.source.label}}</a><span style="font-weight:bold" ng-if="detailsVm.app['expert-mode']">[{{detailsVm.pk.name}}]</span> <span ng-bind="entry.srcMultiplicity==1?'entity':'entities'"></span>
 						</div>						
 					  </button>
 					</div>
 					<div ng-hide="detailsVm.inboundRelations.length>0" class="nodata-text">No Items</div>										
 				</div>	
+				<div class="items-list">
+					<div class="list-group">
+					  <div class="list-group-item" ng-click="$event.stopPropagation();" style="outline: none; cursor: auto; background-color: #f5f5f5">
+						Inbound relations to <span style="font-style:italic; font-weight: bold">{{detailsVm.selectedEntity.label}}</span> from other entities <i class="fa fa-arrow-left"></i>
+					  </div>					
+					  <button type="button" class="list-group-item" ng-repeat="entry in detailsVm.outboundRelations|filter:detailsVm.searchText|orderBy:['name']" ng-click="$event.stopPropagation();" style="outline: none; cursor: auto;">
+						<div class="list-group-item-title">
+							<span class="emphasized">{{entry.name}}</span>
+						</div>
+						<div class="list-group-item-text" style="color:gray" ng-switch on="entry.type">
+							<span ng-bind="entry.srcMultiplicity==1?'One':'Many'"/></span> <span style="font-weight:bold" ng-bind="entry.source.label"></span><span style="font-weight:bold" ng-if="detailsVm.app['expert-mode']">[{{detailsVm.pk.name}}]</span> <span ng-bind="entry.srcMultiplicity==1?'entity':'entities'"></span>
+							<span ng-switch-when="1"> association to </span>
+							<span ng-switch-when="2"> composition of </span>
+							<span ng-switch-when="3"> aggregation of </span>
+							<span ng-bind="entry.targetMultiplicity==1?'one':'many'"/></span> <a style="font-weight:bold" ng-href="#/{{entry.target.id}}">{{entry.target.label}}</a><span style="font-weight:bold" ng-if="detailsVm.app['expert-mode']">[{{entry.targetEntityFkName}}]</span> <span ng-bind="entry.targetMultiplicity==1?'entity':'entities'"></span>
+						</div>						
+					  </button>
+					</div>
+					<div ng-hide="detailsVm.outboundRelations.length>0" class="nodata-text">No Items</div>					
+				</div>				
 			</div>			
 			
 			<div class="tab-pane fade" role="tabpanel" id="config">
@@ -123,18 +139,6 @@
 						    	<p name="table" id="table" class="form-control-static" ng-bind="detailsVm.selectedEntity.table"></p>
 						    </div>
 						  </div>
-<!--						  <div class="form-group" ng-if="detailsVm.filterConfigurationEntries(detailsVm.searchText, 'Entity Identifier Name')">
-						    <label for="primaryKey" class="col-sm-3 control-label" required="true">Entity Identifier Name</label>
-						    <div class="col-sm-5">
-						    	<p name="primaryKey" id="primaryKey" class="form-control-static" ng-bind="detailsVm.pk.name"></p>				    
-						    </div>
-						  </div>
-						  <div class="form-group" ng-if="detailsVm.filterConfigurationEntries(detailsVm.searchText, 'Entity Identifier Data Type')">
-						    <label for="primaryKeyType" class="col-sm-3 control-label" required="true">Entity Identifier Data Type</label>
-						    <div class="col-sm-5">
-						    	<p name="primaryKeyType" id="primaryKeyType" class="form-control-static" ng-bind="detailsVm.pk.type"></p>				    
-						    </div>
-						  </div>-->
 						</div>
 					  </div>
 					</div>

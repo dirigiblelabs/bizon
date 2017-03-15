@@ -64,6 +64,7 @@ angular.module('businessObjects')
 		}
 	};
 	
+	
 	function showDetails(item){
 		if(item){
 			this.showProperties.apply(this);//Initial content to show	
@@ -222,6 +223,20 @@ angular.module('businessObjects')
 	this.filterConfigurationEntries = function(expression, cfgEntry){
 		return !expression || cfgEntry.indexOf(expression)>-1;
 	};
-			
+	
+	this.formatType = function(prop, expertMode){
+		if(prop.type==='VARCHAR'){
+			if(expertMode){
+				return prop.type + ' [' + prop.size + ']';
+			}
+			var sizeText = "Medium";
+			if(prop.size<41)
+				sizeText = "Small";
+			else if(prop.size>255)
+				sizeText = "Huge";
+			return sizeText + ' ' + prop.typeLabel;
+		} 
+		return prop.typeLabel;
+	};
 }]);
 })(angular);

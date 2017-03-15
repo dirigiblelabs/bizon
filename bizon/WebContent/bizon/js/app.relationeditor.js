@@ -17,7 +17,7 @@ angular.module('businessObjects')
 	
 	this.loading = false;
 	this.noResults;
-	var MULTIPLICITY_TYPES = Object.freeze({ONE_TO_ONE:1, ONE_TO_MANY:2, MANY_TO_MANY:3, MANY_TO_ONE:4});	
+	var MULTIPLICITY_TYPES = Object.freeze({ONE_TO_ONE:1, ONE_TO_MANY:2, MANY_TO_MANY:3});	
 	this.slider = {
 	  options: {
 	  	showTicksValues: true,
@@ -26,12 +26,11 @@ angular.module('businessObjects')
 	    stepsArray: [
 	      {value: MULTIPLICITY_TYPES.ONE_TO_ONE, legend: 'One-to-One'},
 	      {value: MULTIPLICITY_TYPES.ONE_TO_MANY, legend: 'One-To-Many'},
-	      {value: MULTIPLICITY_TYPES.MANY_TO_MANY, legend: 'Many-to-Many'}/*,
-	      {value: MULTIPLICITY_TYPES.MANY_TO_ONE, legend: 'Many-to-One'}*/
+	      {value: MULTIPLICITY_TYPES.MANY_TO_MANY, legend: 'Many-to-Many'}
 	    ]
 	  }
 	};
-	var ASSOCIATION_TYPES = Object.freeze({ASSOCIATION:1, COMPOSITION:2, AGGREGATION:2});		
+	var ASSOCIATION_TYPES = Object.freeze({ASSOCIATION:1, COMPOSITION:2, AGGREGATION:3});		
 	this.relTypeSlider = {
 	  options: {
 	  	showTicksValues: true,
@@ -195,26 +194,21 @@ angular.module('businessObjects')
       		relation.srcMultiplicity = MULTIPLICITY_OPTS.ONE;
       		relation.targetMultiplicity = MULTIPLICITY_OPTS.ONE;
   		} else if(sliderValue === MULTIPLICITY_TYPES.ONE_TO_MANY){
-  			relation.srcMultiplicity = MULTIPLICITY_OPTS.MANY;
-      		relation.targetMultiplicity = MULTIPLICITY_OPTS.ONE;
+  			relation.srcMultiplicity = MULTIPLICITY_OPTS.ONE;
+      		relation.targetMultiplicity = MULTIPLICITY_OPTS.MANY;
   		} else if(sliderValue === MULTIPLICITY_TYPES.MANY_TO_MANY){
   			relation.srcMultiplicity = MULTIPLICITY_OPTS.MANY;
       		relation.targetMultiplicity = MULTIPLICITY_OPTS.MANY;
-  		}  else if(sliderValue === MULTIPLICITY_TYPES.MANY_TO_ONE){
-  			relation.srcMultiplicity = MULTIPLICITY_OPTS.MANY;
-      		relation.targetMultiplicity = MULTIPLICITY_OPTS.ONE;
   		}
     }
     
     function relationToSlider(relation, slider){
 		if(relation.srcMultiplicity === MULTIPLICITY_OPTS.ONE && relation.targetMultiplicity === MULTIPLICITY_OPTS.ONE){
       		slider.value = MULTIPLICITY_TYPES.ONE_TO_ONE;
-  		} else if(relation.srcMultiplicity === MULTIPLICITY_OPTS.MANY && relation.targetMultiplicity === MULTIPLICITY_OPTS.ONE){
+  		} else if(relation.srcMultiplicity === MULTIPLICITY_OPTS.ONE && relation.targetMultiplicity === MULTIPLICITY_OPTS.MANY){
   		 	slider.value = MULTIPLICITY_TYPES.ONE_TO_MANY;
   		} else if(relation.srcMultiplicity === MULTIPLICITY_OPTS.MANY && relation.targetMultiplicity === MULTIPLICITY_OPTS.MANY){
   			slider.value = MULTIPLICITY_TYPES.MANY_TO_MANY;
-  		} else if(relation.srcMultiplicity === MULTIPLICITY_OPTS.MANY && relation.targetMultiplicity === MULTIPLICITY_OPTS.ONE){
-  			slider.value = MULTIPLICITY_TYPES.MANY_TO_ONE;
   		}
     }    
     
