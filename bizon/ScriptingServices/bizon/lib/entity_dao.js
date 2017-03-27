@@ -26,7 +26,7 @@ function _createSQLEntity(entity, dbEntity) {
 		var hasPk = false;
 		if(entity.properties){
 			var pks = entity.properties.filter(function(prop){
-				return prop.pk;
+				return prop.isPrimaryKey;
 			});
 			if(pks.length>0){
 				var isIdNameValid = /^[a-zA-Z_][a-zA-Z0-9_]{0,255}$/.test(pks[0].name);//TODO: validation needs to come from database dialect provider
@@ -40,7 +40,7 @@ function _createSQLEntity(entity, dbEntity) {
 			entity.properties.push({
 				"name": "id",
 				"entityName": entity.name,
-				"pk": true,
+				"isPrimaryKey": true,
 				"required": true,
 				"column": "ID",
 				"label": "ID",
@@ -103,7 +103,7 @@ const orm = {
 				"type": "String",
 				"required": true,
 				"unique": true,
-				"size": 100,
+				"size": 128,
 				"allowedOps": ['insert']
 			},{
 				"name": "label",
@@ -121,21 +121,10 @@ const orm = {
 				"type": "String",
 				"size": 128,
 			},{
-				"name": "isJoinTable",
-				"dbName": "BOE_JOIN_TABLE",
-				"type": "Short",
-				"dbValue": function(value){
-					var dbVal = 0;
-					if(value && value === true)
-						dbVal = 1;
-					return dbVal;					
-				},
-				"value": function(dbValue){
-					var val = false;
-					if(dbValue!==null && dbValue > 0)
-						val = true;
-					return val;
-				}
+				"name": "managingRelationName",
+				"dbName": "BOE_REL_NAME",
+				"type": "String",
+				"size": 128
 			},{
 				"name": "svcName",
 				"dbName": "BOE_SVC_NAME",

@@ -11,7 +11,7 @@
       },{
         "name":"BOR_NAME",
         "type":"VARCHAR",
-        "length":"255",
+        "length":"128",
         "notNull":"true",
         "primaryKey":"false",
         "defaultValue":""
@@ -30,14 +30,14 @@
         "primaryKey":"false",
         "defaultValue":""
       },{
-        "name":"BOR_SRC_KEY",
+        "name":"BOR_SRC_PROP_NAME",
         "type":"VARCHAR",
-        "length":"255",
+        "length":"128",
         "notNull":"true",
         "primaryKey":"false",
         "defaultValue":""
       },{
-        "name":"BOR_SRC_TYPE",
+        "name":"BOR_SRC_MULTIPLICITY",
         "type":"SMALLINT",
         "length":"1",
         "notNull":"true",
@@ -46,19 +46,19 @@
       },{
         "name":"BOR_TARGET_BOE_NAME",
         "type":"VARCHAR",
-        "length":"100",
+        "length":"128",
         "notNull":"true",
         "primaryKey":"false",
         "defaultValue":""
       },{
-        "name":"BOR_TARGET_FK_NAME",
+        "name":"BOR_TARGET_PROP_NAME",
         "type":"VARCHAR",
-        "length":"255",
+        "length":"128",
         "notNull":"true",
         "primaryKey":"false",
         "defaultValue":""
       },{
-        "name":"BOR_TARGET_TYPE",
+        "name":"BOR_TARGET_MULTIPLICITY",
         "type":"SMALLINT",
         "length":"1",
         "notNull":"true",
@@ -72,23 +72,23 @@
         "primaryKey":"false",
         "defaultValue":""
       },{
-        "name":"BOR_JOIN_TBL_NAME",
+        "name":"BOR_JOIN_ENTITY_NAME",
         "type":"VARCHAR",
-        "length":"255",
+        "length":"128",
         "notNull":"false",
         "primaryKey":"false",
         "defaultValue":""
       },{
-        "name":"BOR_JOIN_TBL_SRC_ID",
+        "name":"BOR_JOIN_ENTITY_SRC_PROP_NAME",
         "type":"VARCHAR",
-        "length":"255",
+        "length":"128",
         "notNull":"false",
         "primaryKey":"false",
         "defaultValue":""
       },{
-        "name":"BOR_JOIN_TBL_TARGET_ID",
+        "name":"BOR_JOIN_ENTITY_TARGET_PROP_NAME",
         "type":"VARCHAR",
-        "length":"255",
+        "length":"128",
         "notNull":"false",
         "primaryKey":"false",
         "defaultValue":""

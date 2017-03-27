@@ -51,7 +51,7 @@ exports.get = function(){
 				"name": "name",
 				"dbName": "BOR_NAME",
 				"type": "String",
-				"size": 200,
+				"size": 128,
 				"required": true
 			},{
 				"name": "label",
@@ -63,34 +63,34 @@ exports.get = function(){
 				"name": "srcEntityName",
 				"dbName": "BOR_SRC_BOE_NAME",
 				"type": "String",
-				"size": 100,
+				"size": 128,
 				"required": true
 			},{
-				"name": "srcKey",
-				"dbName": "BOR_SRC_KEY",
+				"name": "srcPropertyName",
+				"dbName": "BOR_SRC_PROP_NAME",
 				"type": "String",
-				"size": 255,
+				"size": 128,
 				"required": true
 			},{
 				"name": "srcMultiplicity",
-				"dbName": "BOR_SRC_TYPE",
+				"dbName": "BOR_SRC_MULTIPLICITY",
 				"type": "Short",
 				"required": true
 			},{
 				"name": "targetEntityName",
 				"dbName": "BOR_TARGET_BOE_NAME",
 				"type": "String",
-				"size": 100,
+				"size": 128,
 				"required": true
 			},{
-				"name": "targetEntityFkName",
-				"dbName": "BOR_TARGET_FK_NAME",
+				"name": "targetPropertyName",
+				"dbName": "BOR_TARGET_PROP_NAME",
 				"type": "String",
-				"size": 250,
+				"size": 128,
 				"required": true
 			},{
 				"name": "targetMultiplicity",
-				"dbName": "BOR_TARGET_TYPE",
+				"dbName": "BOR_TARGET_MULTIPLICITY",
 				"type": "Short",
 				"required": true
 			},{
@@ -99,17 +99,20 @@ exports.get = function(){
 				"type": "Short",
 				"required": true
 			},{
-				"name": "joinTableName",
-				"dbName": "BOR_JOIN_TBL_NAME",
-				"type": "String"
+				"name": "joinEntityName",
+				"dbName": "BOR_JOIN_ENTITY_NAME",
+				"type": "String",
+				"size": 128 
 			},{
-				"name": "joinTableSrcKey",
-				"dbName": "BOR_JOIN_TBL_SRC_ID",
-				"type": "String"
+				"name": "joinEntitySrcPropertyName",
+				"dbName": "BOR_JOIN_ENTITY_SRC_PROP_NAME",
+				"type": "String",
+				"size": 128
 			},{
-				"name": "joinTableTargetKey",
-				"dbName": "BOR_JOIN_TBL_TARGET_ID",
-				"type": "String"
+				"name": "joinEntityTargetPropertyName",
+				"dbName": "BOR_JOIN_ENTITY_TARGET_PROP_NAME",
+				"type": "String",
+				"size": 128
 			}]
 		}, "BIZ_RelationDAO");
 	dao.listJoins = listJoins;

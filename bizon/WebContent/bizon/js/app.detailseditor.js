@@ -21,9 +21,9 @@ angular.module('businessObjects')
 	var self = this;
 	var TABS = Object.freeze({PROP_TAB:0, REL_TAB:1, CONF_TAB:2});
 	
-	this.pk = this.entityForEdit.properties
+	this.isPrimaryKey = this.entityForEdit.properties
 				.filter(function(prop){
-					return prop.pk;
+					return prop.isPrimaryKey;
 				})[0];
 	
 	this.showProperties = function(){
@@ -154,7 +154,7 @@ angular.module('businessObjects')
 					if((outboundRel.id && outboundRel.id === item.id) || (outboundRel.id && outboundRel.id === item.id)){
 						outboundRel.action = 'remove';
 						outboundRel.target.properties = outboundRel.target.properties.map(function(prop){
-							if(prop.name === outboundRel.targetEntityFkName)
+							if(prop.name === outboundRel.targetPropertyName)
 								prop.action = "remove";
 							return prop;
 						});

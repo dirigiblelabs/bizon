@@ -13,7 +13,7 @@
       {
         "name":"BOE_NAME",
         "type":"VARCHAR",
-        "length":"100",
+        "length":"128",
         "notNull":"true",
         "primaryKey":"false",
         "defaultValue":""
@@ -92,12 +92,12 @@
       }
       ,
       {
-        "name":"BOE_JOIN_TABLE",
-        "type":"SMALLINT",
-        "length":"0",
+        "name":"BOE_REL_NAME",
+        "type":"VARCHAR",
+        "length":"128",
         "notNull":"false",
         "primaryKey":"false",
-        "defaultValue":"0"
+        "defaultValue":""
       }
     ]
 }

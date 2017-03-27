@@ -87,21 +87,21 @@
 		  </div>
 		  
 		  <div class="form-group" ng-if="relEditorVm.app['expert-mode'] && relEditorVm.slider.value===3">
-	  		<label for="joinTableName" class="col-sm-4 control-label" required="true">Join Table</label>
+	  		<label for="joinEntityName" class="col-sm-4 control-label" required="true">Join Table</label>
 		    <div class="col-sm-7">
-		    	<input name="joinTableName" id="joinTableName" class="form-control" placeholder="Type Join Table Name" ng-model="relEditorVm.relation.joinTableName" minlength="1" required="true">
+		    	<input name="joinEntityName" id="joinEntityName" class="form-control" placeholder="Type Join Table Name" ng-model="relEditorVm.relation.joinEntityName" minlength="1" required="true">
 		    </div>
 		  </div>
 		  <div class="form-group" ng-if="relEditorVm.app['expert-mode'] && relEditorVm.slider.value===3">
-	  		<label for="joinTableSrcKey" class="col-sm-4 control-label" required="true">Join Table Source Key</label>
+	  		<label for="joinEntitySrcPropertyName" class="col-sm-4 control-label" required="true">Join Table Source Key</label>
 		    <div class="col-sm-7">
-		    	<input name="joinTableSrcKey" id="joinTableSrcKey" class="form-control" placeholder="Type Join Table Source Foreign Key Name" ng-model="relEditorVm.relation.joinTableSrcKey" minlength="1" required="true">
+		    	<input name="joinEntitySrcPropertyName" id="joinEntitySrcPropertyName" class="form-control" placeholder="Type Join Table Source Foreign Key Name" ng-model="relEditorVm.relation.joinEntitySrcPropertyName" minlength="1" required="true">
 		    </div>
 		  </div>
 		  <div class="form-group" ng-if="relEditorVm.app['expert-mode'] && relEditorVm.slider.value===3">
-	  		<label for="joinTableTargetKey" class="col-sm-4 control-label" required="true">Join Table Target Key</label>
+	  		<label for="joinEntityTargetPropertyName" class="col-sm-4 control-label" required="true">Join Table Target Key</label>
 		    <div class="col-sm-7">
-		    	<input name="joinTableTargetKey" id="joinTableTargetKey" class="form-control" placeholder="Type Join Table Target Foreign Key Name" ng-model="relEditorVm.relation.joinTableTargetKey" minlength="1" required="true">
+		    	<input name="joinEntityTargetPropertyName" id="joinEntityTargetPropertyName" class="form-control" placeholder="Type Join Table Target Foreign Key Name" ng-model="relEditorVm.relation.joinEntityTargetPropertyName" minlength="1" required="true">
 		    </div>
 		  </div>		  
 		  

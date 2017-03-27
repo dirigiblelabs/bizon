@@ -8,8 +8,8 @@ angular.module('businessObjects')
 	this.app = Settings;
 	var self = this;
 	
-	this.pk = this.selectedEntity.properties.filter(function(prop){
-			return prop.pk;
+	this.isPrimaryKey = this.selectedEntity.properties.filter(function(prop){
+			return prop.isPrimaryKey;
 		})[0];
 	
 	this.showProperties = function(){

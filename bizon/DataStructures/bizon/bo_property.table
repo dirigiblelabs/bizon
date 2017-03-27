@@ -14,7 +14,7 @@
       {
         "name":"BOP_BOH_NAME",
         "type":"VARCHAR",
-        "length":"100",
+        "length":"128",
         "notNull":"true",
         "primaryKey":"false",
         "defaultValue":""
@@ -23,7 +23,7 @@
       {
         "name":"BOP_NAME",
         "type":"VARCHAR",
-        "length":"255",
+        "length":"128",
         "notNull":"true",
         "primaryKey":"false",
         "defaultValue":""
@@ -48,7 +48,7 @@
       }
       ,
       {
-        "name":"BOP_TYPE_NAME",
+        "name":"BOP_DATA_TYPE_LABEL",
         "type":"VARCHAR",
         "length":"255",
         "notNull":"true",
@@ -57,7 +57,7 @@
       }      
       ,
       {
-        "name":"BOP_TYPE",
+        "name":"BOP_DATA_TYPE",
         "type":"VARCHAR",
         "length":"255",
         "notNull":"true",
@@ -84,7 +84,7 @@
       }
       ,
       {
-        "name":"BOP_PK",
+        "name":"BOP_IS_PRIMARY_KEY",
         "type":"SMALLINT",
         "length":"0",
         "notNull":"false",
@@ -93,7 +93,7 @@
       }
       ,
       {
-        "name":"BOP_FK_REL_NAME",
+        "name":"BOP_REL_NAME",
         "type":"VARCHAR",
         "length":"255",
         "notNull":"false",

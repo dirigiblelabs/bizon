@@ -15,13 +15,13 @@ exports.get = function(){
 				"name": "entityName",
 				"dbName": "BOP_BOH_NAME",
 				"type": "String",
-				"size": 100,
+				"size": 128,
 				"required": true
 			},{
 				"name": "name",
 				"dbName": "BOP_NAME",
 				"type": "String",
-				"size": 250,
+				"size": 128,
 				"required": true
 			},{
 				"name": "label",
@@ -36,13 +36,19 @@ exports.get = function(){
 				"required": true
 			},{
 				"name": "type",
-				"dbName": "BOP_TYPE",
+				"dbName": "BOP_DATA_TYPE",
 				"type": "String",
 				"size": 250,
 				"required": true
 			},{
-				"name": "pk",
-				"dbName": "BOP_PK",
+				"name": "typeLabel",
+				"dbName": "BOP_DATA_TYPE_LABEL",
+				"type": "String",
+				"size": 250,
+				"required": true
+			},{
+				"name": "isPrimaryKey",
+				"dbName": "BOP_IS_PRIMARY_KEY",
 				"type": "Short",
 				"dbValue": function(value){
 					return value === null || value === true ? 1 : 0;
@@ -51,16 +57,10 @@ exports.get = function(){
 					return dbValue < 1 ?  false : true;
 				}				
 			},{
-				"name": "fkInRelationName",
-				"dbName": "BOP_FK_REL_NAME",
+				"name": "managingRelationName",
+				"dbName": "BOP_REL_NAME",
 				"type": "String",
-				"size": 250
-			},{
-				"name": "typeLabel",
-				"dbName": "BOP_TYPE_NAME",
-				"type": "String",
-				"size": 250,
-				"required": true
+				"size": 128
 			},{
 				"name": "size",
 				"dbName": "BOP_LENGTH",

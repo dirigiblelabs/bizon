@@ -83,13 +83,13 @@
 				<div class="items-list">
 					<div ng-hide="detailsEditorVm.entityForEdit.properties.length" class="nodata-text">No Properties</div>
 					<div class="list-group" ng-if="detailsEditorVm.propertyItems.length>0">
-					  <a class="list-group-item property-item" ng-repeat="entry in detailsEditorVm.propertyItems|filter:detailsEditorVm.searchText|orderBy:['-pk','-required','name']" ng-if="detailsEditorVm.app['expert-mode'] || (!entry.pk && !entry.fkInRelationName)">
-					  	<div class="prop-{{entry.pk || entry.fkInRelationName?'id':(entry.required?'required':'optional')}}">
+					  <a class="list-group-item property-item" ng-repeat="entry in detailsEditorVm.propertyItems|filter:detailsEditorVm.searchText|orderBy:['-isPrimaryKey','-required','name']" ng-if="detailsEditorVm.app['expert-mode'] || (!entry.isPrimaryKey && !entry.managingRelationName)">
+					  	<div class="prop-{{entry.isPrimaryKey || entry.managingRelationName?'id':(entry.required?'required':'optional')}}">
 							<div class="list-group-item-title">
-								<span ng-class="{emphasized: (entry.required || entry.pk)}">{{entry.label || entry.name}}</span>
-								<i ng-if="entry.required && !entry.pk" class="fa fa-asterisk required" aria-hidden="true"></i>
-								<i ng-if="entry.pk" class="fa fa-key" aria-hidden="true"></i>
-								<span ng-if="!entry.required && !entry.pk" class="optional">(optional)</span>
+								<span ng-class="{emphasized: (entry.required || entry.isPrimaryKey)}">{{entry.label || entry.name}}</span>
+								<i ng-if="entry.required && !entry.isPrimaryKey" class="fa fa-asterisk required" aria-hidden="true"></i>
+								<i ng-if="entry.isPrimaryKey" class="fa fa-key" aria-hidden="true"></i>
+								<span ng-if="!entry.required && !entry.isPrimaryKey" class="optional">(optional)</span>
 							</div>
 							<div class="list-group-item-text">
 								<div>
@@ -107,7 +107,7 @@
 		   					<button class="btn btn-primary" ui-sref="list.entity.edit.items({item: entry, entityForEdit:detailsEditorVm.entityForEdit})">
 							  <i class="fa fa-pencil" aria-hidden="true"></i>
 							</button>
-							<button ng-disabled="entry.pk" class="btn btn-danger" ng-click="detailsEditorVm.deleteProperty(entry)">
+							<button ng-disabled="entry.isPrimaryKey" class="btn btn-danger" ng-click="detailsEditorVm.deleteProperty(entry)">
 							  <i class="glyphicon glyphicon-remove" aria-hidden="true"></i>
 							</button>
 						</div>						
@@ -122,7 +122,7 @@
 				<div class="items-list">
 					<div ng-hide="detailsEditorVm.propertyItems.length" class="nodata-text">No Relations</div>				
 					<ul class="list-group" ng-show="detailsEditorVm.propertyItems.length">
-					  <li class="list-group-item" ng-repeat="entry in detailsEditorVm.propertyItems|filter:detailsEditorVm.searchText|orderBy:['-pk','-required','name']" ng-click="$event.stopPropagation();" style="outline: none; cursor: auto;">
+					  <li class="list-group-item" ng-repeat="entry in detailsEditorVm.propertyItems|filter:detailsEditorVm.searchText|orderBy:['-isPrimaryKey','-required','name']" ng-click="$event.stopPropagation();" style="outline: none; cursor: auto;">
 						<div style="display:inline-block" ng-switch on="detailsEditorVm.app['expert-mode']">
 							<div class="list-group-item-title">
 								<span class="emphasized">{{entry.label}}</span>
@@ -136,7 +136,7 @@
 							</div>						
 							<div class="list-group-item-text" style="color:gray;" ng-switch on="entry.type" ng-if="detailsEditorVm.app['expert-mode']">
 								<div>
-									<span ng-bind="entry.srcMultiplicity==1?'1':'M'"/></span> <span ng-bind="entry.source.table"></span><span>[{{entry.srcKeyProperty.column}}]</span>
+									<span ng-bind="entry.srcMultiplicity==1?'1':'M'"/></span> <span ng-bind="entry.source.table"></span><span>[{{entry.srcEntityKeyProperty.column}}]</span>
 									-
 									<span ng-bind="entry.targetMultiplicity==1?'1':'N'"/></span> <span ng-bind="entry.target.table"></span><span>[{{entry.targetEntityKeyProperty.column}}]</span>
 								</div>

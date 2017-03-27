@@ -57,13 +57,13 @@
 				<div class="items-list">
 					<div ng-hide="detailsVm.propertyItems.length" class="nodata-text">No Properties</div>
 					<div class="list-group" ng-if="detailsVm.propertyItems.length>0">
-					  <a class="list-group-item property-item" ng-repeat="entry in detailsVm.propertyItems|filter:detailsVm.searchText|orderBy:['-pk','-required','name']">
-					  	<div class="prop-{{entry.pk || entry.fkInRelationName?'id':(entry.required?'required':'optional')}}" ng-if="detailsVm.app['expert-mode'] || (!entry.pk && !entry.fkInRelationName)">
+					  <a class="list-group-item property-item" ng-repeat="entry in detailsVm.propertyItems|filter:detailsVm.searchText|orderBy:['-isPrimaryKey','-required','name']">
+					  	<div class="prop-{{entry.isPrimaryKey || entry.managingRelationName?'id':(entry.required?'required':'optional')}}" ng-if="detailsVm.app['expert-mode'] || (!entry.isPrimaryKey && !entry.managingRelationName)">
 							<div class="list-group-item-title">
-								<span ng-class="{emphasized: (entry.required || entry.pk)}">{{entry.label || entry.name}}</span>
-								<i ng-if="entry.required && !entry.pk" class="fa fa-asterisk required" aria-hidden="true"></i>
-								<i ng-if="entry.pk" class="fa fa-key" aria-hidden="true"></i>
-								<span ng-if="!entry.required && !entry.pk" class="optional">(optional)</span>
+								<span ng-class="{emphasized: (entry.required || entry.isPrimaryKey)}">{{entry.label || entry.name}}</span>
+								<i ng-if="entry.required && !entry.isPrimaryKey" class="fa fa-asterisk required" aria-hidden="true"></i>
+								<i ng-if="entry.isPrimaryKey" class="fa fa-key" aria-hidden="true"></i>
+								<span ng-if="!entry.required && !entry.isPrimaryKey" class="optional">(optional)</span>
 							</div>
 							<div class="list-group-item-text">
 								<div>
@@ -100,7 +100,7 @@
 						</div>						
 						<div class="list-group-item-text" style="color:gray;" ng-switch on="entry.type" ng-if="detailsVm.app['expert-mode']">
 							<div>
-								<span ng-bind="entry.srcMultiplicity==1?'1':'M'"/></span> <span ng-bind="entry.source.table"></span><span>[{{entry.srcKeyProperty.column}}]</span>
+								<span ng-bind="entry.srcMultiplicity==1?'1':'M'"/></span> <span ng-bind="entry.source.table"></span><span>[{{entry.srcEntityKeyProperty.column}}]</span>
 								-
 								<span ng-bind="entry.targetMultiplicity==1?'1':'N'"/></span> <span ng-bind="entry.target.table"></span><span>[{{entry.targetEntityKeyProperty.column}}]</span>
 							</div>
@@ -126,7 +126,7 @@
 							<span ng-bind="entry.targetMultiplicity==1?'one':'many'"/></span> <span style="font-weight:bold" ng-bind="entry.target.label"></span> <span ng-bind="entry.targetMultiplicity==1?'entity':'entities'"></span>
 						</div>
 						<div class="list-group-item-text" style="color:gray;" ng-switch on="entry.type" ng-if="detailsVm.app['expert-mode']">
-							<span ng-bind="entry.srcMultiplicity==1?'1':'M'"/></span> <span ng-bind="entry.source.table"></span><span>[{{entry.srcKeyProperty.column}}]</span>
+							<span ng-bind="entry.srcMultiplicity==1?'1':'M'"/></span> <span ng-bind="entry.source.table"></span><span>[{{entry.srcEntityKeyProperty.column}}]</span>
 							-
 							<span ng-bind="entry.targetMultiplicity==1?'1':'N'"/></span> <span ng-bind="entry.target.table"></span><span>[{{entry.targetEntityKeyProperty.column}}]</span>
 						</div>						

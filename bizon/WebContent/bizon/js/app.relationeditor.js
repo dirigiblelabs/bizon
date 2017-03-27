@@ -7,7 +7,7 @@ angular.module('businessObjects')
 		return SQLEntity.formatTableName(entity.label);
 	};
 	var generateTargetEntityKeyColumn = function(relation){
-		return relation.source.table + '_' + relation.srcKeyProperty.column;
+		return relation.source.table + '_' + relation.srcEntityKeyProperty.column;
 	};
 	var newTargetKeyProperty = function(relation){
 		var column = generateTargetEntityKeyColumn(relation);
@@ -15,31 +15,31 @@ angular.module('businessObjects')
 			"name": Utils.randomAlphanumeric(),
 			"label": SQLEntity.formatFieldName(column),
 			"column": SQLEntity.formatFieldName(column),
-			"typeLabel": relation.srcKeyProperty.typeLabel,
-			"type": relation.srcKeyProperty.type,
-			"size": relation.srcKeyProperty.size,
+			"typeLabel": relation.srcEntityKeyProperty.typeLabel,
+			"type": relation.srcEntityKeyProperty.type,
+			"size": relation.srcEntityKeyProperty.size,
 			"required": true,
-			"fkInRelationName": relation.name,
+			"managingRelationName": relation.name,
 			"entityName": relation.target?relation.target.name:undefined,
 			"action": "save"
 		};
-		relation.targetEntityFkName = targetJoinProperty.name;
+		relation.targetPropertyName = targetJoinProperty.name;
 		relation.targetEntityKeyProperty = targetJoinProperty;
 		return targetJoinProperty;
 	};
-	var generateJoinTableName = function(relation){
-		relation.joinTableName = relation.source.table;
+	var generateJoinEntityName = function(relation){
+		relation.joinEntityName = relation.source.table;
 		if(relation.target && relation.target.table){
-      		relation.joinTableName += '_' + relation.target.table;
+      		relation.joinEntityName += '_' + relation.target.table;
   		}
   		return relation;
 	};
-	var generateJoinTableSrcKey = function(relation){	
-		relation.joinTableSrcKey = relation.source.table + '_' + relation.srcKeyProperty.column;
+	var generateJoinEntitySrcPropertyName = function(relation){	
+		relation.joinEntitySrcPropertyName = relation.source.table + '_' + relation.srcEntityKeyProperty.column;
 		return relation;
 	};
-	var generateJoinTableTargetKey = function(relation){	
-		relation.joinTableTargetKey = relation.target.table + '_' + (relation.targetEntityFkName?relation.targetEntityFkName:'');
+	var generateJoinEntityTargetPropertyName = function(relation){	
+		relation.joinEntityTargetPropertyName = relation.target.table + '_' + (relation.targetPropertyName?relation.targetPropertyName:'');
 		return relation;
 	};
 
@@ -73,14 +73,14 @@ angular.module('businessObjects')
 				relation.source.table = tableNameFromLabel(relation.source);
 	    	if(relation.target && !relation.target.table)
 	    		relation.target.table = tableNameFromLabel(relation.target);
-	  		if(!relation.joinTableName){
-	      		generateJoinTableName(relation);
+	  		if(!relation.joinEntityName){
+	      		generateJoinEntityName(relation);
 	  		}
-	  		if(!relation.joinTableSrcKey){
-	      		generateJoinTableSrcKey(relation);
+	  		if(!relation.joinEntitySrcPropertyName){
+	      		generateJoinEntitySrcPropertyName(relation);
 	  		}
-	  		if(!relation.joinTableTargetKey){
-	      		generateJoinTableTargetKey(relation);
+	  		if(!relation.joinEntityTargetPropertyName){
+	      		generateJoinEntityTargetPropertyName(relation);
 	  		}      		
   		}
     };
@@ -98,11 +98,11 @@ angular.module('businessObjects')
 			label: sourceEntity.label +' to',
 			source: Relations.relatedEntitySubset(sourceEntity),
 		};
-		rel.srcKeyProperty = sourceEntity.properties
+		rel.srcEntityKeyProperty = sourceEntity.properties
 							 .filter(function(prop){
-								return prop.pk === true; 
+								return prop.isPrimaryKey === true; 
 							  })[0];
-		rel.srcKey = rel.srcKeyProperty.name;
+		rel.srcPropertyName = rel.srcEntityKeyProperty.name;
 		newTargetKeyProperty(rel);
 		return rel;
 	};
@@ -118,9 +118,9 @@ angular.module('businessObjects')
 		} else {
 			//delete target dependent properties
 			delete relation.target;
-			delete relation.targetEntityFkName;
+			delete relation.targetPropertyName;
 			delete relation.targetMultiplicity;
-			delete relation.joinTableTargetKey;
+			delete relation.joinEntityTargetPropertyName;
 		}
 	};
 	var initRelation = function(relation, sourceEntity){
@@ -135,7 +135,7 @@ angular.module('businessObjects')
 	var getTargetKeyOptions = function(relation){
 		return relation.target.properties
 				.filter(function(prop){
-					return prop.type === relation.srcKeyProperty.type && prop.pk === false;//TODO: filter also those that are already assigned ot anothe relation
+					return prop.type === relation.srcEntityKeyProperty.type && prop.isPrimaryKey === false;//TODO: filter also those that are already assigned ot anothe relation
 				}.bind(this));
 	};
 	var upsertRelation = function(relation, sourceEntity){
@@ -152,14 +152,14 @@ angular.module('businessObjects')
 			if(targetJoinProperty && targetJoinProperty.id!==undefined){
 				//check if the join property in this relation changed and link the new name to the old property name, if necessary
 				//no changes except related to source key type changes will be attempted to preserve user changes, if any
-				if(targetJoinProperty.name !== relation.targetEntityFkName){
-					targetJoinProperty.name = relation.targetEntityFkName;
+				if(targetJoinProperty.name !== relation.targetPropertyName){
+					targetJoinProperty.name = relation.targetPropertyName;
 					targetJoinProperty.action = "update";
 				}
-				if(targetJoinProperty.type !== relation.srcKeyProperty.type){
-					targetJoinProperty.type = relation.srcKeyProperty.type;
-					targetJoinProperty.typeLabel = relation.srcKeyProperty.typeLabel;
-					targetJoinProperty.size = relation.srcKeyProperty.size;
+				if(targetJoinProperty.type !== relation.srcEntityKeyProperty.type){
+					targetJoinProperty.type = relation.srcEntityKeyProperty.type;
+					targetJoinProperty.typeLabel = relation.srcEntityKeyProperty.typeLabel;
+					targetJoinProperty.size = relation.srcEntityKeyProperty.size;
 					targetJoinProperty.action = "update";
 				}
 			}				
@@ -267,7 +267,7 @@ angular.module('businessObjects')
 	};
 	
 	this.onSourceKeyChange = function(sourceKeyProperty){
-		this.relation.srcKey = sourceKeyProperty.name;
+		this.relation.srcPropertyName = sourceKeyProperty.name;
 		//TODO: check if the type of the target key (if any) is still compatible and raise a warning if not
 	};
 
@@ -288,7 +288,7 @@ angular.module('businessObjects')
 		this.targetKeyFilterText = $item;
 		if(this.relation.target){
 			this.relation.targetEntityKeyProperty = this.relation.targetEntityKeyProperty || RelationsEditor.getTargetEntityKeyProperty(this.relation);
-			this.relation.targetEntityFkName = this.relation.targetEntityKeyProperty.name;
+			this.relation.targetPropertyName = this.relation.targetEntityKeyProperty.name;
 		}
 	};
 	

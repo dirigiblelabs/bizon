@@ -280,7 +280,7 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		var getSourceEntityKeyProperty = function(relation){
 			return relation.source.properties
 					.find(function(prop){
-						return relation.srcKey === prop.name;
+						return relation.srcPropertyName === prop.name;
 					}.bind(this));
 		};
 		var getRelationTargetEntity = function(relation){
@@ -322,9 +322,9 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 					} else {
 						//delete target dependent properties if any
 						delete relation.target;
-						delete relation.targetEntityFkName;
+						delete relation.targetPropertyName;
 						delete relation.targetMultiplicity;
-						delete relation.joinTableTargetKey;
+						delete relation.joinEntityTargetPropertyName;
 					}
 					return targetEntity;
 				}.bind(this));
@@ -360,7 +360,7 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 									}.bind(this))
 									.then(function(loadedSourceEntity){
 										relation.source = loadedSourceEntity;
-										relation.srcKeyProperty = getSourceEntityKeyProperty(relation);
+										relation.srcEntityKeyProperty = getSourceEntityKeyProperty(relation);
 									}.bind(this));
 				}
 			}
@@ -368,11 +368,11 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		};
 		var setRelationSourceEntity = function(relation, sourceEntity){
 			relation.source = sourceEntity?relatedEntitySubset(sourceEntity):undefined || getRelationSourceEntity(relation);
-//			relation.srcKeyProperty = getSourceEntityKeyProperty(relation);
+//			relation.srcEntityKeyProperty = getSourceEntityKeyProperty(relation);
 		};
 		var getTargetEntityKeyProperty = function(relation){
 			return relation.target.properties.find(function(prop){
-						return relation.targetEntityFkName === prop.name;
+						return relation.targetPropertyName === prop.name;
 					}.bind(this));
 		};
 		var getJoinEntity = function(relation){
@@ -380,7 +380,7 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 			if(relation.joinEntity){
 				entityPromise = $q.when(relation.joinEntity).$promise;
 			} else {
-				entityPromise = MasterDataService.getByName(relation.joinTableName)
+				entityPromise = MasterDataService.getByName(relation.joinEntityName)
 					.then(function(entity){
 						return entity;
 					}.bind(this));
@@ -392,7 +392,7 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 					.then(function(joinEntity){
 						return joinEntity.properties
 								.find(function(prop){
-									return prop.name === relation.joinTableSrcKey;
+									return prop.name === relation.joinEntitySrcPropertyName;
 								}.bind(this));
 					}.bind(this));
 		};
@@ -401,7 +401,7 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 					.then(function(joinEntity){
 						return joinEntity.properties
 								.find(function(prop){
-									return prop.name === relation.joinTableTargetKey;
+									return prop.name === relation.joinEntityTargetPropertyName;
 								}.bind(this));
 					}.bind(this));
 		};

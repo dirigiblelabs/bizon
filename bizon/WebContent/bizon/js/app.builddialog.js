@@ -129,7 +129,7 @@ angular.module('businessObjects')
 		            'type': nextColumn.type.toUpperCase(),
 		            'length': nextColumn.size===undefined ? 0 : nextColumn.size,
 		            'notNull': nextColumn.required,
-		            'primaryKey': nextColumn.pk,
+		            'primaryKey': nextColumn.isPrimaryKey,
 		            'defaultValue': nextColumn.defaultValue || '',
 		            'order': nextColumn.order
 		         });
@@ -157,12 +157,12 @@ angular.module('businessObjects')
 			var pkName;
 			for (var j in entities[i].properties) {
 				var nextColumn = entities[i].properties[j];
-				if(nextColumn.pk)
+				if(nextColumn.isPrimaryKey)
 					pkName = nextColumn.name;
 				scriptingService.columns.push({  
 		    		'name': nextColumn.name.toUpperCase(),
 		            'type': nextColumn.type.toUpperCase(),
-		            'key' : nextColumn.pk,
+		            'key' : nextColumn.isPrimaryKey,
 		            'order': nextColumn.order
 		         });
 			}
@@ -235,7 +235,7 @@ angular.module('businessObjects')
 					'name': nextColumn.name.toLowerCase(),
 		            'label': nextColumn.label ? nextColumn.label : nextColumn.name,
 		            'widgetType': nextColumn.type==='VARCHAR'? (nextColumn.size<=40?'text':'textarea'): widgetsMapping[nextColumn.type],
-		            'key': nextColumn.pk,
+		            'key': nextColumn.isPrimaryKey,
 		            'visible': true,
 		            'order': nextColumn.order
 		         });
