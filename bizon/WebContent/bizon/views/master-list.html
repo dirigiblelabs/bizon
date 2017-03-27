@@ -33,7 +33,7 @@
 
 	<div class="scrollable">
 		<ul class="nav nav-pills nav-stacked" style="bottom:4rem" infinite-scroll='masterVm.next()' infinite-scroll-disabled="masterVm.busy" infinite-scroll-parent="true">
-	 		<li role="presentation" ui-sref-active="active" ng-repeat="item in masterVm.items | filter:masterVm.searchText track by item.id" ng-if="masterVm.app['expert-mode']===true || (masterVm.app['expert-mode']!==true && item.isJoinTable===false)">
+	 		<li role="presentation" ui-sref-active="active" ng-repeat="item in masterVm.items | filter:masterVm.searchText track by item.id" ng-if="masterVm.app['expert-mode']===true || (masterVm.app['expert-mode']!==true && !item.managingRelationName)">
 	 			<a href ui-sref="list.entity({boId:item.id})"><i class="fa fa-th-large"></i> {{item.label}} <span ng-click="masterVm.deleteItem(item)" class="glyphicon glyphicon-remove pull-right tools-remove" aria-hidden="true"></span></a>
 	 		</li>
 		</ul>

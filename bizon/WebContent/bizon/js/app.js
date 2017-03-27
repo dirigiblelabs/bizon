@@ -368,7 +368,8 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		};
 		var setRelationSourceEntity = function(relation, sourceEntity){
 			relation.source = sourceEntity?relatedEntitySubset(sourceEntity):undefined || getRelationSourceEntity(relation);
-//			relation.srcEntityKeyProperty = getSourceEntityKeyProperty(relation);
+			if(!relation.srcEntityKeyProperty)
+				relation.srcEntityKeyProperty = getSourceEntityKeyProperty(relation);
 		};
 		var getTargetEntityKeyProperty = function(relation){
 			return relation.target.properties.find(function(prop){

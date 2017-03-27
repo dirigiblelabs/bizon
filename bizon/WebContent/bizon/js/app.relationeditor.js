@@ -239,7 +239,7 @@ angular.module('businessObjects')
 			this.targetKeyOptions = RelationsEditor.getTargetKeyOptions(relation);
 		}
 		this.targetKeyFilterText = (this.relation.targetEntityKeyProperty && this.relation.targetEntityKeyProperty.column) || RelationsEditor.getTargetEntityKeyProperty(this.relation).column;		
-		//this.sourceKeyOptions.selection = RelationsEditor.getSourceEntityKeyProperty(this.relation);//No
+		this.sourceKeyOptions.selection = this.relation.srcEntityKeyProperty;
 		$scope.$$postDigest(function () {
 			$scope.$broadcast('rzSliderForceRender');
 		});	
