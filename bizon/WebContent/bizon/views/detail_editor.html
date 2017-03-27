@@ -123,17 +123,24 @@
 					<div ng-hide="detailsEditorVm.propertyItems.length" class="nodata-text">No Relations</div>				
 					<ul class="list-group" ng-show="detailsEditorVm.propertyItems.length">
 					  <li class="list-group-item" ng-repeat="entry in detailsEditorVm.propertyItems|filter:detailsEditorVm.searchText|orderBy:['-pk','-required','name']" ng-click="$event.stopPropagation();" style="outline: none; cursor: auto;">
-						<div style="display:inline-block">
+						<div style="display:inline-block" ng-switch on="detailsEditorVm.app['expert-mode']">
 							<div class="list-group-item-title">
-								<span class="emphasized">{{entry.name}}</span>
+								<span class="emphasized">{{entry.label}}</span>
 							</div>
 							<div class="list-group-item-text" style="color:gray;" ng-switch on="entry.type">
-								<span ng-bind="entry.srcMultiplicity==1?'One':'Many'"/></span> <span style="font-weight:bold" ng-bind="entry.source.label"/><span style="font-weight:bold" ng-if="detailsEditorVm.app['expert-mode']">[{{detailsEditorVm.pk.name}}]</span> <span ng-bind="entry.srcMultiplicity==1?'entity':'entities'"></span>
+								<span ng-bind="entry.srcMultiplicity==1?'One':'Many'"/></span> <span style="font-weight:bold" ng-bind="entry.source.label"/> <span ng-bind="entry.srcMultiplicity==1?'entity':'entities'"></span>
 								<span ng-switch-when="1"> association to </span>
 								<span ng-switch-when="2"> composition of </span>
 								<span ng-switch-when="3"> aggregation of </span>
-								<span ng-bind="entry.targetMultiplicity==1?'one':'many'"/></span> <span style="font-weight:bold" ng-bind="entry.target.label"></span><span style="font-weight:bold" ng-if="detailsEditorVm.app['expert-mode']">[{{entry.targetEntityFkName}}]</span> <span ng-bind="entry.targetMultiplicity==1?'entity':'entities'"></span>
-							</div>	
+								<span ng-bind="entry.targetMultiplicity==1?'one':'many'"/></span> <span style="font-weight:bold" ng-bind="entry.target.label" ui-sref='list.entity({"boId":entry.target.id})'></span> <span ng-bind="entry.targetMultiplicity==1?'entity':'entities'"></span>
+							</div>						
+							<div class="list-group-item-text" style="color:gray;" ng-switch on="entry.type" ng-if="detailsEditorVm.app['expert-mode']">
+								<div>
+									<span ng-bind="entry.srcMultiplicity==1?'1':'M'"/></span> <span ng-bind="entry.source.table"></span><span>[{{entry.srcKeyProperty.column}}]</span>
+									-
+									<span ng-bind="entry.targetMultiplicity==1?'1':'N'"/></span> <span ng-bind="entry.target.table"></span><span>[{{entry.targetEntityKeyProperty.column}}]</span>
+								</div>
+							</div>							
 						</div>
 						<div class="btn-group pull-right">
 		   					<button class="btn btn-primary" ui-sref="list.entity.edit.relations({relation: entry, entityForEdit: detailsEditorVm.entityForEdit})">

@@ -48,10 +48,28 @@ exports.get = function(){
 				"type": "Long",
 				"id": true
 			},{
+				"name": "name",
+				"dbName": "BOR_NAME",
+				"type": "String",
+				"size": 200,
+				"required": true
+			},{
+				"name": "label",
+				"dbName": "BOR_LABEL",
+				"type": "String",
+				"size": 500,
+				"required": true
+			},{
 				"name": "srcEntityName",
 				"dbName": "BOR_SRC_BOE_NAME",
 				"type": "String",
 				"size": 100,
+				"required": true
+			},{
+				"name": "srcKey",
+				"dbName": "BOR_SRC_KEY",
+				"type": "String",
+				"size": 255,
 				"required": true
 			},{
 				"name": "srcMultiplicity",
@@ -76,16 +94,22 @@ exports.get = function(){
 				"type": "Short",
 				"required": true
 			},{
-				"name": "name",
-				"dbName": "BOR_NAME",
-				"type": "String",
-				"size": 200,
-				"required": true
-			},{
 				"name": "type",
 				"dbName": "BOR_TYPE",
 				"type": "Short",
 				"required": true
+			},{
+				"name": "joinTableName",
+				"dbName": "BOR_JOIN_TBL_NAME",
+				"type": "String"
+			},{
+				"name": "joinTableSrcKey",
+				"dbName": "BOR_JOIN_TBL_SRC_ID",
+				"type": "String"
+			},{
+				"name": "joinTableTargetKey",
+				"dbName": "BOR_JOIN_TBL_TARGET_ID",
+				"type": "String"
 			}]
 		}, "BIZ_RelationDAO");
 	dao.listJoins = listJoins;

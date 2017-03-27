@@ -36,7 +36,7 @@
 		  <div class="form-group">
 		    <label for="name" class="col-sm-4 control-label" required="true" readonly>Name</label>
 		    <div class="col-sm-7">
-		      <input name="name" id="name" class="form-control" placeholder="Type Relationship Name" ng-model="relEditorVm.relation.name" minlength="1" required="true">
+		      <input name="name" id="name" class="form-control" placeholder="Type Relationship Name" ng-model="relEditorVm.relation.label" minlength="1" required="true">
 		    </div>
 		  </div>
 		  <div class="form-group">
@@ -46,9 +46,10 @@
 		    </div>
 		  </div>
 		  <div class="form-group" ng-if="relEditorVm.app['expert-mode']">
-	  		<label for="sourceKey" class="col-sm-4 control-label" required="true">Source Key</label>
+	  		<label for="sourceKey" class="col-sm-4 control-label" required="true">Source Table Key</label>
 		    <div class="col-sm-7">
 		    	<select name="sourceKey" class="form-control" required="true"
+		    			ng-change="relEditorVm.onSourceKeyChange(item)"
 		    			ng-model="relEditorVm.sourceKeyOptions.selection" 
 		    			ng-options="item as item.label for item in relEditorVm.sourceKeyOptions.options track by item.name">
 			    </select>
@@ -63,7 +64,6 @@
 					 typeahead-loading="relEditorVm.loading" 
 					 typeahead-no-results="relEditorVm.noResults"
 					 typeahead-show-hint = "true"
-					 typeahead-input-formatter = "relEditorVm.formatTarget()"
 					 typeahead-on-select = "relEditorVm.changeTarget($item, $model, $label)"
 					 uib-typeahead="target as target.label for target in relEditorVm.matchTargets($viewValue)">
 			    <i ng-show="relEditorVm.loading" class="glyphicon glyphicon-refresh"></i>
@@ -72,35 +72,39 @@
 			    </div>
 		    </div>
 		  </div>
+		  
+		  <div class="form-group" ng-if="relEditorVm.app['expert-mode']">
+	  		<label for="targetKey" class="col-sm-4 control-label" required="true">Target Table Key</label>
+		    <div class="col-sm-7">
+		    	<input id="targetKey" type="text" placeholder="Type to select target object" class="form-control" required="true" pattern="[a-zA-Z0-9_]{1,100}" data-rule-alphanumeric="^\w+$"
+					 ng-model="relEditorVm.targetKeyFilterText"
+					 ng-model-options="{debounce: 500, blur: 250}"
+					 typeahead-show-hint = "true"
+					 typeahead-on-select = "relEditorVm.onTargetKeySelect($item, $model)"
+					 ng-change="relEditorVm.onTargetKeyChange()"
+					 uib-typeahead="property as property.column for property in relEditorVm.targetKeyOptions.options">
+		    </div>
+		  </div>
+		  
 		  <div class="form-group" ng-if="relEditorVm.app['expert-mode'] && relEditorVm.slider.value===3">
 	  		<label for="joinTableName" class="col-sm-4 control-label" required="true">Join Table</label>
 		    <div class="col-sm-7">
-		    	<input name="joinTableName" id="joinTableName" class="form-control" placeholder="Type Join Table Name" ng-model="relEditorVm.relation.joinTable" minlength="1" required="true">
+		    	<input name="joinTableName" id="joinTableName" class="form-control" placeholder="Type Join Table Name" ng-model="relEditorVm.relation.joinTableName" minlength="1" required="true">
 		    </div>
 		  </div>
 		  <div class="form-group" ng-if="relEditorVm.app['expert-mode'] && relEditorVm.slider.value===3">
-	  		<label for="joinTableNameSrcId" class="col-sm-4 control-label" required="true">Join Table Source Key</label>
+	  		<label for="joinTableSrcKey" class="col-sm-4 control-label" required="true">Join Table Source Key</label>
 		    <div class="col-sm-7">
-		    	<input name="joinTableNameSrcId" id="joinTableNameSrcId" class="form-control" placeholder="Type Join Table Source Foreign Key Name" ng-model="relEditorVm.relation.joinTableSrcKey" minlength="1" required="true">
+		    	<input name="joinTableSrcKey" id="joinTableSrcKey" class="form-control" placeholder="Type Join Table Source Foreign Key Name" ng-model="relEditorVm.relation.joinTableSrcKey" minlength="1" required="true">
 		    </div>
 		  </div>
 		  <div class="form-group" ng-if="relEditorVm.app['expert-mode'] && relEditorVm.slider.value===3">
-	  		<label for="joinTableNameTargetId" class="col-sm-4 control-label" required="true">Join Table Target Key</label>
+	  		<label for="joinTableTargetKey" class="col-sm-4 control-label" required="true">Join Table Target Key</label>
 		    <div class="col-sm-7">
-		    	<input name="joinTableNameTargetId" id="joinTableNameTargetId" class="form-control" placeholder="Type Join Table Target Foreign Key Name" ng-model="relEditorVm.relation.joinTableTargetKey" minlength="1" required="true">
+		    	<input name="joinTableTargetKey" id="joinTableTargetKey" class="form-control" placeholder="Type Join Table Target Foreign Key Name" ng-model="relEditorVm.relation.joinTableTargetKey" minlength="1" required="true">
 		    </div>
 		  </div>		  
 		  
-		  <div class="form-group" ng-if="relEditorVm.app['expert-mode']">
-	  		<label for="targetKey" class="col-sm-4 control-label" required="true">Target Key</label>
-		    <div class="col-sm-7">
-		    	<input id="targetKey" type="text" placeholder="Type to select target object" class="form-control" required="true" pattern="[a-zA-Z0-9_]{1,100}" data-rule-alphanumeric="^\w+$"
-					 ng-model="relEditorVm.relation.targetEntityFkName" 
-					 ng-model-options="{ debounce: 500, blur: 250 }"
-					 typeahead-show-hint = "true"
-					 uib-typeahead="property as property.label for property in relEditorVm.targetKeyOptions.options">
-		    </div>
-		  </div>
 		  <div class="form-group">
 	  		<label for="required" class="col-sm-4 control-label">Multiplicity</label>
 		    <div class="col-sm-7">

@@ -121,6 +121,22 @@ const orm = {
 				"type": "String",
 				"size": 128,
 			},{
+				"name": "isJoinTable",
+				"dbName": "BOE_JOIN_TABLE",
+				"type": "Short",
+				"dbValue": function(value){
+					var dbVal = 0;
+					if(value && value === true)
+						dbVal = 1;
+					return dbVal;					
+				},
+				"value": function(dbValue){
+					var val = false;
+					if(dbValue!==null && dbValue > 0)
+						val = true;
+					return val;
+				}
+			},{
 				"name": "svcName",
 				"dbName": "BOE_SVC_NAME",
 				"type": "String",

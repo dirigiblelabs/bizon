@@ -90,5 +90,14 @@
         "primaryKey":"false",
         "defaultValue":""
       }
+      ,
+      {
+        "name":"BOE_JOIN_TABLE",
+        "type":"SMALLINT",
+        "length":"0",
+        "notNull":"false",
+        "primaryKey":"false",
+        "defaultValue":"0"
+      }
     ]
 }

@@ -2,7 +2,7 @@
 "use strict";
 
 angular.module('businessObjects')
-.controller('DetailsCtrl', ['masterDataSvc', 'modalService', 'Notifications', 'selectedEntity', '$log', '$state', '$stateParams', 'Relation','Settings', function (masterDataSvc, modalService, Notifications, selectedEntity, $log, $state, $stateParams, Relation, Settings) {
+.controller('DetailsCtrl', ['masterDataSvc', 'modalService', 'Notifications', 'selectedEntity', '$log', '$state', '$stateParams', 'Relation', 'Relations', 'Settings', function (masterDataSvc, modalService, Notifications, selectedEntity, $log, $state, $stateParams, Relation, Relations, Settings) {
 	
 	this.selectedEntity = selectedEntity;
 	this.app = Settings;
@@ -30,46 +30,11 @@ angular.module('businessObjects')
 		if(this.selectedEntity){
 			this.inboundRelations = this.selectedEntity['inbound-relations']
 										.map(function(rel){
-											rel.source = this.selectedEntity['inbound-entities']
-															.filter(function(entity){
-																return entity.name === rel.targetEntityName;
-															})
-															.map(function(entity){
-																return {
-																	id: entity.id,
-																	name: entity.name,
-																	label: entity.label,
-																	properties: entity.properties
-																};
-															})[0];
-											rel.target = {
-												id: this.selectedEntity.id,
-												name: this.selectedEntity.name,
-												label: this.selectedEntity.label,
-												properties: this.selectedEntity.properties
-											};
-											return rel;
+											return Relations.decorateRelation(rel);
 										}.bind(this));
-			this.outboundRelations = this.selectedEntity['outbound-relations'] = this.selectedEntity['outbound-relations']
+			this.outboundRelations = this.selectedEntity['outbound-relations']
 										.map(function(rel){
-											rel.source = {
-												id: this.selectedEntity.id,
-												name: this.selectedEntity.name,
-												label: this.selectedEntity.label,
-												properties: this.selectedEntity.properties
-											};
-											rel.target = this.selectedEntity['outbound-entities']
-															.filter(function(entity){
-																return entity.name === rel.targetEntityName;
-															}).map(function(entity){
-																return {
-																	id: entity.id,
-																	name: entity.name,
-																	label: entity.label,
-																	properties: entity.properties
-																};
-															})[0];
-											return rel;
+											return Relations.decorateRelation(rel);
 										}.bind(this));
 		}
 	};

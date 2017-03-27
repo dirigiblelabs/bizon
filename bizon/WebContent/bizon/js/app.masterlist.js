@@ -2,8 +2,9 @@
 "use strict";
 
 angular.module('businessObjects')
-.controller('MasterListCtrl', ['masterDataSvc', 'modalService', 'Notifications', '$log', '$q', '$state', '$stateParams', '$window', function (masterDataSvc, modalService, Notifications, $log, $q, $state, $stateParams, $window) {
+.controller('MasterListCtrl', ['masterDataSvc', 'modalService', 'Notifications', 'Settings', '$log', '$q', '$state', '$stateParams', '$window', function (masterDataSvc, modalService, Notifications, Settings, $log, $q, $state, $stateParams, $window) {
 
+	this.app = Settings;
 	this.items = masterDataSvc.getLoadedData();
 	this.selectedEntity = masterDataSvc.selection[0];
 	this.count = masterDataSvc._itemsCount;

@@ -1,77 +1,96 @@
 {
   "tableName":"BO_RELATION",
   "columns":
-    [
-      {
+    [{
         "name":"BOR_ID",
         "type":"BIGINT",
         "length":"0",
         "notNull":"true",
         "primaryKey":"true",
         "defaultValue":""
-      }
-      ,
-      {
-        "name":"BOR_SRC_BOE_NAME",
-        "type":"VARCHAR",
-        "length":"100",
-        "notNull":"true",
-        "primaryKey":"false",
-        "defaultValue":""
-      }
-      ,
-      {
-        "name":"BOR_SRC_TYPE",
-        "type":"SMALLINT",
-        "length":"1",
-        "notNull":"true",
-        "primaryKey":"false",
-        "defaultValue":""
-      }
-      ,
-      {
-        "name":"BOR_TARGET_BOE_NAME",
-        "type":"VARCHAR",
-        "length":"100",
-        "notNull":"true",
-        "primaryKey":"false",
-        "defaultValue":""
-      }
-      ,
-      {
-        "name":"BOR_TARGET_TYPE",
-        "type":"SMALLINT",
-        "length":"1",
-        "notNull":"true",
-        "primaryKey":"false",
-        "defaultValue":""
-      }
-      ,
-      {
-        "name":"BOR_TARGET_FK_NAME",
-        "type":"VARCHAR",
-        "length":"255",
-        "notNull":"true",
-        "primaryKey":"false",
-        "defaultValue":""
-      }
-      ,
-      {
+      },{
         "name":"BOR_NAME",
         "type":"VARCHAR",
         "length":"255",
         "notNull":"true",
         "primaryKey":"false",
         "defaultValue":""
-      }
-      ,
-      {
+      },{
+        "name":"BOR_LABEL",
+        "type":"VARCHAR",
+        "length":"500",
+        "notNull":"true",
+        "primaryKey":"false",
+        "defaultValue":""
+      },{
+        "name":"BOR_SRC_BOE_NAME",
+        "type":"VARCHAR",
+        "length":"100",
+        "notNull":"true",
+        "primaryKey":"false",
+        "defaultValue":""
+      },{
+        "name":"BOR_SRC_KEY",
+        "type":"VARCHAR",
+        "length":"255",
+        "notNull":"true",
+        "primaryKey":"false",
+        "defaultValue":""
+      },{
+        "name":"BOR_SRC_TYPE",
+        "type":"SMALLINT",
+        "length":"1",
+        "notNull":"true",
+        "primaryKey":"false",
+        "defaultValue":""
+      },{
+        "name":"BOR_TARGET_BOE_NAME",
+        "type":"VARCHAR",
+        "length":"100",
+        "notNull":"true",
+        "primaryKey":"false",
+        "defaultValue":""
+      },{
+        "name":"BOR_TARGET_FK_NAME",
+        "type":"VARCHAR",
+        "length":"255",
+        "notNull":"true",
+        "primaryKey":"false",
+        "defaultValue":""
+      },{
+        "name":"BOR_TARGET_TYPE",
+        "type":"SMALLINT",
+        "length":"1",
+        "notNull":"true",
+        "primaryKey":"false",
+        "defaultValue":""
+      },{
         "name":"BOR_TYPE",
         "type":"SMALLINT",
         "length":"1",
         "notNull":"true",
         "primaryKey":"false",
         "defaultValue":""
-      }      
-    ]
+      },{
+        "name":"BOR_JOIN_TBL_NAME",
+        "type":"VARCHAR",
+        "length":"255",
+        "notNull":"false",
+        "primaryKey":"false",
+        "defaultValue":""
+      },{
+        "name":"BOR_JOIN_TBL_SRC_ID",
+        "type":"VARCHAR",
+        "length":"255",
+        "notNull":"false",
+        "primaryKey":"false",
+        "defaultValue":""
+      },{
+        "name":"BOR_JOIN_TBL_TARGET_ID",
+        "type":"VARCHAR",
+        "length":"255",
+        "notNull":"false",
+        "primaryKey":"false",
+        "defaultValue":""
+      }]
 }

@@ -2,6 +2,22 @@
 "use strict";
 
 	angular.module('businessObjects')
+	.service('Utils', [function(){
+		var toAlphanumeric= function(string){
+			return string.replace(/[^A-Za-z0-9_]/g, '');
+		};
+		var createRandomAlphanumeric = function(length){
+			if(!length)
+				length = 4;
+			var power = length;
+			var sliceIndex = -Math.abs(length);
+		    return ("0000" + (Math.random()*Math.pow(36,power) << 0).toString(36)).slice(sliceIndex);
+		};
+		return {
+			transformToAlphanumeric : toAlphanumeric,
+			randomAlphanumeric: createRandomAlphanumeric
+		};
+	}])		
 	.service('ResourceSvcConfiguration', ['$log', function($log) {
 	
 		return {
@@ -46,6 +62,7 @@
 		var cfg = angular.copy(ResourceSvcConfiguration.cfg);
 /*		cfg.count = {method:'GET', params:{count:true}, isArray:false, ignoreLoadingBar: true};*/
 		cfg.getByName = {method:'GET', isArray:false, ignoreLoadingBar: false};
+		cfg.queryByProperty = {method:'GET', isArray:true, ignoreLoadingBar: true};
 		
 	  	var res = $resource('../../js/bizon/svc/v1/entities.js/:boId', { boId:'@id' }, cfg);
 
@@ -114,15 +131,15 @@
 	.service('Relation', ['$resource', 'ResourceSvcConfiguration', function($resource, ResourceSvcConfiguration) {
 	  	return $resource('../../js/bizon/svc/v1/relations.js/:boId', { boId:'@id' }, ResourceSvcConfiguration.cfg);
 	}])		
-	.service('masterDataSvc', ['Entity', 'Item', 'Relation', 'EntityCount', 'EntityQueryByName', '$q', '$log', function(Entity, Item, Relation, EntityCount, EntityQueryByName, $q, $log) {
+	.service('masterDataSvc', ['Entity', 'Item', 'Relation', 'EntityCount', 'EntityQueryByName', '$q', '$log', 'Utils', function(Entity, Item, Relation, EntityCount, EntityQueryByName, $q, $log, Utils) {
 
-		var createRandomAlphanumeric = function(length){
+		/*var createRandomAlphanumeric = function(length){
 			if(!length)
 				length = 4;
 			var power = length;
 			var sliceIndex = -Math.abs(length);
 		    return ("0000" + (Math.random()*Math.pow(36,power) << 0).toString(36)).slice(sliceIndex);
-		}
+		};*/
 	
 		function createMasterDataTemplateObject(){
 			var obj = angular.copy(Entity.newObjectTemplate);
@@ -264,9 +281,12 @@
 			Note: With progessive loading and pagination patterns it is possible that an item exists but has not been loaded from remote service yet.
 				  The second parameter addresses precisely these situations.	
 		*/
-		this.findByName = function(name){
-			return EntityQueryByName.queryByName({"label":name, $filter:"label"}).$promise;
-		};		
+		this.findByName = function(name, expand){
+			var params = {"label":name, "$filter":"label"}
+			if(expand!=undefined)
+				params['$expand'] = expand;
+			return EntityQueryByName.queryByName(params).$promise;
+		};
 
 		this._itemsCount;
 
@@ -313,7 +333,7 @@
 			var entity = template;
 			if(!entity){
 				entity = this.masterDataTemplateObject = createMasterDataTemplateObject();
-				entity.name = createRandomAlphanumeric();
+				entity.name = Utils.randomAlphanumeric();
 				entity.properties.map(function(prop){
 					prop.entityName = entity.name;
 					return prop;
@@ -460,6 +480,20 @@
 		};*/
 				
 	}])
+	.service('SQLEntity', ['Utils', function(Utils){
+		return {
+			formatTableName: function(string, upperCase, maxLength){
+				maxLength =  maxLength || 125;
+				var letterCaseMethod = upperCase===false?'toLowerCase':'toUpperCase';
+				return Utils.transformToAlphanumeric(string)[letterCaseMethod]().substring(0, maxLength);
+			},
+			formatFieldName: function(string, upperCase, maxLength){
+				maxLength =  maxLength || 255;
+				var letterCaseMethod = upperCase===false?'toLowerCase':'toUpperCase';
+				return Utils.transformToAlphanumeric(string)[letterCaseMethod]().substring(0, maxLength);
+			}		
+		};
+	}])		
 	.service('Settings', ['BuildTemplatesService', function(BuildTemplatesService) {
 		return {
 			"expert-mode": false,

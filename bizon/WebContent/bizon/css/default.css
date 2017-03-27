@@ -420,7 +420,7 @@ a>i {
 }
 	
 .items-list .nodata-text {
-  padding: 5px;
+  padding: 10px 15px;
   font-weight: bold;
   color: #ccc;
 }

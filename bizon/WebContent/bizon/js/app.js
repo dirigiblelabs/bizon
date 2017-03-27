@@ -267,6 +267,165 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 		cfpLoadingBarProvider.includeSpinner = false;
 		  
 	}])
+	.service('Relations', ['masterDataSvc', 'Entity', '$q', function(MasterDataService, Entity, $q){
+		var relatedEntitySubset = function(entity){
+			return {
+				"id": entity["id"],
+				"name": entity["name"],
+				"label": entity["label"],
+				"table": entity["table"],
+				"properties": entity["properties"]
+			};
+		};				
+		var getSourceEntityKeyProperty = function(relation){
+			return relation.source.properties
+					.find(function(prop){
+						return relation.srcKey === prop.name;
+					}.bind(this));
+		};
+		var getRelationTargetEntity = function(relation){
+			var targetEntity;
+			if(relation.targetEntityName){
+				if(relation.target && relation.target.name === relation.targetEntityName){
+					targetEntity = relation.target;
+				} else {
+					//first try loaded entities
+					targetEntity = MasterDataService.getByName(relation.targetEntityName, false)
+									.then(function(loadedTargetEntity){
+										if(!loadedTargetEntity){
+											//if the required entity is still not loaded, look it up remotely without affecting the local entity cache
+											var params = {"name":relation.targetEntityName, "$filter":"name", "$expand": "properties"};
+											return Entity.queryByProperty(params).$promise
+													.then(function(_loadedTargetEntities){
+														var _loadedTargetEntity = _loadedTargetEntities[0];
+														if(!_loadedTargetEntity)
+															return;
+														return relatedEntitySubset(_loadedTargetEntity);
+													}.bind(this));
+										}
+										return relatedEntitySubset(loadedTargetEntity);
+									}.bind(this));
+				}
+			}
+			return $q.when(targetEntity);
+		};
+		
+		var setRelationTargetEntity = function(relation, targetEntity){
+			if(targetEntity)
+				relation.target = relatedEntitySubset(targetEntity);
+			else
+				getRelationTargetEntity(relation)
+				.then(function(targetEntity){
+					if(targetEntity){
+						relation.target = targetEntity;
+						relation.targetEntityKeyProperty = getTargetEntityKeyProperty(relation);
+					} else {
+						//delete target dependent properties if any
+						delete relation.target;
+						delete relation.targetEntityFkName;
+						delete relation.targetMultiplicity;
+						delete relation.joinTableTargetKey;
+					}
+					return targetEntity;
+				}.bind(this));
+		};
+		var getRelationSourceEntity = function(relation){
+			var sourceEntity;
+			if(relation.srcEntityName){
+				if(relation.source && relation.source.name === relation.srcEntityName){
+					sourceEntity = relation.source;
+				} else {
+					//first try loaded entities
+					sourceEntity = MasterDataService.getByName(relation.srcEntityName, false)
+									.then(function(loadedSourceEntity){
+										if(!loadedSourceEntity){
+											return;
+										} else {
+											return relatedEntitySubset(loadedSourceEntity);
+										}
+									}.bind(this))
+									.then(function(loadedSourceEntity){
+										if(loadedSourceEntity)
+											return loadedSourceEntity;
+											
+										//if the required entity is still not loaded, look it up remotely without affecting the local entity cache
+										var params = {"name":relation.srcEntityName, "$filter":"name", "$expand": "properties"};
+										return Entity.queryByProperty(params).$promise
+												.then(function(_loadedSourceEntities){
+													var _loadedSourceEntity = _loadedSourceEntities[0];
+													if(!_loadedSourceEntity)
+														return;
+													return relatedEntitySubset(_loadedSourceEntity);
+												}.bind(this));
+									}.bind(this))
+									.then(function(loadedSourceEntity){
+										relation.source = loadedSourceEntity;
+										relation.srcKeyProperty = getSourceEntityKeyProperty(relation);
+									}.bind(this));
+				}
+			}
+			return sourceEntity;
+		};
+		var setRelationSourceEntity = function(relation, sourceEntity){
+			relation.source = sourceEntity?relatedEntitySubset(sourceEntity):undefined || getRelationSourceEntity(relation);
+//			relation.srcKeyProperty = getSourceEntityKeyProperty(relation);
+		};
+		var getTargetEntityKeyProperty = function(relation){
+			return relation.target.properties.find(function(prop){
+						return relation.targetEntityFkName === prop.name;
+					}.bind(this));
+		};
+		var getJoinEntity = function(relation){
+			var entityPromise;
+			if(relation.joinEntity){
+				entityPromise = $q.when(relation.joinEntity).$promise;
+			} else {
+				entityPromise = MasterDataService.getByName(relation.joinTableName)
+					.then(function(entity){
+						return entity;
+					}.bind(this));
+			}
+			return entityPromise;
+		};
+		var getJoinEntitySourceKeyProperty = function(relation){
+			return getJoinEntity(relation)
+					.then(function(joinEntity){
+						return joinEntity.properties
+								.find(function(prop){
+									return prop.name === relation.joinTableSrcKey;
+								}.bind(this));
+					}.bind(this));
+		};
+		var getJoinEntityTargetKeyProperty = function(relation){
+			return getJoinEntity(relation)
+					.then(function(joinEntity){
+						return joinEntity.properties
+								.find(function(prop){
+									return prop.name === relation.joinTableTargetKey;
+								}.bind(this));
+					}.bind(this));
+		};
+		
+		var decorateRelation = function(relation, sourceEntity, targetEntity){
+			setRelationSourceEntity(relation, sourceEntity);
+			setRelationTargetEntity(relation, targetEntity);
+			return relation;
+		};
+		
+		return {
+			relatedEntitySubset: relatedEntitySubset,
+			decorateRelation: decorateRelation,
+			getRelationTargetEntity: getRelationTargetEntity,
+			setRelationTargetEntity: setRelationTargetEntity,
+			getRelationSourceEntity: getRelationSourceEntity,
+			setRelationSourceEntity: setRelationSourceEntity,
+			getSourceEntityKeyProperty: getSourceEntityKeyProperty,
+			getTargetEntityKeyProperty: getTargetEntityKeyProperty,
+			getJoinEntity: getJoinEntity,
+			getJoinEntitySourceKeyProperty: getJoinEntitySourceKeyProperty,
+			getJoinEntityTargetKeyProperty: getJoinEntityTargetKeyProperty
+		};
+	}])
 	.directive('bootstrapSwitch', [
         function() {
         	/*http://benjii.me/2014/07/angular-directive-for-bootstrap-switch/*/

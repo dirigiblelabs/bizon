@@ -160,7 +160,7 @@
 		angular.module('page', ['ngAnimate', 'ui.bootstrap']);
 		angular.module('page').controller('ManageController', function ($scope, $http) {
 			
-			var url = '../../js/bizon/svc/v1/item.js';
+			var url = '../../js/bizon/svc/v1/properties.js';
 
 			$http.get(url)
 				.success(function(data){

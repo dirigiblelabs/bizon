@@ -2,95 +2,261 @@
 "use strict";
 
 angular.module('businessObjects')
-.controller('RelationEditorCtrl', ['$scope', 'masterDataSvc', '$log', 'selectedEntity', 'relation', 'Settings', function($scope, masterDataSvc, $log, selectedEntity, relation, Settings) {
+.service('RelationsEditor', ['Relations', 'SQLEntity', 'masterDataSvc', 'Utils', function(Relations, SQLEntity, MasterDataSvc, Utils){
+	var tableNameFromLabel = function(entity){
+		return SQLEntity.formatTableName(entity.label);
+	};
+	var generateTargetEntityKeyColumn = function(relation){
+		return relation.source.table + '_' + relation.srcKeyProperty.column;
+	};
+	var newTargetKeyProperty = function(relation){
+		var column = generateTargetEntityKeyColumn(relation);
+		var targetJoinProperty = {
+			"name": Utils.randomAlphanumeric(),
+			"label": SQLEntity.formatFieldName(column),
+			"column": SQLEntity.formatFieldName(column),
+			"typeLabel": relation.srcKeyProperty.typeLabel,
+			"type": relation.srcKeyProperty.type,
+			"size": relation.srcKeyProperty.size,
+			"required": true,
+			"fkInRelationName": relation.name,
+			"entityName": relation.target?relation.target.name:undefined,
+			"action": "save"
+		};
+		relation.targetEntityFkName = targetJoinProperty.name;
+		relation.targetEntityKeyProperty = targetJoinProperty;
+		return targetJoinProperty;
+	};
+	var generateJoinTableName = function(relation){
+		relation.joinTableName = relation.source.table;
+		if(relation.target && relation.target.table){
+      		relation.joinTableName += '_' + relation.target.table;
+  		}
+  		return relation;
+	};
+	var generateJoinTableSrcKey = function(relation){	
+		relation.joinTableSrcKey = relation.source.table + '_' + relation.srcKeyProperty.column;
+		return relation;
+	};
+	var generateJoinTableTargetKey = function(relation){	
+		relation.joinTableTargetKey = relation.target.table + '_' + (relation.targetEntityFkName?relation.targetEntityFkName:'');
+		return relation;
+	};
+
+	var MULTIPLICITY_OPTS = Object.freeze({ONE:1, MANY:2});
+	var MULTIPLICITY_TYPES = Object.freeze({ONE_TO_ONE:1, ONE_TO_MANY:2, MANY_TO_MANY:3});
+	var ASSOCIATION_TYPES = Object.freeze({ASSOCIATION:1, COMPOSITION:2, AGGREGATION:3});		
+	
+ 	var getRelationMultiplicity = function(relation){
+ 		var multiplicity;
+		if(relation.srcMultiplicity === MULTIPLICITY_OPTS.ONE && relation.targetMultiplicity === MULTIPLICITY_OPTS.ONE){
+      		multiplicity = MULTIPLICITY_TYPES.ONE_TO_ONE;
+  		} else if(relation.srcMultiplicity === MULTIPLICITY_OPTS.ONE && relation.targetMultiplicity === MULTIPLICITY_OPTS.MANY){
+  		 	multiplicity = MULTIPLICITY_TYPES.ONE_TO_MANY;
+  		} else if(relation.srcMultiplicity === MULTIPLICITY_OPTS.MANY && relation.targetMultiplicity === MULTIPLICITY_OPTS.MANY){
+  			multiplicity = MULTIPLICITY_TYPES.MANY_TO_MANY;
+  		}
+  		return multiplicity;
+    };
+    
+    var setRelationMultiplicity = function(multiplicity, relation){
+    	if(multiplicity === MULTIPLICITY_TYPES.ONE_TO_ONE){
+      		relation.srcMultiplicity = MULTIPLICITY_OPTS.ONE;
+      		relation.targetMultiplicity = MULTIPLICITY_OPTS.ONE;
+  		} else if(multiplicity === MULTIPLICITY_TYPES.ONE_TO_MANY){
+  			relation.srcMultiplicity = MULTIPLICITY_OPTS.ONE;
+      		relation.targetMultiplicity = MULTIPLICITY_OPTS.MANY;
+  		} else if(multiplicity === MULTIPLICITY_TYPES.MANY_TO_MANY){
+  			relation.srcMultiplicity = MULTIPLICITY_OPTS.MANY;
+      		relation.targetMultiplicity = MULTIPLICITY_OPTS.MANY;
+			if(!relation.source.table)
+				relation.source.table = tableNameFromLabel(relation.source);
+	    	if(relation.target && !relation.target.table)
+	    		relation.target.table = tableNameFromLabel(relation.target);
+	  		if(!relation.joinTableName){
+	      		generateJoinTableName(relation);
+	  		}
+	  		if(!relation.joinTableSrcKey){
+	      		generateJoinTableSrcKey(relation);
+	  		}
+	  		if(!relation.joinTableTargetKey){
+	      		generateJoinTableTargetKey(relation);
+	  		}      		
+  		}
+    };
+	
+	var setRelationAssociationType = function(type, relation){
+		//No need to handle for now
+	};
+	
+	var newRelation = function(sourceEntity){
+		var rel= {
+			srcEntityName: sourceEntity.name,
+			srcEntityLabel: sourceEntity.label,
+			srcMultiplicity: MULTIPLICITY_OPTS.ONE,
+			name: Utils.randomAlphanumeric(),
+			label: sourceEntity.label +' to',
+			source: Relations.relatedEntitySubset(sourceEntity),
+		};
+		rel.srcKeyProperty = sourceEntity.properties
+							 .filter(function(prop){
+								return prop.pk === true; 
+							  })[0];
+		rel.srcKey = rel.srcKeyProperty.name;
+		newTargetKeyProperty(rel);
+		return rel;
+	};
+	var setRelationTarget = function(relation){
+		if(relation.targetEntityName) {
+			if(!relation.target || (relation.target && relation.target.name!==relation.targetEntityName)){
+				MasterDataSvc.getByName(relation.targetEntityName, true)
+				.then(function(loadedTargetEntity){
+					relation.target = Relations.relatedEntitySubset(loadedTargetEntity);
+					relation.targetEntityKeyProperty = Relations.getTargetEntityKeyProperty();
+				}.bind(this));
+			}
+		} else {
+			//delete target dependent properties
+			delete relation.target;
+			delete relation.targetEntityFkName;
+			delete relation.targetMultiplicity;
+			delete relation.joinTableTargetKey;
+		}
+	};
+	var initRelation = function(relation, sourceEntity){
+		if(relation === undefined) {
+			relation = newRelation(sourceEntity);
+		} else {
+			if(relation.target === undefined && relation.targetEntityName)
+				setRelationTarget(relation);
+		}
+		return relation;
+	};
+	var getTargetKeyOptions = function(relation){
+		return relation.target.properties
+				.filter(function(prop){
+					return prop.type === relation.srcKeyProperty.type && prop.pk === false;//TODO: filter also those that are already assigned ot anothe relation
+				}.bind(this));
+	};
+	var upsertRelation = function(relation, sourceEntity){
+		var targetJoinProperty;
+		if(relation.id === undefined){
+			relation.action = 'save';
+			sourceEntity['outbound-relations'].push(relation); 
+			targetJoinProperty = relation.targetEntityKeyProperty;
+			relation.target.properties.push(targetJoinProperty);
+		} else {
+			if(relation.action!=='save')
+				relation.action = 'update';
+			targetJoinProperty = Relations.getTargetEntityKeyProperty(relation);
+			if(targetJoinProperty && targetJoinProperty.id!==undefined){
+				//check if the join property in this relation changed and link the new name to the old property name, if necessary
+				//no changes except related to source key type changes will be attempted to preserve user changes, if any
+				if(targetJoinProperty.name !== relation.targetEntityFkName){
+					targetJoinProperty.name = relation.targetEntityFkName;
+					targetJoinProperty.action = "update";
+				}
+				if(targetJoinProperty.type !== relation.srcKeyProperty.type){
+					targetJoinProperty.type = relation.srcKeyProperty.type;
+					targetJoinProperty.typeLabel = relation.srcKeyProperty.typeLabel;
+					targetJoinProperty.size = relation.srcKeyProperty.size;
+					targetJoinProperty.action = "update";
+				}
+			}				
+			sourceEntity['outbound-relations'] = sourceEntity['outbound-relations']
+													.map(function(rel){
+														if(rel.id === relation.id){
+															return relation;
+														}
+														return rel;
+													}.bind(this));
+		}
+	};
+	
+	var RelationsEditor = Relations;
+	RelationsEditor.MULTIPLICITY_OPTS = MULTIPLICITY_OPTS;
+	RelationsEditor.MULTIPLICITY_TYPES = MULTIPLICITY_TYPES;
+	RelationsEditor.ASSOCIATION_TYPES = ASSOCIATION_TYPES;
+	RelationsEditor.getRelationMultiplicity = getRelationMultiplicity;
+	RelationsEditor.setRelationMultiplicity = setRelationMultiplicity;
+	RelationsEditor.setRelationTarget = setRelationTarget;
+	RelationsEditor.initRelation = initRelation;
+	RelationsEditor.getTargetKeyOptions = getTargetKeyOptions;
+	RelationsEditor.upsert = upsertRelation;
+	RelationsEditor.newTargetKeyProperty = newTargetKeyProperty;
+	RelationsEditor.setRelationAssociationType = setRelationAssociationType;
+	
+	return RelationsEditor;
+}])
+.controller('RelationEditorCtrl', ['RelationsEditor', '$scope', 'masterDataSvc', '$log', 'selectedEntity', 'relation', 'Settings', function(RelationsEditor, $scope, masterDataSvc, $log, selectedEntity, relation, Settings) {
+	this.RelationsEditor = RelationsEditor;
 	this.app = Settings;
-	this.relation = relation;
-	this.selectedEntity = selectedEntity;
+	this.relation = angular.copy(relation);
 	this.sourceKeyOptions = {
-		options: selectedEntity.properties,
-		selection: selectedEntity.properties
-					 .filter(function(prop){
-						return prop.pk === true; 
-					  })[0]
+		options: selectedEntity.properties
 	};
 	this.targetKeyOptions = {};
-	
 	this.loading = false;
 	this.noResults;
-	var MULTIPLICITY_TYPES = Object.freeze({ONE_TO_ONE:1, ONE_TO_MANY:2, MANY_TO_MANY:3});	
+
 	this.slider = {
 	  options: {
 	  	showTicksValues: true,
 		floor: 1,
 	    ceil: 3,
 	    stepsArray: [
-	      {value: MULTIPLICITY_TYPES.ONE_TO_ONE, legend: 'One-to-One'},
-	      {value: MULTIPLICITY_TYPES.ONE_TO_MANY, legend: 'One-To-Many'},
-	      {value: MULTIPLICITY_TYPES.MANY_TO_MANY, legend: 'Many-to-Many'}
-	    ]
+	      {value: RelationsEditor.MULTIPLICITY_TYPES.ONE_TO_ONE, legend: 'One-to-One'},
+	      {value: RelationsEditor.MULTIPLICITY_TYPES.ONE_TO_MANY, legend: 'One-To-Many'},
+	      {value: RelationsEditor.MULTIPLICITY_TYPES.MANY_TO_MANY, legend: 'Many-to-Many'}
+	    ],
+	    onEnd: function(){
+	    	RelationsEditor.setRelationMultiplicity(this.slider.value, this.relation);
+		}.bind(this)
 	  }
 	};
-	var ASSOCIATION_TYPES = Object.freeze({ASSOCIATION:1, COMPOSITION:2, AGGREGATION:3});		
 	this.relTypeSlider = {
 	  options: {
 	  	showTicksValues: true,
 		floor: 1,
 	    ceil: 3,
 	    stepsArray: [
-	      {value: ASSOCIATION_TYPES.ASSOCIATION, legend: 'Association'},
-	      {value: ASSOCIATION_TYPES.AGGREGATION, legend: 'Aggregation'},
-	      {value: ASSOCIATION_TYPES.COMPOSITION, legend: 'Composition'}
-	    ]
+	      {value: RelationsEditor.ASSOCIATION_TYPES.ASSOCIATION, legend: 'Association'},
+	      {value: RelationsEditor.ASSOCIATION_TYPES.AGGREGATION, legend: 'Aggregation'},
+	      {value: RelationsEditor.ASSOCIATION_TYPES.COMPOSITION, legend: 'Composition'}
+	    ],
+		onEnd: function(){
+	    	RelationsEditor.setRelationAssociationType(this.relTypeSlider.value, this.relation);
+		}.bind(this)	    
 	  }
 	};
-	
-	var MULTIPLICITY_OPTS = Object.freeze({ONE:1, MANY:2});
-	var isNewProperty = relation === undefined ? true : false;
-	
+		
 	var self = this;
 
 	function init(){
-		if(isNewProperty) {
-			this.relation = {
-				srcEntityName: selectedEntity.name,
-				srcEntityLabel: selectedEntity.label,
-				srcMultiplicity: MULTIPLICITY_OPTS.ONE,
-				name: selectedEntity.name +'- '
-			};
-		} else {
-			if(this.relation.target===undefined){
-				masterDataSvc.getByName(this.relation.targetEntityName, true)
-				.then(function(loadedTargetEntity){
-					this.relation.target = {
-						name: loadedTargetEntity.name,
-						label: loadedTargetEntity.label,
-						properties: loadedTargetEntity.properties
-					};
-				}.bind(this));
-			}		
-			relationToSlider.apply(this, [this.relation, this.slider]);
+		this.relation = RelationsEditor.initRelation(relation, selectedEntity);
+		if(this.relation.target){
+			this.slider.value = RelationsEditor.getRelationMultiplicity(relation);
+			this.targetKeyOptions = RelationsEditor.getTargetKeyOptions(relation);
 		}
-		if(this.relation.source===undefined){
-			this.relation.source = {
-				label: selectedEntity.label,
-				name: selectedEntity.name,
-				properties: selectedEntity.properties
-			};
-		}
+		this.targetKeyFilterText = (this.relation.targetEntityKeyProperty && this.relation.targetEntityKeyProperty.column) || RelationsEditor.getTargetEntityKeyProperty(this.relation).column;		
+		//this.sourceKeyOptions.selection = RelationsEditor.getSourceEntityKeyProperty(this.relation);//No
 		$scope.$$postDigest(function () {
-			    $scope.$broadcast('rzSliderForceRender');
+			$scope.$broadcast('rzSliderForceRender');
 		});	
 	}
 	
+	//type-ahead options list function for target entity selection
 	this.matchTargets = function(name){
 		self.loading = true;
-		return masterDataSvc.findByName(name)
+		return masterDataSvc.findByName(name, 'properties')
 		.then(function(targets){
 			if(!targets || targets.length===0)
 				self.noResults = true;
 			else
 				self.noResults = false;
-			return targets;
+			return targets.map(function(entity){
+						return RelationsEditor.relatedEntitySubset(entity);
+					});
 		})
 		.catch(function(err){
 			$log.error(err);
@@ -100,41 +266,36 @@ angular.module('businessObjects')
 		});
 	};
 	
-	this.formatTarget = function(){
-/*		var nameSegments = self.relation.name.split('-');
-		if(self.relation.target){
-			nameSegments[1] = self.relation.target.label;	
-		} else {
-			nameSegments[1] = "[No target selected yet]";
-		}
-		self.relation.name = nameSegments.join('-');*/
-		//TODO: implement in case we need some special formatting
-		return (self.relation.target && self.relation.target.label) || '';
+	this.onSourceKeyChange = function(sourceKeyProperty){
+		this.relation.srcKey = sourceKeyProperty.name;
+		//TODO: check if the type of the target key (if any) is still compatible and raise a warning if not
 	};
 
-	this.changeTarget = function($item, $model, $label){
-		if(self.relation.target){
-			self.relation.target = masterDataSvc.getLoadedData()
-									.filter(function(entity){
-										return entity.name === this.relation.target.name;
-									}.bind(this)).
-									map(function(entity){
-										return {
-											"id": entity.id,
-											"name": entity.name,
-											"label": entity.label,
-											"properties": entity.properties
-										}
-									})[0];
-			self.targetKeyOptions.options = self.relation.target.properties
-												.filter(function(prop){
-													return prop.type === self.sourceKeyOptions.selection.type && prop.pk === false;
-												});
-			if(self.relation.targetEntityFkName){
-				//TODO: mark for update of the target entity join property
-			} else {
-				self.relation.targetEntityFkName = self.relation.srcEntityName+"_"+self.relation.name;
+	//target entity selection handler
+	this.changeTarget = function($item, $model){
+		if(this.relation.target){
+			this.relation.targetEntityName = $item.name;
+			this.targetKeyOptions.options = RelationsEditor.getTargetKeyOptions(this.relation);
+			if(this.relation.targetEntityKeyProperty){
+				this.targetKeyOptions.options.push(this.relation.targetEntityKeyProperty);
+				this.targetKeyFilterText = this.relation.targetEntityKeyProperty.column;
+				this.relation.targetEntityKeyProperty.entityName = this.relation.target.name;
 			}
+		}
+	};
+	
+	this.onTargetKeySelect = function($item, $model){
+		this.targetKeyFilterText = $item;
+		if(this.relation.target){
+			this.relation.targetEntityKeyProperty = this.relation.targetEntityKeyProperty || RelationsEditor.getTargetEntityKeyProperty(this.relation);
+			this.relation.targetEntityFkName = this.relation.targetEntityKeyProperty.name;
+		}
+	};
+	
+	this.onTargetKeyChange = function(){
+		if(this.relation.targetEntityKeyProperty){
+			this.relation.targetEntityKeyProperty.column = this.targetKeyFilterText;
+			this.relation.targetEntityKeyProperty.action = 'update';
 		}
 	};
     
@@ -147,70 +308,9 @@ angular.module('businessObjects')
     		$event.stopPropagation();
     		return;
     	}
-		sliderValueToRelation.apply(self, [self.slider.value, self.relation]);
-		if(this.relation.target){
-  			this.relation.targetEntityName = this.relation.target.name;
-  		}
-  		var joinProperty = this.relation.target.properties
-  							.filter(function(prop){
-  								return prop.name === this.relation.targetEntityFkName;
-  							}.bind(this))[0];
-		if(isNewProperty){
-			this.relation.action = 'save';
-			selectedEntity['outbound-relations'].push(this.relation); 
-			if(joinProperty===undefined){
-				joinProperty = {
-					"name": this.relation.targetEntityFkName,
-					"label": this.relation.targetEntityFkName,
-					"column": this.relation.targetEntityFkName,
-					"typeLabel": this.sourceKeyOptions.selection.typeLabel,
-					"type": this.sourceKeyOptions.selection.type,
-					"size": this.sourceKeyOptions.selection.size,
-					"required": true,
-					"fkInRelationName": this.relation.name,
-					"entityName": this.relation.target.name,
-					"action": "save"
-				};
-				this.relation.target.properties.push(joinProperty);
-			}
-		} else {
-			if(this.relation.action!=='save')
-				this.relation.action = 'update';
-			selectedEntity['outbound-relations'] = selectedEntity['outbound-relations']
-													.map(function(rel){
-														if(rel.id === self.relation.id){
-															return self.relation;
-														}
-														return rel;
-													});
-			if(joinProperty && joinProperty.id!==undefined)
-				joinProperty.action = "update";
-		}
+  		RelationsEditor.upsert(this.relation, selectedEntity);
 		$scope.$close(selectedEntity);
     };
-    
-    function sliderValueToRelation(sliderValue, relation){
-    	if(sliderValue === MULTIPLICITY_TYPES.ONE_TO_ONE){
-      		relation.srcMultiplicity = MULTIPLICITY_OPTS.ONE;
-      		relation.targetMultiplicity = MULTIPLICITY_OPTS.ONE;
-  		} else if(sliderValue === MULTIPLICITY_TYPES.ONE_TO_MANY){
-  			relation.srcMultiplicity = MULTIPLICITY_OPTS.ONE;
-      		relation.targetMultiplicity = MULTIPLICITY_OPTS.MANY;
-  		} else if(sliderValue === MULTIPLICITY_TYPES.MANY_TO_MANY){
-  			relation.srcMultiplicity = MULTIPLICITY_OPTS.MANY;
-      		relation.targetMultiplicity = MULTIPLICITY_OPTS.MANY;
-  		}
-    }
-    
-    function relationToSlider(relation, slider){
-		if(relation.srcMultiplicity === MULTIPLICITY_OPTS.ONE && relation.targetMultiplicity === MULTIPLICITY_OPTS.ONE){
-      		slider.value = MULTIPLICITY_TYPES.ONE_TO_ONE;
-  		} else if(relation.srcMultiplicity === MULTIPLICITY_OPTS.ONE && relation.targetMultiplicity === MULTIPLICITY_OPTS.MANY){
-  		 	slider.value = MULTIPLICITY_TYPES.ONE_TO_MANY;
-  		} else if(relation.srcMultiplicity === MULTIPLICITY_OPTS.MANY && relation.targetMultiplicity === MULTIPLICITY_OPTS.MANY){
-  			slider.value = MULTIPLICITY_TYPES.MANY_TO_MANY;
-  		}
-    }    
     
     init.apply(this);
     

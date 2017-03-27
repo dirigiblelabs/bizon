@@ -2,40 +2,15 @@
 "use strict";
 
 angular.module('businessObjects')
-.controller('EditCtrl', ['Settings', 'masterDataSvc', 'modalService', 'Notifications', 'selectedEntity', '$log', '$state', '$stateParams', function(Settings, masterDataSvc, modalService, Notifications, selectedEntity, $log, $state, $stateParams) {
+.controller('EditCtrl', ['Settings', 'masterDataSvc', 'modalService', 'Notifications', 'selectedEntity', '$log', '$state', '$stateParams', 'Relations', function(Settings, masterDataSvc, modalService, Notifications, selectedEntity, $log, $state, $stateParams, Relations) {
 
 	this.app = Settings;
 	this.entityForEdit = $stateParams.entityForEdit || JSON.parse(JSON.stringify(selectedEntity));
 
 	this.entityForEdit['outbound-relations'] = this.entityForEdit['outbound-relations']
 												.map(function(rel){
-													if(rel.source===undefined){
-														rel.source = {
-															id: this.entityForEdit.id,
-															label: this.entityForEdit.label,
-															name: this.entityForEdit.name,
-															properties: this.entityForEdit.properties
-														};
-													}
-													if(!rel.target || !rel.target.properties){
-														rel.target = this.entityForEdit['outbound-entities']
-																		.filter(function(entity){
-																			return entity.name === rel.targetEntityName;
-																		})
-																		.map(function(entity){
-																			var target = {
-																				id: entity.id,
-																				name: entity.name,
-																				label: entity.label
-																			};
-																			if(target.properties === undefined){
-																				masterDataSvc.getByName(target.name, true)
-																				.then(function(_target){
-																					target.properties = _target.properties;
-																				});																		
-																			}
-																			return target;
-																		})[0];
+													if(rel.action!=='save'){
+														rel = Relations.decorateRelation(rel, this.entityForEdit);
 													}
 													return rel;
 												}.bind(this));

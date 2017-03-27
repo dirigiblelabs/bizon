@@ -32,8 +32,6 @@
 </style>
 </head>
 <body>
-<div ng-include="'header.html'"></div>
-
 	<div id="wrap" ng-controller="ManageController">
 		<div class="row">
 			<div class="col-lg-12">
@@ -148,7 +146,7 @@
 		angular.module('page', ['ngAnimate', 'ui.bootstrap']);
 		angular.module('page').controller('ManageController', function ($scope, $http) {
 			
-			var url = '../../js/bizon/svc/v1/relation.js';
+			var url = '../../js/bizon/svc/v1/relations.js';
 
 			$http.get(url)
 				.success(function(data){
@@ -251,7 +249,7 @@
                     $scope.errorMessage = null;
 				})
 				.error(function(response){
-					$scope.errorMessage = response.err.message;
+					$scope.errorMessage = (response.err && response.err.message) || response;
 				});
 			}
 			
@@ -264,7 +262,7 @@
 	                    $scope.errorMessage = null;
 					})
 					.error(function(response){
-						$scope.errorMessage = response.err.message;
+						$scope.errorMessage = (response.err && response.err.message) || response;
 					});
 			}
 
@@ -279,7 +277,7 @@
 					$scope.errorMessage = null;
 				})
 				.error(function(response){
-					$scope.errorMessage = response.err.message;
+					$scope.errorMessage = (response.err && response.err.message) || response;
 				});
 			}
                     
@@ -292,7 +290,7 @@
                     $scope.errorMessage = null;
 				})
 				.error(function(response){
-					$scope.errorMessage = response.err.message;
+					$scope.errorMessage = (response.err && response.err.message) || response;
 				});
 			}
 			
@@ -360,7 +358,5 @@
 		});
 	  });
 	</script>
-	
-<div ng-include="'footer.html'"></div>
 </body>
 </html>
