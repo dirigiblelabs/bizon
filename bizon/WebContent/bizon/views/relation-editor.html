@@ -45,7 +45,7 @@
 		      <span name="source" class="form-control" ng-bind="relEditorVm.relation.source.label" no-validate></span>
 		    </div>
 		  </div>
-		  <div class="form-group" ng-if="relEditorVm.app['expert-mode']">
+		  <div class="form-group" ng-if="relEditorVm.app['expert-mode'] && relEditorVm.slider.value<3">
 	  		<label for="sourceKey" class="col-sm-4 control-label" required="true">Source Table Key</label>
 		    <div class="col-sm-7">
 		    	<select name="sourceKey" class="form-control" required="true"
@@ -53,6 +53,20 @@
 		    			ng-model="relEditorVm.sourceKeyOptions.selection" 
 		    			ng-options="item as item.label for item in relEditorVm.sourceKeyOptions.options track by item.name">
 			    </select>
+		    </div>
+		  </div>
+		  <div class="form-group" ng-if="relEditorVm.app['expert-mode'] && relEditorVm.slider.value===3">
+	  		<label for="sourceKey" class="col-sm-4 control-label" required="true">Source Table Key</label>
+		    <div class="col-sm-7">
+				<input id="sourceKey" type="text" placeholder="Type to select source entity join key" class="form-control" required="true" pattern="[a-zA-Z0-9_]{1,100}" data-rule-alphanumeric="^\w+$" 
+					 ng-model="relEditorVm.sourceKeyFilterText"
+					 ng-model-options="{debounce: 500, blur: 250}"
+					 typeahead-show-hint = "true"
+					 typeahead-select-on-exact = "true"
+					 typeahead-focus-first = "false"
+					 typeahead-on-select = "relEditorVm.onSourceKeyChange($item)"
+					 ng-change="relEditorVm.relEditorVm.onSourceKeyChange($item)"
+					 uib-typeahead="item as item.label for item in relEditorVm.sourceKeyOptions.options">
 		    </div>
 		  </div>
 		  <div class="form-group">
@@ -66,17 +80,17 @@
 					 typeahead-show-hint = "true"
 					 typeahead-on-select = "relEditorVm.changeTarget($item, $model, $label)"
 					 uib-typeahead="target as target.label for target in relEditorVm.matchTargets($viewValue)">
-			    <i ng-show="relEditorVm.loading" class="glyphicon glyphicon-refresh"></i>
+			    <!--<i ng-show="relEditorVm.loading" class="glyphicon glyphicon-refresh"></i>
 			    <div ng-show="relEditorVm.noResults">
 			      <i class="glyphicon glyphicon-remove" ng-click="relEditorVm.noResults=false"></i> No Results Found
-			    </div>
+			    </div>-->
 		    </div>
 		  </div>
 		  
 		  <div class="form-group" ng-if="relEditorVm.app['expert-mode']">
 	  		<label for="targetKey" class="col-sm-4 control-label" required="true">Target Table Key</label>
 		    <div class="col-sm-7">
-		    	<input id="targetKey" type="text" placeholder="Type to select target object" class="form-control" required="true" pattern="[a-zA-Z0-9_]{1,100}" data-rule-noneof="{{relEditorVm.getTargetPropertiesColumnNames()}}" data-rule-alphanumeric="^\w+$" 
+		    	<input id="targetKey" type="text" placeholder="Type to select target object" class="form-control" required="true" pattern="[a-zA-Z0-9_]{1,100}" data-rule-noneof="{{relEditorVm.slider.value<3?relEditorVm.getTargetPropertiesColumnNames():[]}}" data-rule-alphanumeric="^\w+$" 
 					 ng-model="relEditorVm.targetKeyFilterText"
 					 ng-model-options="{debounce: 500, blur: 250}"
 					 typeahead-show-hint = "true"

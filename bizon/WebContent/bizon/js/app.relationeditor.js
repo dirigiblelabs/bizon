@@ -20,8 +20,8 @@ angular.module('businessObjects')
 	    ceil: 3,
 	    stepsArray: [
 	      {value: RelationsEditor.MULTIPLICITY_TYPES.ONE_TO_ONE, legend: 'One-to-One'},
-	      {value: RelationsEditor.MULTIPLICITY_TYPES.ONE_TO_MANY, legend: 'One-To-Many'},
-	      {value: RelationsEditor.MULTIPLICITY_TYPES.MANY_TO_MANY, legend: 'Many-to-Many'}
+	      {value: RelationsEditor.MULTIPLICITY_TYPES.ONE_TO_MANY, legend: 'One-To-Many'}/*,
+	      {value: RelationsEditor.MULTIPLICITY_TYPES.MANY_TO_MANY, legend: 'Many-to-Many'}*/
 	    ],
 	    onEnd: function(){
 	    	RelationsEditor.setRelationMultiplicity(this.slider.value, this.relation);

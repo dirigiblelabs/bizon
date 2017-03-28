@@ -388,6 +388,18 @@
 	        		}
 	        		return $promise;
 		    	}));
+		    	//update join entities, if any
+		    	/*for(var i=0; i< rels.length; i++){
+		    		var joinEntity = rels[i].joinEntity;
+					var action = rels[i].action;
+					var $promise;
+					if(action === 'remove') {
+			        	$promise = Entity.remove({boId: joinEntity.id}).$promise;
+		        	} else {
+	        			$promise = Entity[action]({boId: joinEntity.id}, joinEntity).$promise;
+	        		}
+			    	promises = promises.concat($promise);
+		    	}	*/	    	
 		    	//update join properties in relations targets, if any
 		    	for(var i=0; i< rels.length; i++){
 		    		var targetEntity = rels[i].target;

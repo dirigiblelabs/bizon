@@ -203,8 +203,18 @@ angular.module('businessObjects')
 	};
 
 	var formatJoinEntityTargetPropertyName = function(relation){
-		if(relation.target && relation.target.table)
-			relation.joinEntityTargetPropertyName = relation.target.table + '_' + (relation.targetPropertyName?relation.targetPropertyName:'');
+		if(relation.target && relation.target.table){
+			var suffix='';
+			if(relation.targetPropertyName){
+				var targetProp = relation.target.properties
+									.find(function(prop){
+										return prop.name === relation.targetPropertyName;
+									});
+				if(targetProp)
+					suffix = targetProp.label;
+			}
+			relation.joinEntityTargetPropertyName = relation.target.table + '_' + suffix;
+		}
 		return relation;
 	};
 
@@ -341,6 +351,37 @@ angular.module('businessObjects')
 			sourceEntity['outbound-relations'].push(relation); 
 			targetJoinProperty = relation.targetEntityKeyProperty;
 			relation.target.properties.push(targetJoinProperty);
+			if(relation.joinEntityName){
+				relation.joinEntity = {
+					"name": relation.joinEntityName,
+					"label": relation.label,
+					"managingRelationName": relation.name,
+					"action": "save",
+					"properties": [{
+						"name": Utils.randomAlphanumeric(),
+						"label": SQLEntity.formatFieldName(relation.joinEntitySrcPropertyName),
+						"column": SQLEntity.formatFieldName(relation.joinEntitySrcPropertyName),
+						"typeLabel": relation.srcEntityKeyProperty.typeLabel,
+						"type": relation.srcEntityKeyProperty.type,
+						"size": relation.srcEntityKeyProperty.size,
+						"required": true,
+						"managingRelationName": relation.name,
+						"entityName": relation.joinEntityName,
+						"action": "save"
+					},{
+						"name": Utils.randomAlphanumeric(),
+						"label": SQLEntity.formatFieldName(relation.joinEntityTargetPropertyName),
+						"column": SQLEntity.formatFieldName(relation.joinEntityTargetPropertyName),
+						"typeLabel": relation.targetEntityKeyProperty.typeLabel,
+						"type": relation.targetEntityKeyProperty.type,
+						"size": relation.targetEntityKeyProperty.size,
+						"required": true,
+						"managingRelationName": relation.name,
+						"entityName": relation.joinEntityName,
+						"action": "save"
+					}]
+				};
+			}
 		} else {
 			if(relation.action!=='save')
 				relation.action = 'update';
