@@ -25,6 +25,28 @@ angular.module('businessObjects')
 				.filter(function(prop){
 					return prop.isPrimaryKey;
 				})[0];
+				
+	var decorateProperty = function(prop){
+		if(prop.managingRelationName && !prop.managingRelation){
+			var rel = this.entityForEdit['inbound-relations']
+						.find(function(inboundRel){
+							return inboundRel.name === prop.managingRelationName; 
+						});
+			if(rel){
+				prop.managingRelation = {};
+				prop.managingRelation.name = rel.label;
+				var defEntity = this.selectedEntity['inbound-entities']
+									.find(function(inboundEntity){
+										return inboundEntity.name === rel.srcEntityName; 
+									});
+				if(defEntity){
+					prop.managingRelation.entityId = defEntity.id;
+					prop.managingRelation.entityLabel = defEntity.label;
+				}
+			}
+		}
+		return prop;
+	};				
 	
 	this.showProperties = function(){
 		this.searchText = undefined;	
@@ -35,7 +57,7 @@ angular.module('businessObjects')
 					return true;
 				}
 				return false;
-			}, this);
+			}, this).map(decorateProperty.bind(this));
 		}
 	};
 	

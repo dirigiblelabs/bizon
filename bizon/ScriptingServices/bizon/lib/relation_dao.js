@@ -23,9 +23,9 @@ var listJoins = function(settings, daos){
 		var stmnt = statements.builder()
 						.select()
 						.from(daos.targetDao.orm.dbName)
-						.left_join( daos.joinDao.orm.dbName, undefined, daos.joinDao.orm.getProperty("targetEntityName").dbName+'='+daos.targetDao.orm.getProperty('name').dbName)
+						.left_join(daos.joinDao.orm.dbName, undefined, daos.joinDao.orm.getProperty("srcEntityName").dbName+'='+daos.targetDao.orm.getProperty('name').dbName)
 						.where(daos.joinDao.orm.getProperty(joinKey).dbName+"=?", [daos.joinDao.orm.getProperty(joinKey)]);
-		
+
 		var resultSet = statements.execute(stmnt, connection, settings);
 		var entities = [];
         while (resultSet.next()) {

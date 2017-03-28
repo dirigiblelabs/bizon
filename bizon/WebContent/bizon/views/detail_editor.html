@@ -83,7 +83,7 @@
 				<div class="items-list">
 					<div ng-hide="detailsEditorVm.entityForEdit.properties.length" class="nodata-text">No Properties</div>
 					<div class="list-group" ng-if="detailsEditorVm.propertyItems.length>0">
-					  <a class="list-group-item property-item" ng-repeat="entry in detailsEditorVm.propertyItems|filter:detailsEditorVm.searchText|orderBy:['-isPrimaryKey','-required','name']" ng-if="detailsEditorVm.app['expert-mode'] || (!entry.isPrimaryKey && !entry.managingRelationName)">
+					  <div class="list-group-item property-item" ng-repeat="entry in detailsEditorVm.propertyItems|filter:detailsEditorVm.searchText|orderBy:['-isPrimaryKey','-required','name']" ng-if="detailsEditorVm.app['expert-mode'] || (!entry.isPrimaryKey && !entry.managingRelationName)">
 					  	<div class="prop-{{entry.isPrimaryKey || entry.managingRelationName?'id':(entry.required?'required':'optional')}}">
 							<div class="list-group-item-title">
 								<span ng-class="{emphasized: (entry.required || entry.isPrimaryKey)}">{{entry.label || entry.name}}</span>
@@ -96,22 +96,25 @@
 									Data Type: <span style="color:gray">{{detailsEditorVm.formatType(entry, detailsVm.app['expert-mode'])}}</span>
 								</div>
 								<div ng-if="detailsEditorVm.app['expert-mode']">
-									<div>Default: <span style="color:gray">{{entry.defaultValue}}</span></div>
 									<div>Column: <span style="color:gray">{{entry.column}}</span></div>
+									<div>Default: <span style="color:gray">{{entry.defaultValue}}</span></div>									
 									<div>Order: <span style="color:gray">{{entry.order}}</span></div>
+									<div ng-if="entry.managingRelation">
+										Managed by Relationship: <span style="color:gray" ng-bind="entry.managingRelation.name"></span> defined in <span ng-bind="entry.managingRelation.entityLabel"></span> entity
+									</div>
 								</div>
 							</div>
-							<!--Data Type: <span style="color: gray; font-style: italic">{{detailsEditorVm.app['expert-mode']===true?entry.type:entry.typeLabel}}<span>-->							
+							<!--Data Type: <span style="color: gray; font-style: italic">{{detailsEditorVm.app['expert-mode']===true?entry.type:entry.typeLabel}}<span>-->
 						</div>
 						<div class="btn-group" style="align-self: center;">
 		   					<button class="btn btn-primary" ui-sref="list.entity.edit.items({item: entry, entityForEdit:detailsEditorVm.entityForEdit})">
 							  <i class="fa fa-pencil" aria-hidden="true"></i>
 							</button>
-							<button ng-disabled="entry.isPrimaryKey" class="btn btn-danger" ng-click="detailsEditorVm.deleteProperty(entry)">
+							<button ng-disabled="entry.isPrimaryKey || entry.managingRelationName" class="btn btn-danger" ng-click="detailsEditorVm.deleteProperty(entry)">
 							  <i class="glyphicon glyphicon-remove" aria-hidden="true"></i>
 							</button>
 						</div>						
-					  </a>
+					  </div>
 					</div>
 				</div>
 				

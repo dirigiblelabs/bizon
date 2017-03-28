@@ -3,6 +3,7 @@
 
 angular.module('businessObjects')
 .service('Relations', ['masterDataSvc', 'Entity', '$q', function(MasterDataService, Entity, $q){
+
 	var relatedEntitySubset = function(entity){
 		return {
 			"id": entity["id"],
@@ -11,13 +12,15 @@ angular.module('businessObjects')
 			"table": entity["table"],
 			"properties": entity["properties"]
 		};
-	};				
+	};
+	
 	var getSourceEntityKeyProperty = function(relation){
 		return relation.source.properties
 				.find(function(prop){
 					return relation.srcPropertyName === prop.name;
 				}.bind(this));
 	};
+	
 	var getRelationTargetEntity = function(relation){
 		var targetEntity;
 		if(relation.targetEntityName){
@@ -64,6 +67,7 @@ angular.module('businessObjects')
 				return targetEntity;
 			}.bind(this));
 	};
+	
 	var getRelationSourceEntity = function(relation){
 		var sourceEntity;
 		if(relation.srcEntityName){
@@ -101,6 +105,7 @@ angular.module('businessObjects')
 		}
 		return sourceEntity;
 	};
+	
 	var setRelationSourceEntity = function(relation, sourceEntity){
 		relation.source = sourceEntity?relatedEntitySubset(sourceEntity):undefined || getRelationSourceEntity(relation);
 		if(!relation.srcEntityKeyProperty){
@@ -114,11 +119,13 @@ angular.module('businessObjects')
 			}
 		}
 	};
+	
 	var getTargetEntityKeyProperty = function(relation){
 		return relation.target.properties.find(function(prop){
 					return relation.targetPropertyName === prop.name;
 				}.bind(this));
 	};
+	
 	var getJoinEntity = function(relation){
 		var entityPromise;
 		if(relation.joinEntity){
@@ -131,6 +138,7 @@ angular.module('businessObjects')
 		}
 		return entityPromise;
 	};
+	
 	var getJoinEntitySourceKeyProperty = function(relation){
 		return getJoinEntity(relation)
 				.then(function(joinEntity){
@@ -140,6 +148,7 @@ angular.module('businessObjects')
 							}.bind(this));
 				}.bind(this));
 	};
+	
 	var getJoinEntityTargetKeyProperty = function(relation){
 		return getJoinEntity(relation)
 				.then(function(joinEntity){
@@ -171,42 +180,29 @@ angular.module('businessObjects')
 	};
 }])
 .service('RelationsEditor', ['Relations', 'SQLEntity', 'masterDataSvc', 'Utils', function(Relations, SQLEntity, MasterDataSvc, Utils){
+
 	var tableNameFromLabel = function(entity){
 		return SQLEntity.formatTableName(entity.label);
 	};
-	var generateTargetEntityKeyColumn = function(relation){
+
+	var formatTargetEntityKeyColumn = function(relation){
 		return relation.source.table + '_' + relation.srcEntityKeyProperty.column;
 	};
-	var newTargetKeyProperty = function(relation){
-		var column = generateTargetEntityKeyColumn(relation);
-		var targetJoinProperty = {
-			"name": Utils.randomAlphanumeric(),
-			"label": SQLEntity.formatFieldName(column),
-			"column": SQLEntity.formatFieldName(column),
-			"typeLabel": relation.srcEntityKeyProperty.typeLabel,
-			"type": relation.srcEntityKeyProperty.type,
-			"size": relation.srcEntityKeyProperty.size,
-			"required": true,
-			"managingRelationName": relation.name,
-			"entityName": relation.target?relation.target.name:undefined,
-			"action": "save"
-		};
-		relation.targetPropertyName = targetJoinProperty.name;
-		relation.targetEntityKeyProperty = targetJoinProperty;
-		return targetJoinProperty;
-	};
-	var generateJoinEntityName = function(relation){
+
+	var formatJoinEntityName = function(relation){
 		relation.joinEntityName = relation.source.table;
 		if(relation.target && relation.target.table){
       		relation.joinEntityName += '_' + relation.target.table;
   		}
   		return relation;
 	};
-	var generateJoinEntitySrcPropertyName = function(relation){	
+
+	var formatJoinEntitySrcPropertyName = function(relation){	
 		relation.joinEntitySrcPropertyName = relation.source.table + '_' + relation.srcEntityKeyProperty.column;
 		return relation;
 	};
-	var generateJoinEntityTargetPropertyName = function(relation){
+
+	var formatJoinEntityTargetPropertyName = function(relation){
 		if(relation.target && relation.target.table)
 			relation.joinEntityTargetPropertyName = relation.target.table + '_' + (relation.targetPropertyName?relation.targetPropertyName:'');
 		return relation;
@@ -243,13 +239,13 @@ angular.module('businessObjects')
 	    	if(relation.target && !relation.target.table)
 	    		relation.target.table = tableNameFromLabel(relation.target);
 	  		if(!relation.joinEntityName){
-	      		generateJoinEntityName(relation);
+	      		formatJoinEntityName(relation);
 	  		}
 	  		if(!relation.joinEntitySrcPropertyName){
-	      		generateJoinEntitySrcPropertyName(relation);
+	      		formatJoinEntitySrcPropertyName(relation);
 	  		}
 	  		if(!relation.joinEntityTargetPropertyName){
-	      		generateJoinEntityTargetPropertyName(relation);
+	      		formatJoinEntityTargetPropertyName(relation);
 	  		}      		
   		}
     };
@@ -258,8 +254,27 @@ angular.module('businessObjects')
 		//No need to handle for now
 	};
 	
+	var newTargetKeyProperty = function(relation){
+		var column = formatTargetEntityKeyColumn(relation);
+		var targetJoinProperty = {
+			"name": Utils.randomAlphanumeric(),
+			"label": SQLEntity.formatFieldName(column),
+			"column": SQLEntity.formatFieldName(column),
+			"typeLabel": relation.srcEntityKeyProperty.typeLabel,
+			"type": relation.srcEntityKeyProperty.type,
+			"size": relation.srcEntityKeyProperty.size,
+			"required": true,
+			"managingRelationName": relation.name,
+			"entityName": relation.target?relation.target.name:undefined,
+			"action": "save"
+		};
+		relation.targetPropertyName = targetJoinProperty.name;
+		relation.targetEntityKeyProperty = targetJoinProperty;
+		return targetJoinProperty;
+	};
+	
 	var newRelation = function(sourceEntity){
-		var rel= {
+		var relation = {
 			srcEntityName: sourceEntity.name,
 			srcEntityLabel: sourceEntity.label,
 			srcMultiplicity: MULTIPLICITY_OPTS.ONE,
@@ -267,14 +282,15 @@ angular.module('businessObjects')
 			label: sourceEntity.label +' to',
 			source: Relations.relatedEntitySubset(sourceEntity),
 		};
-		rel.srcEntityKeyProperty = sourceEntity.properties
-							 .filter(function(prop){
-								return prop.isPrimaryKey === true; 
-							  })[0];
-		rel.srcPropertyName = rel.srcEntityKeyProperty.name;
-		newTargetKeyProperty(rel);
-		return rel;
+		relation.srcEntityKeyProperty = sourceEntity.properties
+										 .filter(function(prop){
+											return prop.isPrimaryKey === true; 
+										  })[0];
+		relation.srcPropertyName = relation.srcEntityKeyProperty.name;
+		newTargetKeyProperty(relation);
+		return relation;
 	};
+
 	var setRelationTarget = function(relation){
 		if(relation.targetEntityName) {
 			if(!relation.target || (relation.target && relation.target.name!==relation.targetEntityName)){
@@ -292,6 +308,7 @@ angular.module('businessObjects')
 			delete relation.joinEntityTargetPropertyName;
 		}
 	};
+
 	var initRelation = function(relation, sourceEntity){
 		if(relation === undefined) {
 			relation = newRelation(sourceEntity);
@@ -301,12 +318,22 @@ angular.module('businessObjects')
 		}
 		return relation;
 	};
+
+	/** Returns the subset of existing target entity properties that are eligible for foreign key according to criteria: 
+	 *  - not target entity pk
+	 *  - same data type as source key data type 
+	 *  - not managed by another relation already
+	 **/
 	var getTargetKeyOptions = function(relation){
-		return relation.target.properties
-				.filter(function(prop){
-					return prop.type === relation.srcEntityKeyProperty.type && prop.isPrimaryKey === false;//TODO: filter also those that are already assigned ot anothe relation
-				}.bind(this));
+		if(relation.target){
+			return relation.target.properties
+					.filter(function(prop){
+						return prop.type === relation.srcEntityKeyProperty.type && prop.isPrimaryKey === false && (prop.managingRelationName===relation.name || !prop.managingRelationName);
+					}.bind(this));
+		}
+		return [];
 	};
+
 	var upsertRelation = function(relation, sourceEntity){
 		var targetJoinProperty;
 		if(relation.id === undefined){

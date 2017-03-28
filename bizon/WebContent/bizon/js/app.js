@@ -321,6 +321,15 @@ angular.module('businessObjects', ['ngAnimate', 'ngResource', 'ui.router', 'ui.b
 				return this.optional( element ) || new RegExp(regex, 'gi').test(value);
 			}, "Valid input consits of letters, numbers, and underscores only");
 			
+			var getAttrValue = function(element, attr){
+				return angular.fromJson(angular.element.attr(element,attr));
+			}.bind(this);
+			
+			angular.element.validator.addMethod( "noneof", function( value, element, values) {
+				var vals = getAttrValue(element, 'data-rule-noneof');
+				return this.optional( element ) || !vals.length || !vals.includes(value);
+			}, "Already exists. Choose another value.");
+			
             return {
                 restrict: 'A',
                 link: function(scope, formElement, attrs) {

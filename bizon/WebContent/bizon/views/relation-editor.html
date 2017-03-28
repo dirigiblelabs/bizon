@@ -34,7 +34,7 @@
 	
 		<form class="form-horizontal" form-validation>
 		  <div class="form-group">
-		    <label for="name" class="col-sm-4 control-label" required="true" readonly>Name</label>
+		    <label for="name" class="col-sm-4 control-label" required="true" readonly>Title</label>
 		    <div class="col-sm-7">
 		      <input name="name" id="name" class="form-control" placeholder="Type Relationship Name" ng-model="relEditorVm.relation.label" minlength="1" required="true">
 		    </div>
@@ -59,7 +59,7 @@
 		    <label for="item_target_name" class="col-sm-4 control-label" required="true">Target Object</label>
 		    <div class="col-sm-7">
 				<input id="item_target_name" type="text" placeholder="Type to select target object" class="form-control" required="true"
-					 ng-model="relEditorVm.relation.target" 
+					 ng-model="relEditorVm.targetFilterText" 
 					 ng-model-options="{ debounce: 500, blur: 250 }"
 					 typeahead-loading="relEditorVm.loading" 
 					 typeahead-no-results="relEditorVm.noResults"
@@ -76,10 +76,12 @@
 		  <div class="form-group" ng-if="relEditorVm.app['expert-mode']">
 	  		<label for="targetKey" class="col-sm-4 control-label" required="true">Target Table Key</label>
 		    <div class="col-sm-7">
-		    	<input id="targetKey" type="text" placeholder="Type to select target object" class="form-control" required="true" pattern="[a-zA-Z0-9_]{1,100}" data-rule-alphanumeric="^\w+$"
+		    	<input id="targetKey" type="text" placeholder="Type to select target object" class="form-control" required="true" pattern="[a-zA-Z0-9_]{1,100}" data-rule-noneof="{{relEditorVm.getTargetPropertiesColumnNames()}}" data-rule-alphanumeric="^\w+$" 
 					 ng-model="relEditorVm.targetKeyFilterText"
 					 ng-model-options="{debounce: 500, blur: 250}"
 					 typeahead-show-hint = "true"
+					 typeahead-select-on-exact = "true"
+					 typeahead-focus-first = "false"
 					 typeahead-on-select = "relEditorVm.onTargetKeySelect($item, $model)"
 					 ng-change="relEditorVm.onTargetKeyChange()"
 					 uib-typeahead="property as property.column for property in relEditorVm.targetKeyOptions.options">

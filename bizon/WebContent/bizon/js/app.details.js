@@ -11,9 +11,31 @@ angular.module('businessObjects')
 	this.isPrimaryKey = this.selectedEntity.properties.filter(function(prop){
 			return prop.isPrimaryKey;
 		})[0];
+		
+	var decorateProperty = function(prop){
+		if(prop.managingRelationName && !prop.managingRelation){
+			var rel = this.selectedEntity['inbound-relations']
+						.find(function(inboundRel){
+							return inboundRel.name === prop.managingRelationName; 
+						});
+			if(rel){
+				prop.managingRelation = {};
+				prop.managingRelation.name = rel.label;
+				var defEntity = this.selectedEntity['inbound-entities']
+									.find(function(inboundEntity){
+										return inboundEntity.name === rel.srcEntityName; 
+									});
+				if(defEntity){
+					prop.managingRelation.entityId = defEntity.id;
+					prop.managingRelation.entityLabel = defEntity.label;
+				}
+			}
+		}
+		return prop;
+	};
 	
 	this.showProperties = function(){
-		this.propertyItems = this.selectedEntity.properties;
+		this.propertyItems = this.selectedEntity.properties.map(decorateProperty.bind(this));
 	};
 	
 	function showDetails(item){

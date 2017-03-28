@@ -49,8 +49,9 @@ angular.module('businessObjects')
 	function init(){
 		this.relation = RelationsEditor.initRelation(relation, selectedEntity);
 		if(this.relation.target){
+			this.targetFilterText = this.relation.target.label;
 			this.slider.value = RelationsEditor.getRelationMultiplicity(relation);
-			this.targetKeyOptions = RelationsEditor.getTargetKeyOptions(relation);
+			this.targetKeyOptions.options = RelationsEditor.getTargetKeyOptions(relation);
 		}
 		this.targetKeyFilterText = (this.relation.targetEntityKeyProperty && this.relation.targetEntityKeyProperty.column) || RelationsEditor.getTargetEntityKeyProperty(this.relation).column;		
 		this.sourceKeyOptions.selection = this.relation.srcEntityKeyProperty;
@@ -80,6 +81,20 @@ angular.module('businessObjects')
 		});
 	};
 	
+	this.getTargetPropertiesColumnNames = function(){
+		var props = [];
+		if(this.relation.target){
+			props = this.relation.target.properties
+					.filter(function(prop){
+						return this.relation.name !== prop.managingRelationName;
+					}.bind(this))
+					.map(function(prop){
+						return prop.column;
+					});
+		}
+		return props;
+	};
+	
 	this.onSourceKeyChange = function(sourceKeyProperty){
 		this.relation.srcPropertyName = sourceKeyProperty.name;
 		//TODO: check if the type of the target key (if any) is still compatible and raise a warning if not
@@ -87,14 +102,13 @@ angular.module('businessObjects')
 
 	//target entity selection handler
 	this.changeTarget = function($item, $model){
-		if(this.relation.target){
-			this.relation.targetEntityName = $item.name;
-			this.targetKeyOptions.options = RelationsEditor.getTargetKeyOptions(this.relation);
-			if(this.relation.targetEntityKeyProperty){
-				this.targetKeyOptions.options.push(this.relation.targetEntityKeyProperty);
-				this.targetKeyFilterText = this.relation.targetEntityKeyProperty.column;
-				this.relation.targetEntityKeyProperty.entityName = this.relation.target.name;
-			}
+		this.relation.target = $item;
+		this.relation.targetEntityName = $item.name;
+		this.targetKeyOptions.options = RelationsEditor.getTargetKeyOptions(this.relation);
+		if(this.relation.targetEntityKeyProperty){
+			this.targetKeyOptions.options.push(this.relation.targetEntityKeyProperty);
+			this.targetKeyFilterText = this.relation.targetEntityKeyProperty.column;
+			this.relation.targetEntityKeyProperty.entityName = this.relation.target.name;
 		}
 	};
 	
