@@ -125,7 +125,7 @@ angular.module('businessObjects')
 			for (var j in entities[i].properties) {
 				var nextColumn = entities[i].properties[j];
 				dataStructure.columns.push({
-					'name': nextColumn.name.toUpperCase(),
+					'name': nextColumn.column.toUpperCase(),
 		            'type': nextColumn.type.toUpperCase(),
 		            'length': nextColumn.size===undefined ? 0 : nextColumn.size,
 		            'notNull': nextColumn.required,
@@ -173,7 +173,7 @@ angular.module('businessObjects')
 				}
 				return 0;
 			});
-			for (var j in entities[i]['inbound-entities']) {
+/*			for (var j in entities[i]['inbound-entities']) {
 				if(!scriptingService.associations)
 					scriptingService.associations = []
 				var relatedEntity = entities[i]['inbound-entities'][j];
@@ -196,16 +196,16 @@ angular.module('businessObjects')
 					def['key'] = pkName;
 					def['joinKey'] = relatedEntity.id;
 				}
-				/*if(relType==='many-to-many'){
+				if(relType==='many-to-many'){
 					def['daoJoin'] = relatedEntity.svcName;
 					if(relatedEntity.daoN){
 						def['daoN'] = relatedEntity.daoN;
 					}
 					def['key'] = entities[i].id;
 					def['joinKey'] = relatedEntity.joinKey;
-				}*/
+				}
 				scriptingService.associations.push(def);
-			}
+			}*/
 			template.scriptingServices.push(scriptingService);
 		}
 	}
