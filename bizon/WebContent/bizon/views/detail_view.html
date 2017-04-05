@@ -108,16 +108,16 @@
 								<span ng-bind="entry.targetMultiplicity==1?'1':'N'"/></span> <span ng-bind="entry.target.table"></span><span>[{{entry.targetEntityKeyProperty.column}}]</span>
 							</div>
 						</div>
-					  </button>
+					  </div>
 					</div>				
 					<div ng-hide="detailsVm.outboundRelations.length>0" class="nodata-text">No Items</div>										
 				</div>	
 				<div class="items-list">
 					<div class="list-group">
-					  <div class="list-group-item" ng-click="$event.stopPropagation();" style="outline: none; cursor: auto; background-color: #f5f5f5">
+					  <div class="list-group-item" style="outline: none; cursor: auto; background-color: #f5f5f5">
 						Inbound relations to <span style="font-style:italic; font-weight: bold">{{detailsVm.selectedEntity.label}}</span> from other entities <i class="fa fa-arrow-left"></i>
 					  </div>										
-					  <div class="list-group-item" ng-repeat="entry in detailsVm.inboundRelations|filter:detailsVm.searchText|orderBy:['name']" ng-click="$event.stopPropagation();" style="outline:none;cursor:auto;">
+					  <div class="list-group-item" ng-repeat="entry in detailsVm.inboundRelations|filter:detailsVm.searchText|orderBy:['name']" style="outline:none;cursor:auto;">
 						<div class="list-group-item-title">
 							<span class="emphasized">{{entry.label}}</span>
 						</div>
@@ -133,7 +133,7 @@
 							-
 							<span ng-bind="entry.targetMultiplicity==1?'1':'N'"/></span> <span ng-bind="entry.target.table"></span><span>[{{entry.targetEntityKeyProperty.column}}]</span>
 						</div>						
-					  </button>
+					  </div>
 					</div>
 					<div ng-hide="detailsVm.inboundRelations.length>0" class="nodata-text">No Items</div>					
 				</div>				
